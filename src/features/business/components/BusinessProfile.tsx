@@ -10,84 +10,98 @@ import {
   Instagram,
   Star,
   Tag,
+  Clock,
 } from "lucide-react";
 
 interface Props {
   businessId: string;
 }
 
+// Días en español para traducir
+const daysES: Record<string, string> = {
+  MONDAY: "Lunes",
+  TUESDAY: "Martes",
+  WEDNESDAY: "Miércoles",
+  THURSDAY: "Jueves",
+  FRIDAY: "Viernes",
+  SATURDAY: "Sábado",
+  SUNDAY: "Domingo",
+};
+
 export default function BusinessProfile({ businessId }: Props) {
   const { data, isLoading, error, isError } = useBusinessProfile(businessId);
 
   if (isLoading)
-    return <p className="text-center text-gray-500">Cargando perfil...</p>;
+    return (
+      <p className="text-center text-gray-500 mt-8">Cargando perfil...</p>
+    );
   if (isError)
     return (
-      <p className="text-center text-red-500">
+      <p className="text-center text-red-500 mt-8">
         Error: {(error as Error).message}
       </p>
     );
   if (!data) return null;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-      <div className="bg-white rounded-2xl shadow p-6 space-y-6">
+    <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
+      {/* Card principal */}
+      <section className="bg-white rounded-3xl shadow-lg p-8 space-y-6">
         {/* Logo y nombre */}
-        <div className="flex items-center items-start gap-6">
+        <div className="flex items-center gap-8">
           {data.logoUrl && (
             <img
               src={data.logoUrl}
               alt={`${data.name} logo`}
-              className="w-28 h-28 rounded-lg object-cover border"
+              className="w-32 h-32 rounded-2xl object-cover border border-gray-200 shadow-sm"
             />
           )}
-          <div className="">
-            <h1 className="text-3xl font-bold text-gray-900">{data.name}</h1>
+          <div>
+            <h1 className="text-4xl font-extrabold text-gray-900">{data.name}</h1>
             {data.shortDescription && (
-              <p className="text-gray-600 mt-1">{data.shortDescription}</p>
+              <p className="text-gray-600 mt-2 text-lg">{data.shortDescription}</p>
             )}
           </div>
         </div>
 
-        {/* Descripción completa */}
+        {/* Descripción */}
         {data.fullDescription && (
-          <div className="text-gray-800 text-sm">
-            <p>{data.fullDescription}</p>
-          </div>
+          <p className="text-gray-700 leading-relaxed">{data.fullDescription}</p>
         )}
 
-        {/* Contacto y ubicación */}
-        <div className="grid sm:grid-cols-2 gap-4 text-gray-700 text-sm">
-          <div className="flex items-start gap-2">
-            <MapPin className="mt-0.5" size={18} />
+        {/* Contacto */}
+        <div className="grid sm:grid-cols-2 gap-6 text-gray-700 text-base">
+          <div className="flex items-center gap-3">
+            <MapPin className="text-blue-600" size={20} />
             <span>{data.address}</span>
           </div>
-          <div className="flex items-start gap-2">
-            <Phone className="mt-0.5" size={18} />
+          <div className="flex items-center gap-3">
+            <Phone className="text-green-600" size={20} />
             <span>{data.phone}</span>
           </div>
-          <div className="flex items-start gap-2">
-            <Phone className="mt-0.5" size={18} />
+          <div className="flex items-center gap-3">
+            <Phone className="text-green-500" size={20} />
             <span>{data.whatsapp}</span>
           </div>
           {data.email && (
-            <div className="flex items-start gap-2">
-              <Mail className="mt-0.5" size={18} />
+            <div className="flex items-center gap-3">
+              <Mail className="text-red-600" size={20} />
               <span>{data.email}</span>
             </div>
           )}
         </div>
 
         {/* Redes sociales */}
-        <div className="flex items-center gap-4 text-gray-700">
+        <div className="flex items-center gap-6 mt-4 text-gray-600">
           {data.websiteUrl && (
             <a
               href={data.websiteUrl}
               target="_blank"
               rel="noopener noreferrer"
-              title="Sitio web"
+              aria-label="Sitio web"
+              className="hover:text-blue-700 transition"
             >
-              <Globe size={20} className="text-blue-600 hover:text-blue-800" />
+              <Globe size={24} />
             </a>
           )}
           {data.facebookUrl && (
@@ -95,12 +109,10 @@ export default function BusinessProfile({ businessId }: Props) {
               href={data.facebookUrl}
               target="_blank"
               rel="noopener noreferrer"
-              title="Facebook"
+              aria-label="Facebook"
+              className="hover:text-blue-800 transition"
             >
-              <Facebook
-                size={20}
-                className="text-blue-700 hover:text-blue-900"
-              />
+              <Facebook size={24} />
             </a>
           )}
           {data.instagramUrl && (
@@ -108,45 +120,73 @@ export default function BusinessProfile({ businessId }: Props) {
               href={data.instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
-              title="Instagram"
+              aria-label="Instagram"
+              className="hover:text-pink-600 transition"
             >
-              <Instagram
-                size={20}
-                className="text-pink-500 hover:text-pink-700"
-              />
+              <Instagram size={24} />
             </a>
           )}
         </div>
 
+        {/* Horarios */}
+        {data.weeklySchedule && Object.keys(data.weeklySchedule).length > 0 && (
+          <section className="mt-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <Clock size={20} /> Horarios de atención
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-gray-700 text-sm">
+              {Object.entries(data.weeklySchedule).map(([day, intervals]) => (
+                <div
+                  key={day}
+                  className="bg-blue-50 rounded-lg p-3 flex flex-col items-start shadow-sm"
+                >
+                  <span className="font-semibold text-blue-700 mb-1">
+                    {daysES[day] ?? day}
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {intervals.map((interval) => (
+                      <span
+                        key={interval}
+                        className="bg-blue-200 text-blue-900 rounded-full px-3 py-1 text-xs font-medium"
+                      >
+                        {interval}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Categorías y Tags */}
         {(data.categories?.length || data.tags?.length) && (
-          <div>
+          <section className="mt-8 space-y-4">
             {data.categories?.length ? (
-              <div className="mb-2">
-                <h3 className="font-semibold text-gray-800 mb-1">
-                  Categorías:
-                </h3>
-                <ul className="flex flex-wrap gap-2">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800 mb-3">
+                  Categorías
+                </h2>
+                <ul className="flex flex-wrap gap-3">
                   {data.categories.map((cat) => (
                     <li
                       key={cat.id}
-                      className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded flex items-center gap-1"
+                      className="bg-blue-100 text-blue-800 text-sm font-semibold px-4 py-1 rounded-full flex items-center gap-2 shadow-sm"
                     >
-                      <Tag size={14} /> {cat.name}
+                      <Tag size={16} /> {cat.name}
                     </li>
                   ))}
                 </ul>
               </div>
             ) : null}
-
             {data.tags?.length ? (
               <div>
-                <h3 className="font-semibold text-gray-800 mb-1">Tags:</h3>
-                <ul className="flex flex-wrap gap-2">
+                <h2 className="text-lg font-semibold text-gray-800 mb-3">Tags</h2>
+                <ul className="flex flex-wrap gap-3">
                   {data.tags.map((tag) => (
                     <li
                       key={tag.id}
-                      className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded"
+                      className="bg-green-100 text-green-800 text-sm font-semibold px-4 py-1 rounded-full shadow-sm"
                     >
                       {tag.name}
                     </li>
@@ -154,56 +194,54 @@ export default function BusinessProfile({ businessId }: Props) {
                 </ul>
               </div>
             ) : null}
-          </div>
+          </section>
         )}
 
-        {/* Galería de imágenes */}
+        {/* Galería */}
         {data.gallery?.length ? (
-          <div>
-            <h3 className="font-semibold text-gray-800 mb-2">Galería</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <section className="mt-8">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Galería</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {data.gallery.map((img) => (
                 <img
                   key={img.id}
                   src={img.url}
                   alt={`${data.name} imagen`}
-                  className="w-full h-32 object-cover rounded-lg"
+                  className="w-full h-28 object-cover rounded-2xl shadow-md hover:scale-105 transition-transform duration-300 cursor-pointer"
+                  loading="lazy"
                 />
               ))}
             </div>
-          </div>
+          </section>
         ) : null}
 
         {/* Calificación */}
         {typeof data.averageRating === "number" && (
-          <div className="pt-4 flex items-center gap-2 text-yellow-600 text-sm font-medium">
-            <Star size={18} />
+          <section className="mt-8 flex items-center gap-3 text-yellow-500 font-semibold text-lg">
+            <Star size={24} />
             <span>{data.averageRating.toFixed(1)} / 5</span>
-            <span className="text-gray-500">
+            <span className="text-gray-500 text-base">
               ({data.ratingsCount ?? 0} reseñas)
             </span>
-          </div>
+          </section>
         )}
 
-        {/* Coordenadas con enlace a Google Maps */}
+        {/* Ubicación */}
         {typeof data.latitude === "number" &&
           typeof data.longitude === "number" && (
-            <div className="pt-4 text-sm text-gray-600">
+            <section className="mt-8 text-gray-600 text-sm">
               <a
                 href={`https://www.google.com/maps/search/?api=1&query=${data.latitude},${data.longitude}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:underline"
+                className="inline-flex items-center gap-2 hover:underline"
               >
-                <MapPin size={18} />
-                <span>
-                  Ver ubicación: {data.latitude.toFixed(4)},{" "}
-                  {data.longitude.toFixed(4)}
-                </span>
+                <MapPin size={20} />
+                Ver ubicación en Google Maps
               </a>
-            </div>
+            </section>
           )}
-      </div>
+      </section>
     </div>
   );
 }
