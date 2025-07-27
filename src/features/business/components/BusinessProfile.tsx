@@ -1,5 +1,7 @@
 "use client";
 
+import { useAuthStore } from "@/features/auth/store/authStore";
+import { follow, unfollow } from "../api/businessApi";
 import { useBusinessProfile } from "../hooks/useBusinessProfile";
 import {
   MapPin,
@@ -12,6 +14,8 @@ import {
   Tag,
   Clock,
 } from "lucide-react";
+import { useFollowMutation } from "../hooks/useFollowMutation";
+import { useUnfollowMutation } from "../hooks/useUnfollowMutation";
 
 interface Props {
   businessId: string;
@@ -29,12 +33,16 @@ const daysES: Record<string, string> = {
 };
 
 export default function BusinessProfile({ businessId }: Props) {
+  const user = useAuthStore((state) => state.user);
+  const userId = user?.id ?? null;
   const { data, isLoading, error, isError } = useBusinessProfile(businessId);
+  const followMutation = useFollowMutation();
+  const unfollowMutation = useUnfollowMutation();
+
+  const isMutating = followMutation.isPending || unfollowMutation.isPending;
 
   if (isLoading)
-    return (
-      <p className="text-center text-gray-500 mt-8">Cargando perfil...</p>
-    );
+    return <p className="text-center text-gray-500 mt-8">Cargando perfil...</p>;
   if (isError)
     return (
       <p className="text-center text-red-500 mt-8">
@@ -42,6 +50,15 @@ export default function BusinessProfile({ businessId }: Props) {
       </p>
     );
   if (!data) return null;
+
+  const handleFollowToggle = () => {
+    if (!userId) return;
+    if (data.follow.isFollowing) {
+      unfollowMutation.mutate({ userId, businessId });
+    } else {
+      followMutation.mutate({ userId, businessId });
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
@@ -57,17 +74,62 @@ export default function BusinessProfile({ businessId }: Props) {
             />
           )}
           <div>
-            <h1 className="text-4xl font-extrabold text-gray-900">{data.name}</h1>
+            <h1 className="text-4xl font-extrabold text-gray-900">
+              {data.name}
+            </h1>
             {data.shortDescription && (
-              <p className="text-gray-600 mt-2 text-lg">{data.shortDescription}</p>
+              <p className="text-gray-600 mt-2 text-lg">
+                {data.shortDescription}
+              </p>
             )}
           </div>
         </div>
 
         {/* Descripción */}
         {data.fullDescription && (
-          <p className="text-gray-700 leading-relaxed">{data.fullDescription}</p>
+          <p className="text-gray-700 leading-relaxed">
+            {data.fullDescription}
+          </p>
         )}
+
+        {/* Seguimiento estilo moderno */}
+        <div className="flex items-center gap-4 mt-4">
+          <button
+            onClick={handleFollowToggle} // ✅ Esta línea estaba mal antes, no lo estaba llamando
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-300
+              ${
+                data.follow.isFollowing
+                  ? "bg-gray-100 border-gray-300 text-gray-800 hover:bg-gray-200"
+                  : "bg-blue-600 border-blue-600 text-white hover:bg-blue-700"
+              }
+            `}
+            disabled={isMutating}
+          >
+            <Star size={18} />
+            {isMutating
+              ? "Cargando..."
+              : data.follow.isFollowing
+              ? "Siguiendo"
+              : "Seguir"}
+          </button>
+
+          <div className="flex items-center gap-1 text-sm text-gray-600">
+            <Star size={16} className="text-yellow-500" />
+            <span>{data.follow.count}</span>
+            <span className="text-gray-400">seguidores</span>
+          </div>
+        </div>
+
+{typeof data.averageRating === "number" && (
+  <section className="mt-8 flex items-center gap-3 text-yellow-500 font-semibold text-lg">
+    <Star size={24} />
+    <span>{data.averageRating.toFixed(1)} / 5</span>
+    <span className="text-gray-500 text-base">
+      ({data.ratingsCount ?? 0} reseñas)
+    </span>
+  </section>
+)}
+
 
         {/* Contacto */}
         <div className="grid sm:grid-cols-2 gap-6 text-gray-700 text-base">
@@ -181,7 +243,9 @@ export default function BusinessProfile({ businessId }: Props) {
             ) : null}
             {data.tags?.length ? (
               <div>
-                <h2 className="text-lg font-semibold text-gray-800 mb-3">Tags</h2>
+                <h2 className="text-lg font-semibold text-gray-800 mb-3">
+                  Tags
+                </h2>
                 <ul className="flex flex-wrap gap-3">
                   {data.tags.map((tag) => (
                     <li
@@ -200,7 +264,9 @@ export default function BusinessProfile({ businessId }: Props) {
         {/* Galería */}
         {data.gallery?.length ? (
           <section className="mt-8">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Galería</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Galería
+            </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {data.gallery.map((img) => (
                 <img

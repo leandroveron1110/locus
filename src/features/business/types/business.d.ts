@@ -1,3 +1,32 @@
+export type BusinessTag = {
+  id: string;
+  name: string;
+};
+export type BusinessCategory = {
+  id: string;
+  name: string;
+};
+
+export type BusinessGalery = {
+  id: string;
+  url: string;
+};
+
+export type BusinessWeeklySchedule = Partial<
+  Record<
+    | "MONDAY"
+    | "TUESDAY"
+    | "WEDNESDAY"
+    | "THURSDAY"
+    | "FRIDAY"
+    | "SATURDAY"
+    | "SUNDAY",
+    string[]
+  >
+>;
+
+export type BusinessFollow = { isFollowing: boolean; count: number };
+
 export interface Business {
   id: string;
   ownerId: string;
@@ -9,8 +38,8 @@ export interface Business {
   whatsapp: string;
   email?: string;
   statusId?: string;
-  createdAt: string;  // ISO string
-  updatedAt: string;  // ISO string
+  createdAt: string; // ISO string
+  updatedAt: string; // ISO string
   instagramUrl?: string;
   facebookUrl?: string;
   websiteUrl?: string;
@@ -22,23 +51,13 @@ export interface Business {
   averageRating?: number | null;
   ratingsCount?: number;
 
-  categories?: Array<{
-    id: string;
-    name: string;
-  }>;
+  categories?: BusinessCategory[];
 
-  tags?: Array<{
-    id: string;
-    name: string;
-  }>;
+  tags?: BusinessTag[];
 
-  gallery?: Array<{
-    id: string;
-    url: string;
-  }>;
+  gallery?: BusinessGalery[];
 
-  weeklySchedule?: Partial<Record<
-    'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY',
-    string[]
-  >>;
+  weeklySchedule?: BusinessWeeklySchedule;
+
+  follow: BusinessFollow;
 }
