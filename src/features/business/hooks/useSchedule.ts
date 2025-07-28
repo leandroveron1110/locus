@@ -1,14 +1,11 @@
 // src/features/business/hooks/useBusinessProfile.ts
 import { useQuery } from "@tanstack/react-query";
-import { fetchBusinessesByID } from "../api/businessApi";
-import { useAuthStore } from "@/features/auth/store/authStore";
+import { fetchBusinessSchedule } from "../api/businessApi";
 
-export const useBusinessProfile = (businessId: string) => {
-  const user = useAuthStore((state) => state.user);
-
+export const useSchedule = (businessId: string) => {
   return useQuery({
-    queryKey: ["business-profile", businessId], // incluimos user?.id en la clave
-    queryFn: () => fetchBusinessesByID(businessId),
+    queryKey: ["business-schedule", businessId], // incluimos user?.id en la clave
+    queryFn: () => fetchBusinessSchedule(businessId),
     enabled: !!businessId, // solo si hay ambos
     refetchOnWindowFocus: false, // ❌ no refetch al cambiar de pestaña
     refetchOnReconnect: false, // ❌ no refetch al reconectarse

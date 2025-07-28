@@ -1,14 +1,14 @@
 // src/features/business/hooks/useBusinessProfile.ts
 import { useQuery } from "@tanstack/react-query";
-import { fetchBusinessesByID } from "../api/businessApi";
+import { fetchFollowers } from "../api/businessApi";
 import { useAuthStore } from "@/features/auth/store/authStore";
 
-export const useBusinessProfile = (businessId: string) => {
+export const useFollowInfo = (businessId: string) => {
   const user = useAuthStore((state) => state.user);
 
   return useQuery({
-    queryKey: ["business-profile", businessId], // incluimos user?.id en la clave
-    queryFn: () => fetchBusinessesByID(businessId),
+    queryKey: ["business-follow", businessId], // incluimos user?.id en la clave
+    queryFn: () => fetchFollowers(businessId, user?.id),
     enabled: !!businessId, // solo si hay ambos
     refetchOnWindowFocus: false, // ❌ no refetch al cambiar de pestaña
     refetchOnReconnect: false, // ❌ no refetch al reconectarse

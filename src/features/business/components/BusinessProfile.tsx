@@ -1,7 +1,4 @@
 "use client";
-
-import { useAuthStore } from "@/features/auth/store/authStore";
-import { follow, unfollow } from "../api/businessApi";
 import { useBusinessProfile } from "../hooks/useBusinessProfile";
 import {
   MapPin,
@@ -14,33 +11,38 @@ import {
   Tag,
   Clock,
 } from "lucide-react";
-import { useFollowMutation } from "../hooks/useFollowMutation";
-import { useUnfollowMutation } from "../hooks/useUnfollowMutation";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
+import { SkeletonFollowButton } from "./components/Skeleton/SkeletonFollowButton";
+import { SkeletonCategories } from "./components/Skeleton/SkeletonCategories";
+import { SkeletonSchedule } from "./components/Skeleton/SkeletonSchedule";
+import { SkeletonGallery } from "./components/Skeleton/SkeletonGallery";
 
 interface Props {
   businessId: string;
 }
 
-// Días en español para traducir
-const daysES: Record<string, string> = {
-  MONDAY: "Lunes",
-  TUESDAY: "Martes",
-  WEDNESDAY: "Miércoles",
-  THURSDAY: "Jueves",
-  FRIDAY: "Viernes",
-  SATURDAY: "Sábado",
-  SUNDAY: "Domingo",
-};
+const LazyCategoriesTags = dynamic(
+  () => import("./components/CategoriesTags"),
+  {
+    ssr: false,
+  }
+);
+
+const LazyFolloweButton = dynamic(() => import("./components/FollowButton"), {
+  ssr: false,
+});
+
+const LazySchedule = dynamic(() => import("./components/Schedule"), {
+  ssr: false,
+});
+
+const LazyGallery = dynamic(() => import("./components/Gallery"), {
+  ssr: false,
+});
 
 export default function BusinessProfile({ businessId }: Props) {
-  const user = useAuthStore((state) => state.user);
-  const userId = user?.id ?? null;
   const { data, isLoading, error, isError } = useBusinessProfile(businessId);
-  const followMutation = useFollowMutation();
-  const unfollowMutation = useUnfollowMutation();
-
-  const isMutating = followMutation.isPending || unfollowMutation.isPending;
-
   if (isLoading)
     return <p className="text-center text-gray-500 mt-8">Cargando perfil...</p>;
   if (isError)
@@ -50,15 +52,6 @@ export default function BusinessProfile({ businessId }: Props) {
       </p>
     );
   if (!data) return null;
-
-  const handleFollowToggle = () => {
-    if (!userId) return;
-    if (data.follow.isFollowing) {
-      unfollowMutation.mutate({ userId, businessId });
-    } else {
-      followMutation.mutate({ userId, businessId });
-    }
-  };
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
@@ -92,44 +85,23 @@ export default function BusinessProfile({ businessId }: Props) {
           </p>
         )}
 
-        {/* Seguimiento estilo moderno */}
-        <div className="flex items-center gap-4 mt-4">
-          <button
-            onClick={handleFollowToggle} // ✅ Esta línea estaba mal antes, no lo estaba llamando
-            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-300
-              ${
-                data.follow.isFollowing
-                  ? "bg-gray-100 border-gray-300 text-gray-800 hover:bg-gray-200"
-                  : "bg-blue-600 border-blue-600 text-white hover:bg-blue-700"
-              }
-            `}
-            disabled={isMutating}
-          >
-            <Star size={18} />
-            {isMutating
-              ? "Cargando..."
-              : data.follow.isFollowing
-              ? "Siguiendo"
-              : "Seguir"}
-          </button>
+        <Suspense fallback={<SkeletonFollowButton />}>
+          <LazyFolloweButton businessId={businessId} />
+        </Suspense>
 
-          <div className="flex items-center gap-1 text-sm text-gray-600">
-            <Star size={16} className="text-yellow-500" />
-            <span>{data.follow.count}</span>
-            <span className="text-gray-400">seguidores</span>
-          </div>
-        </div>
+        {typeof data.averageRating === "number" && (
+          <section className="mt-8 flex items-center gap-3 text-yellow-500 font-semibold text-lg">
+            <Star size={24} />
+            <span>{data.averageRating.toFixed(1)} / 5</span>
+            <span className="text-gray-500 text-base">
+              ({data.ratingsCount ?? 0} reseñas)
+            </span>
+          </section>
+        )}
 
-{typeof data.averageRating === "number" && (
-  <section className="mt-8 flex items-center gap-3 text-yellow-500 font-semibold text-lg">
-    <Star size={24} />
-    <span>{data.averageRating.toFixed(1)} / 5</span>
-    <span className="text-gray-500 text-base">
-      ({data.ratingsCount ?? 0} reseñas)
-    </span>
-  </section>
-)}
-
+        <Suspense fallback={<SkeletonCategories />}>
+          <LazyCategoriesTags businessId={businessId} />
+        </Suspense>
 
         {/* Contacto */}
         <div className="grid sm:grid-cols-2 gap-6 text-gray-700 text-base">
@@ -191,97 +163,15 @@ export default function BusinessProfile({ businessId }: Props) {
         </div>
 
         {/* Horarios */}
-        {data.weeklySchedule && Object.keys(data.weeklySchedule).length > 0 && (
-          <section className="mt-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <Clock size={20} /> Horarios de atención
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-gray-700 text-sm">
-              {Object.entries(data.weeklySchedule).map(([day, intervals]) => (
-                <div
-                  key={day}
-                  className="bg-blue-50 rounded-lg p-3 flex flex-col items-start shadow-sm"
-                >
-                  <span className="font-semibold text-blue-700 mb-1">
-                    {daysES[day] ?? day}
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {intervals.map((interval) => (
-                      <span
-                        key={interval}
-                        className="bg-blue-200 text-blue-900 rounded-full px-3 py-1 text-xs font-medium"
-                      >
-                        {interval}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+        <Suspense fallback={<SkeletonSchedule />}>
+          <LazySchedule businessId={businessId} />
+        </Suspense>
 
-        {/* Categorías y Tags */}
-        {(data.categories?.length || data.tags?.length) && (
-          <section className="mt-8 space-y-4">
-            {data.categories?.length ? (
-              <div>
-                <h2 className="text-lg font-semibold text-gray-800 mb-3">
-                  Categorías
-                </h2>
-                <ul className="flex flex-wrap gap-3">
-                  {data.categories.map((cat) => (
-                    <li
-                      key={cat.id}
-                      className="bg-blue-100 text-blue-800 text-sm font-semibold px-4 py-1 rounded-full flex items-center gap-2 shadow-sm"
-                    >
-                      <Tag size={16} /> {cat.name}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-            {data.tags?.length ? (
-              <div>
-                <h2 className="text-lg font-semibold text-gray-800 mb-3">
-                  Tags
-                </h2>
-                <ul className="flex flex-wrap gap-3">
-                  {data.tags.map((tag) => (
-                    <li
-                      key={tag.id}
-                      className="bg-green-100 text-green-800 text-sm font-semibold px-4 py-1 rounded-full shadow-sm"
-                    >
-                      {tag.name}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </section>
-        )}
+        <Suspense fallback={<SkeletonGallery />}>
+          <LazyGallery businessId={businessId} />
+        </Suspense>
 
-        {/* Galería */}
-        {data.gallery?.length ? (
-          <section className="mt-8">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Galería
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {data.gallery.map((img) => (
-                <img
-                  key={img.id}
-                  src={img.url}
-                  alt={`${data.name} imagen`}
-                  className="w-full h-28 object-cover rounded-2xl shadow-md hover:scale-105 transition-transform duration-300 cursor-pointer"
-                  loading="lazy"
-                />
-              ))}
-            </div>
-          </section>
-        ) : null}
-
-        {/* Calificación */}
+        {/* Calificación
         {typeof data.averageRating === "number" && (
           <section className="mt-8 flex items-center gap-3 text-yellow-500 font-semibold text-lg">
             <Star size={24} />
@@ -293,7 +183,7 @@ export default function BusinessProfile({ businessId }: Props) {
         )}
 
         {/* Ubicación */}
-        {typeof data.latitude === "number" &&
+        {/* {typeof data.latitude === "number" &&
           typeof data.longitude === "number" && (
             <section className="mt-8 text-gray-600 text-sm">
               <a
@@ -306,7 +196,7 @@ export default function BusinessProfile({ businessId }: Props) {
                 Ver ubicación en Google Maps
               </a>
             </section>
-          )}
+          )}  */}
       </section>
     </div>
   );

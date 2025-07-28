@@ -1,7 +1,7 @@
 // src/features/business/hooks/useUnfollowMutation.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "@/lib/api";
-import { Business } from "../types/business";
+import { Business, BusinessFollow } from "../types/business";
 
 interface UnfollowParams {
   userId: string;
@@ -19,17 +19,14 @@ export const useUnfollowMutation = () => {
   return useMutation({
     mutationFn: unfollowBusiness,
     onSuccess: (_, { businessId }) => {
-      queryClient.setQueryData<Business>(
-        ["business-profile", businessId],
+      queryClient.setQueryData<BusinessFollow>(
+        ["business-follow", businessId],
         (oldData) => {
           if (!oldData) return oldData;
           return {
             ...oldData,
-            follow: {
-              ...oldData.follow,
-              isFollowing: false,
-              count: oldData.follow.count -1,
-            },
+            count: oldData.count - 1,
+            isFollowing: false,
           };
         }
       );
