@@ -4,8 +4,10 @@ import {
   BusinessCategory,
   BusinessFollow,
   BusinessGalery,
+  BusinessRating,
   BusinessTag,
   BusinessWeeklySchedule,
+  Review,
 } from "../types/business";
 
 const baseUrlBusiness = "/businesses/";
@@ -103,5 +105,34 @@ export const fetchBusinessGaleryBasic = async (
   businessId: string
 ): Promise<BusinessGalery[]> => {
   const res = await axios.get(`/businesses/${businessId}/gallery`);
+  return res.data;
+};
+
+export const fetchSummary = async (
+  businessId: string
+): Promise<BusinessRating> => {
+  const res = await axios.get(`/ratings/summary/${businessId}`);
+  return res.data;
+};
+
+export const fetchSummarySudmi = async (
+  businessId: string,
+  userId: string,
+  value: number,
+  comment: string
+): Promise<BusinessRating> => {
+  const res = await axios.post(`/ratings`, {
+    businessId,
+    userId,
+    value,
+    comment,
+  });
+  return res.data;
+};
+
+export const fetchCommentsByBusinessId = async (
+  businessId: string
+): Promise<Review[]> => {
+  const res = await axios.get(`/ratings/comments/${businessId}`);
   return res.data;
 };

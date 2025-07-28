@@ -12,6 +12,22 @@ export type BusinessGalery = {
   url: string;
 };
 
+export type BusinessRating = {
+  averageRating: number;
+  ratingsCount: number;
+}
+
+export type Review = {
+  id: string;
+  comment: string;
+  value: number;
+  user: {
+    id: string;
+    fullName: string;
+  };
+};
+
+
 export type BusinessWeeklySchedule = Partial<
   Record<
     | "MONDAY"
@@ -50,14 +66,4 @@ export interface Business {
   longitude?: number | null;
   averageRating?: number | null;
   ratingsCount?: number;
-
-  categories?: BusinessCategory[];
-
-  tags?: BusinessTag[];
-
-  gallery?: BusinessGalery[];
-
-  weeklySchedule?: BusinessWeeklySchedule;
-
-  follow: BusinessFollow;
 }

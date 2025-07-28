@@ -1,3 +1,4 @@
+"use client"
 // SkeletonSchedule.tsx
 export const SkeletonSchedule = () => {
   return (

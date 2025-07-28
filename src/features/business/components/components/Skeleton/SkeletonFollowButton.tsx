@@ -1,3 +1,4 @@
+"use client"
 // SkeletonFollowButton.tsx
 export const SkeletonFollowButton = () => {
   return (

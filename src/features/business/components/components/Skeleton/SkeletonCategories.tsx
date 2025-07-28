@@ -1,3 +1,4 @@
+"use client"
 // SkeletonCategories.tsx
 export const SkeletonCategories = () => {
   return (
