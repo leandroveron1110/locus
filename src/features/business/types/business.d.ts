@@ -43,6 +43,16 @@ export type BusinessWeeklySchedule = Partial<
 
 export type BusinessFollow = { isFollowing: boolean; count: number };
 
+export interface ModuleConfig {
+  enabled: boolean;
+  version: string;
+}
+
+export interface ModulesConfig {
+  [key: string]: ModuleConfig | undefined;
+}
+
+
 export interface Business {
   id: string;
   ownerId: string;
@@ -60,7 +70,7 @@ export interface Business {
   facebookUrl?: string;
   websiteUrl?: string;
   logoUrl?: string;
-  modulesConfig: Record<string, any> | {}; // puede ser objeto vacío
+  modulesConfig: ModulesConfig; // puede ser objeto vacío
 
   latitude?: number | null;
   longitude?: number | null;
