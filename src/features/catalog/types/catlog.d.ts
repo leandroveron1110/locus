@@ -3,12 +3,12 @@ interface Option {
   name: string;
   hasStock: boolean;
   index: number;
-  priceFinal: string;          // precio con impuestos y descuentos
+  priceFinal: string; // precio con impuestos y descuentos
   priceWithoutTaxes: string;
   taxesAmount: string;
-  priceModifierType: "INCREASE" | "NOT_CHANGE" | string;  // quizá más tipos según backend
+  priceModifierType: "INCREASE" | "NOT_CHANGE" | string; // quizá más tipos según backend
   maxQuantity: number;
-  images: string[];            // URLs de imágenes opcionales
+  images: string[]; // URLs de imágenes opcionales
 }
 
 interface OptionGroup {
@@ -26,9 +26,9 @@ interface Product {
   description: string;
   enabled: boolean;
   finalPrice: number;
-  originalPrice: number;
-  currency: string;            // Ej: "ARS"
-  currencyMask: string;        // Ej: "$"
+  originalPrice?: number;
+  currency: string; // Ej: "ARS"
+  currencyMask: string; // Ej: "$"
   finalPriceWithoutTaxes: string;
   taxesAmount: string;
   discountAmount: string;
@@ -38,6 +38,10 @@ interface Product {
   hasOptions: boolean;
   isMostOrdered: boolean;
   isRecommended: boolean;
+  available: boolean;
+  stock: number;
+  preparationTime: number | null;
+  imageUrl: string | null;
   seccionId: string;
   optionGroups: OptionGroup[];
 }
@@ -46,7 +50,7 @@ interface Section {
   id: string;
   name: string;
   imageUrls: string[];
-  index: number;              // orden dentro del menú
+  index: number; // orden dentro del menú
   products: Product[];
 }
 

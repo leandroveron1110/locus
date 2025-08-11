@@ -3,6 +3,8 @@
 import React from "react";
 import { useCatalg } from "../hooks/useCatalg";
 import CatalogMenu from "./CatalogMenu";
+import CartList from "./cart/CartList";
+import { useAuthStore } from "@/features/auth/store/authStore";
 
 interface Props {
   businessId: string;
@@ -10,6 +12,7 @@ interface Props {
 
 export default function Catalog({ businessId }: Props) {
   const { data, isLoading, error, isError } = useCatalg(businessId);
+  const user = useAuthStore((state) => state.user);
 
   if (isLoading) {
     return (
@@ -38,10 +41,22 @@ export default function Catalog({ businessId }: Props) {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
-      {data.map((menu) => (
-        <CatalogMenu key={menu.id} menu={menu} />
-      ))}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Columna izquierda: Catálogo */}
+        <div className="flex-1 space-y-16">
+          {data.map((menu) => (
+            <CatalogMenu key={menu.id} menu={menu} />
+          ))}
+        </div>
+
+        {/* Columna derecha: Carrito */}
+        <div className="w-full lg:w-80 xl:w-96">
+          <div className="sticky top-24">
+            <CartList userId={user?.id} businessId={businessId} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
