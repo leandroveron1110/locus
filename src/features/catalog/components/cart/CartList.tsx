@@ -1,89 +1,24 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { CartItem, useCartStore } from "../../stores/useCartStore";
 import CartSummary from "./CartSummary";
-import AddressSelector from "./AddressSelector";
-import AddressForm from "./AddressForm";
 import CartItemModal from "./CartItemModal";
 import CartItemCard from "./CartItemCard";
-import SubmitOrderButton from "./SubmitOrderButton";
-import { useAddress, useAddresses } from "../../hooks/useAddress";
-import { Address, AddressCreateDto } from "../../types/address";
+import OrderForm from "./order/OrderForm";
+import { BusinessPaymentMethod } from "../../types/business";
 
 interface Props {
   userId?: string;
   businessId: string;
+  businessName: string;
+  businessPhone: string;
+  businessAddress: string;
+  businessPaymentMethod?: BusinessPaymentMethod[]
 }
 
-export default function CartList({ userId, businessId }: Props) {
-  const items = useCartStore((state) => state.items);
-  const removeItem = useCartStore((state) => state.removeItem);
-  const clearCart = useCartStore((state) => state.clearCart);
-  const getTotal = useCartStore((state) => state.getTotal);
-
-  const createAddress = useAddress();
-  const { data: addresses, isLoading } = useAddresses(userId);
-
+export default function CartList(props: Props) {
+  const { items, removeItem, clearCart, getTotal } = useCartStore();
   const [editingItem, setEditingItem] = useState<CartItem | null>(null);
-  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
-    null
-  );
-  const [savedAddresses, setSavedAddresses] = useState<AddressCreateDto[]>([]);
-  const [newAddress, setNewAddress] = useState<Address>({
-    city: "Concepción del Uruguay",
-    province: "Entre Ríos",
-    country: "Argentina",
-    postalCode: "3260",
-    street: "",
-  });
-  const [showAddressForm, setShowAddressForm] = useState(false);
-
-  useEffect(() => {
-    if (addresses) {
-      setSavedAddresses(addresses);
-
-      // Si no hay direcciones, mostrar formulario para crear una
-      if (addresses.length === 0) {
-        setShowAddressForm(true);
-      }
-    }
-  }, [addresses]);
-
-  const handleProceedToCheckout = () => {
-    if (!userId) return alert("Debes iniciar sesión para continuar.");
-    if (savedAddresses.length === 0 || selectedAddressId === "new") {
-      setShowAddressForm(true);
-      return;
-    }
-    if (!selectedAddressId) {
-      alert("Selecciona una dirección o crea una nueva.");
-      return;
-    }
-
-
-  };
-
-  const handleSaveAddress = () => {
-    if (!userId)
-      return alert("Debes iniciar sesión para agregar una dirección");
-
-    const payload: Address = {
-      ...newAddress,
-      userId: userId,
-    };
-
-    createAddress.mutate(payload, {
-      onSuccess: (data) => {
-        console.log("Dirección creada:", data);
-        setShowAddressForm(false);
-        setSelectedAddressId(data.id); // usar la nueva dirección
-        // Aquí podrías hacer un refetch de direcciones guardadas
-      },
-      onError: (error) => {
-        alert("Error al crear dirección: " + error.message);
-      },
-    });
-  };
 
   if (items.length === 0) {
     return (
@@ -108,40 +43,11 @@ export default function CartList({ userId, businessId }: Props) {
 
       <CartSummary total={getTotal()} onClear={clearCart} />
 
-      {userId && savedAddresses.length > 0 && !showAddressForm && (
-        <AddressSelector
-          addresses={savedAddresses}
-          selectedId={selectedAddressId}
-          onChange={setSelectedAddressId}
-          onCreateNew={() => setShowAddressForm(true)}
-        />
-      )}
-
-      {showAddressForm && (
-        <AddressForm
-          address={newAddress}
-          onChange={(data) => setNewAddress((prev) => ({ ...prev, ...data }))}
-          onSave={handleSaveAddress}
-        />
-      )}
-
-      {userId && selectedAddressId && !showAddressForm && (
-        <div onClick={handleProceedToCheckout}>
-          <SubmitOrderButton
-            userId={userId}
-            businessId={businessId}
-            note={""}
-            deliveryAddressId={""}
-            pickupAddressId= {selectedAddressId}
-          />
-        </div>
-      )}
+      {/* La parte de la orden queda afuera en su propio form */}
+      <OrderForm {...props} />
 
       {editingItem && (
-        <CartItemModal
-          item={editingItem}
-          onClose={() => setEditingItem(null)}
-        />
+        <CartItemModal item={editingItem} onClose={() => setEditingItem(null)} />
       )}
     </div>
   );

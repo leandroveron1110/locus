@@ -1,52 +1,90 @@
 "use client";
 import { useState } from "react";
-import { useCartStore } from "../../stores/useCartStore";
-import { useCreateOrder } from "../../hooks/useCreateOrder";
-import { mapCartToOrderPayload } from "../../stores/createOrderFull";
+
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/features/auth/store/authStore";
+import { useCartStore } from "@/features/catalog/stores/useCartStore";
+import { useCreateOrder } from "@/features/catalog/hooks/useCreateOrder";
+import { mapCartToOrderPayload } from "@/features/catalog/stores/createOrderFull";
 
 interface Props {
-  userId: string;
-  businessId: string;
-  note: string;
-  deliveryAddressId?: string;
-  pickupAddressId?: string;
+  orderPayload: {
+    userId: string;
+    businessId: string;
+    note: string;
+    deliveryAddressId?: string;
+    pickupAddressId?: string;
+    customerAddress?: string;
+    customerObservations?: string;
+    businessName: string;
+    businessPhone: string;
+    businessAddress: string;
+    businessObservations?: string;
+    paymentType?: "CASH" | "TRANSFER" | "DELIVERY";
+    paymentInstructions?: string;
+    paymentHolderName?: string;
+  };
 }
 
 export default function SubmitOrderButton({
-  userId,
-  businessId,
-  note,
-  deliveryAddressId,
-  pickupAddressId,
+  orderPayload: {
+    userId,
+    businessId,
+    note,
+    deliveryAddressId,
+    pickupAddressId,
+    customerAddress,
+    customerObservations,
+    businessName,
+    businessPhone,
+    businessAddress,
+    businessObservations,
+    paymentType,
+    paymentInstructions,
+    paymentHolderName,
+  },
 }: Props) {
   const [error, setError] = useState("");
   const { clearCart } = useCartStore();
   const createOrderMutation = useCreateOrder();
   const router = useRouter();
+  const userStore = useAuthStore((state) => state.user);
 
   const handleSubmitOrder = async () => {
     setError("");
 
-    if (!userId || !businessId || (!deliveryAddressId && !pickupAddressId)) {
+    if (
+      !userId ||
+      !businessId ||
+      !userStore
+    ) {
       setError("Faltan datos para completar la orden.");
       return;
     }
 
     try {
       // 1️⃣ Construir payload
-      const payload = mapCartToOrderPayload(
+      const payload = mapCartToOrderPayload({
         userId,
         businessId,
+        customerName: `${userStore.firstName} ${userStore.lastName}`,
+        customerPhone: userStore.email,
+        customerAddress,
+        customerObservations,
+        businessName,
+        businessPhone,
+        businessAddress,
+        businessObservations,
         deliveryAddressId,
         pickupAddressId,
-        note
-      );
+        notes: note,
+        paymentType,
+        paymentInstructions,
+        paymentHolderName,
+      });
 
       // 2️⃣ Crear orden vía API
       const order = await createOrderMutation.mutateAsync(payload);
-      console.log("Orden creada:", order);
-
       // 3️⃣ Limpiar carrito
       clearCart();
       router.push(`/orders`);
@@ -54,7 +92,6 @@ export default function SubmitOrderButton({
       // ✅ Ya no necesitamos iniciar el socket aquí.
       // La página de órdenes (`useOrders`) lo maneja de forma global
       // y agregará esta orden automáticamente cuando el backend emita `order_created`.
-
     } catch (err: any) {
       console.error(err);
       const message =

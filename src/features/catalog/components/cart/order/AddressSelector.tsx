@@ -1,11 +1,11 @@
 "use client";
+import { AddressCreateDto } from "@/features/catalog/types/address";
 import React from "react";
-import { Address, AddressCreateDto } from "../../types/address";
 
 interface Props {
   addresses: AddressCreateDto[];
-  selectedId: string | null;
-  onChange: (id: string) => void;
+  selectedId: string | undefined;
+  onChange: (selection: { id: string; text: string }) => void;
   onCreateNew: () => void;
 }
 
@@ -21,7 +21,18 @@ export default function AddressSelector({
       <select
         className="border rounded px-2 py-1 w-full"
         value={selectedId || ""}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          const id = e.target.value;
+          if (id === "new") {
+            onChange({ id, text: "" });
+          } else {
+            const addr = addresses.find((a) => a.id === id);
+            if (addr) {
+              const text = `${addr.street} ${addr.number}, ${addr.city}`;
+              onChange({ id, text });
+            }
+          }
+        }}
       >
         <option value="">-- Selecciona una dirección --</option>
         {addresses.map((addr) => (

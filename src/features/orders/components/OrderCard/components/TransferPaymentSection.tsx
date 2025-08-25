@@ -1,0 +1,133 @@
+"use client";
+
+import React, { useState, useCallback, useMemo } from "react";
+import { PaymentStatus, PaymentMethodType } from "../../../types/order";
+import { useUpdatePayment } from "../../../hooks/useUpdatePayment";
+import { useBusinessPaymentMethods } from "../../../hooks/useBusinessPaymentMethods";
+import PaymentStatusSection from "./PaymentStatusSection";
+import UploadReceiptSection from "./UploadReceiptSection";
+import { ChevronUp, ChevronDown } from "lucide-react";
+
+interface Props {
+  orderId: string;
+  businessId: string;
+  paymentStatus: PaymentStatus;
+  paymentReceiptUrl?: string | null;
+}
+
+export default function TransferPaymentSection({
+  orderId,
+  businessId,
+  paymentStatus,
+  paymentReceiptUrl,
+}: Props) {
+  const [file, setFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [showTransferInfo, setShowTransferInfo] = useState(false);
+  const [showOrderDetails, setShowOrderDetails] = useState(false);
+
+  const updatePaymentMutation = useUpdatePayment();
+  const { data: paymentMethods } = useBusinessPaymentMethods(businessId);
+
+  const { canUpload, isPaymentRejected } = useMemo(
+    () => ({
+      canUpload: paymentStatus === PaymentStatus.PENDING,
+      isPaymentRejected: paymentStatus === PaymentStatus.REJECTED,
+    }),
+    [paymentStatus]
+  );
+
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFileError(null);
+      const selectedFile = e.target.files?.[0];
+      if (!selectedFile) return setFile(null);
+
+      const validTypes = ["image/jpeg", "image/png", "application/pdf"];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+
+      if (!validTypes.includes(selectedFile.type)) {
+        setFileError(
+          "Formato no válido. Sube una imagen (JPEG, PNG) o un PDF."
+        );
+        return setFile(null);
+      }
+      if (selectedFile.size > maxSize) {
+        setFileError("El archivo es demasiado grande. Máximo 5 MB.");
+        return setFile(null);
+      }
+      setFile(selectedFile);
+    },
+    []
+  );
+
+  const uploadFile = async (file: File) => {
+    // Simulación de subida
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    return "https://via.placeholder.com/400x200.png?text=comprobante";
+  };
+
+  const handleUpload = useCallback(async () => {
+    if (!file) return;
+    try {
+      const uploadedUrl = await uploadFile(file);
+      await updatePaymentMutation.mutateAsync({
+        orderId,
+        payload: {
+          paymentStatus: PaymentStatus.IN_PROGRESS,
+          paymentReceiptUrl: uploadedUrl,
+          paymentHolderName: "",
+          paymentType: PaymentMethodType.TRANSFER,
+        },
+      });
+      setFile(null);
+      setFileError(null);
+    } catch (err) {
+      console.error(err);
+      setFileError("Error al procesar el comprobante. Intenta de nuevo.");
+    }
+  }, [file, orderId, updatePaymentMutation]);
+
+  return (
+    <div className="mt-4 rounded-xl">
+      <button
+        className="flex items-center justify-between w-full font-semibold text-gray-800 hover:text-gray-600 transition-colors"
+        onClick={() => setShowOrderDetails(!showOrderDetails)}
+      >
+        <span>
+          {canUpload || isPaymentRejected ? "Pagar" : "Ver comprobante"}
+        </span>
+        {showOrderDetails ? (
+          <ChevronUp className="w-4 h-4 text-gray-500" />
+        ) : (
+          <ChevronDown className="w-4 h-4 text-gray-500" />
+        )}
+      </button>
+
+      {showOrderDetails && (
+        <div className="mt-2 space-y-4 text-sm text-gray-700 animate-slide-down">
+          {/* Estado del pago */}
+          <PaymentStatusSection
+            status={paymentStatus}
+            paymentReceiptUrl={paymentReceiptUrl}
+          />
+
+          {/* Subida de comprobante */}
+          {(canUpload || isPaymentRejected) && (
+            <UploadReceiptSection
+              orderId={orderId}
+              file={file}
+              error={fileError}
+              onFileChange={handleFileChange}
+              onUpload={handleUpload}
+              loading={updatePaymentMutation.isPending}
+              paymentMethods={paymentMethods}
+              showTransferInfo={showTransferInfo}
+              setShowTransferInfo={setShowTransferInfo}
+            />
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

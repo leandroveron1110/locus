@@ -7,6 +7,7 @@ interface Props {
 }
 
 export default function CartSummary({ total, onClear }: Props) {
+  console.log(total)
   return (
     <div className="flex justify-between items-center mt-6">
       <div className="text-xl font-bold text-gray-800">

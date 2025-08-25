@@ -1,12 +1,12 @@
-// interfaces/order.ts
+import { PaymentMethodType, PaymentStatus, OrderStatus } from '@prisma/client';
 
 export interface CreateOrderOption {
   optionName: string;
   priceModifierType: string;
   quantity: number;
-  priceFinal: string;
-  priceWithoutTaxes: string;
-  taxesAmount: string;
+  priceFinal: string;         // número decimal como string
+  priceWithoutTaxes: string;  // número decimal como string
+  taxesAmount: string;        // número decimal como string
   opcionId?: string;
 }
 
@@ -25,7 +25,7 @@ export interface CreateOrderItem {
   productDescription?: string;
   productImageUrl?: string;
   quantity: number;
-  priceAtPurchase: string;
+  priceAtPurchase: string;   // número decimal como string
   notes?: string;
   optionGroups: CreateOrderOptionGroup[];
 }
@@ -39,9 +39,29 @@ export interface CreateOrderFull {
   businessId: string;
   deliveryAddress?: AddressId;
   pickupAddress?: AddressId;
-  status?: string;
+
+  // --- snapshot cliente ---
+  customerName: string;
+  customerPhone: string;
+  customerAddress?: string;
+  customerObservations?: string;
+
+  // --- snapshot negocio ---
+  businessName: string;
+  businessPhone: string;
+  businessAddress: string;
+  businessObservations?: string;
+
+  status?: OrderStatus;
   isTest?: boolean;
   total: number;
   notes?: string;
   items: CreateOrderItem[];
+
+  // --- pagos ---
+  paymentType?: PaymentMethodType;       // CASH, TRANSFER, DELIVERY
+  paymentStatus?: PaymentStatus;         // PENDING, IN_PROGRESS, CONFIRMED, REJECTED
+  paymentReceiptUrl?: string;            // URL del comprobante
+  paymentInstructions?: string;          // solo si es transferencia
+  paymentHolderName?: string;            // titular del cliente (transferencias)
 }

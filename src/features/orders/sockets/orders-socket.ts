@@ -1,6 +1,6 @@
-// sockets/userOrdersSocket.ts
+// sockets/order-socket.ts
 import { io, Socket } from "socket.io-client";
-import { Order } from "../types/order";
+import { Order, PaymentStatus } from "../types/order";
 import { useOrdersStore } from "../stores/useOrdersStore";
 
 let socket: Socket | null = null;
@@ -16,7 +16,8 @@ export function initOrdersSocket(userId: string) {
     return socket;
   }
 
-  const { addOrder, updateOrderStatus } = useOrdersStore.getState();
+  const { addOrder, updateOrderStatus, updatePaymentStatus } =
+    useOrdersStore.getState();
 
   socket = io(process.env.NEXT_PUBLIC_SOCKET_URL!, {
     transports: ["websocket"],
@@ -32,10 +33,29 @@ export function initOrdersSocket(userId: string) {
     addOrder(order);
   });
 
-  socket.on("order_status_updated", (data: { orderId: string; status: string }) => {
-    console.log("Estado de orden actualizado:", data);
-    updateOrderStatus(data.orderId, data.status);
-  });
+  socket.on(
+    "order_status_updated",
+    (data: { orderId: string; status: string }) => {
+      console.log("Estado de orden actualizado:", data);
+      updateOrderStatus(data.orderId, data.status);
+    }
+  );
+
+  socket.on(
+    "payment_updated",
+    (data: {
+      orderId: string;
+      paymentStatus: string;
+      paymentReceiptUrl: string;
+    }) => {
+      console.log("Estado de pago actualizado:", data);
+      updatePaymentStatus(
+        data.orderId,
+        data.paymentStatus as PaymentStatus,
+        data.paymentReceiptUrl
+      );
+    }
+  );
 
   return socket;
 }

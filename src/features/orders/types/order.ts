@@ -1,25 +1,15 @@
 export interface User {
   id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
+  fullName: string;
+  phone: string;
+  address?: string | null; // dirección completa como string
   avatarId?: string | null;
 }
 
-export interface Address {
-  id: string;
-  street: string;
-  number?: string | null;
-  apartment?: string | null;
-  city: string;
-  province: string;
-  country: string;
-  postalCode?: string | null;
-  latitude?: number | null;
-  longitude?: number | null;
-  isDefault: boolean;
-  enabled: boolean;
-  notes?: string | null;
+export interface Bussiness {
+  name: string;
+  address: string; // dirección completa como string
+  phone: string;
 }
 
 export interface OrderOption {
@@ -54,22 +44,63 @@ export interface OrderItem {
   optionGroups: OrderOptionGroup[];
 }
 
+export interface OrderDiscount {
+  id: string;
+  amount: number;
+  type: string;
+  notes?: string | null;
+  paidBy?: string | null;
+}
+
 export interface Order {
   id: string;
   businessId: string;
+  userId: string;
+  deliveryCompanyId?: string | null;
   status: OrderStatus;
   origin: string;
   isTest: boolean;
   total: number;
-  notes: string;
+  notes?: string | null;
   createdAt: string; // ISO string
   updatedAt: string; // ISO string
+  deliveryType: DeliveryType;
+  paymentType: PaymentMethodType;
+  paymentStatus: PaymentStatus;
+  paymentReceiptUrl?: string | null;
+  paymentInstructions?: string | null;
+  paymentHolderName?: string | null;
+  customerObservations?: string | null;
+  businessObservations?: string | null;
+
   user: User;
-  pickupAddress?: Address | null;
-  deliveryAddress?: Address | null;
+  bussiness: Bussiness;
+
   items: OrderItem[];
-  discounts: any[]; // Según tu ejemplo está vacío, pero podés definir la interface si tenés datos
+  discounts: OrderDiscount[];
 }
+
+export  enum DeliveryType {
+    PICKUP = "PICKUP", // El cliente retira en el local
+    DELIVERY = "DELIVERY",
+    IN_HOUSE_DELIVERY = "IN_HOUSE_DELIVERY", // El negocio entrega por su cuenta
+    EXTERNAL_DELIVERY = "EXTERNAL_DELIVERY" // Se usa una cadetería externa
+  }
+
+export enum PaymentMethodType {
+  TRANSFER = "TRANSFER",
+  CASH = "CASH",
+  DELIVERY = "DELIVERY",
+}
+
+/// Estados de pago de una orden
+export enum PaymentStatus {
+  PENDING = "PENDING",       /// Pago pendiente (cliente aún no inició)
+  IN_PROGRESS = "IN_PROGRESS" ,   /// Pago en curso (por ejemplo, transferencia en proceso)
+  CONFIRMED = "CONFIRMED",     /// Pago confirmado (negocio recibió el dinero)
+  REJECTED = "REJECTED"      /// Pago rechazado o fallido
+}
+
 
 export enum OrderStatus {
   // 1. Creación y pago

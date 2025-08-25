@@ -70,7 +70,7 @@ export default function ProductDetails({ product, onClose }: Props) {
       .map((opt) => ({
         id: opt.id,
         name: opt.name,
-        value: `${product.currencyMask}${Number(opt.priceFinal).toFixed(2)}`,
+        value: `${Number(opt.priceFinal).toFixed(2)}`,
       }));
 
     addToCart({

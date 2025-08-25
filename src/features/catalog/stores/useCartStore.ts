@@ -71,10 +71,30 @@ export const useCartStore = create<CartState>((set, get) => ({
 
   clearCart: () => set({ items: [] }),
 
+  // ... the rest of your Zustand store
+
   getTotal: () =>
-    get().items.reduce(
-      (acc, item) =>
-        acc + parseFloat(String((item.product.finalPrice))) * item.quantity,
-      0
-    ),
+    get().items.reduce((acc, item) => {
+      // 1. Get the base product price, defaulting to 0 if not a valid number
+      const productPrice = parseFloat(String(item.product.finalPrice)) || 0;
+
+      let itemTotal = productPrice * item.quantity;
+
+      // 2. Sum the value of selected options
+      if (item.selectedOptions && item.selectedOptions.length > 0) {
+        console.log(item.selectedOptions)
+        const optionsTotal = item.selectedOptions.reduce(
+          (optionsAcc, option) => {
+            // Get the option value, defaulting to 0 if not a valid number
+            const optionValue = parseFloat(option.value) || 0;
+            return optionsAcc + optionValue;
+          },
+          0
+        );
+        itemTotal += optionsTotal * item.quantity;
+      }
+
+      // 3. Add the item's total to the accumulator
+      return acc + itemTotal;
+    }, 0),
 }));
