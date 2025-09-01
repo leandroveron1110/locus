@@ -1,12 +1,10 @@
-import Map from "@/features/locationSelector/Map";
+import MapClientWrapper from "@/features/locationSelector/components/MapClientWrapper";
 import SearchPage from "@/features/search/components/Search";
-
 
 export default function Home() {
   return (
     <div>
-            <h1>Seleccioná tu ubicación</h1>
-      <Map />
+      <MapClientWrapper />
       {/* <SearchPage /> */}
     </div>
   );
