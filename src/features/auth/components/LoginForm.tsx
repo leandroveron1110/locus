@@ -15,7 +15,7 @@ export const LoginForm = () => {
     handleSubmit,
     formState: { errors },
     reset, // Para resetear el formulario después de un envío
-  } = useForm<LoginPayload>({
+  } = useForm<Omit<LoginPayload, "role">>({
     resolver: zodResolver(loginSchema), // Usa zodResolver para la validación
   });
 
@@ -23,12 +23,16 @@ export const LoginForm = () => {
   const { mutate: loginUser, isPending, isError, error } = useLogin();
 
   // Función que se ejecuta al enviar el formulario
-  const onSubmit = (data: LoginPayload) => {
-    loginUser(data, {
-      onSuccess: () => {
-        reset(); // Limpia el formulario al éxito
-      },
-    });
+  const onSubmit = (data: Omit<LoginPayload, "role">) => {
+    console.log("Payload:", data); // ✅ siempre log para debug
+    loginUser(
+      { ...data, role: "CLIENT" },
+      {
+        onSuccess: () => {
+          reset();
+        },
+      }
+    );
   };
 
   return (

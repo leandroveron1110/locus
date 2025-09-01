@@ -25,6 +25,7 @@ export interface User {
 export interface LoginPayload {
   email: string;
   password: string;
+  role: 'CLIENT'
 }
 
 // Interface for a successful login response
