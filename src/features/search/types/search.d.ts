@@ -1,5 +1,5 @@
 export interface ISearchBusinessParams {
-  q?: string;
+  query?: string;
   categoryId?: string;
   city?: string;
   province?: string;

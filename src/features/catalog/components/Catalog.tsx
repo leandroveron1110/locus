@@ -1,14 +1,14 @@
-// app/components/Catalog.tsx
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useCatalg } from "../hooks/useCatalg";
 import CatalogMenu from "./CatalogMenu";
-import CartList from "./cart/CartList";
 import { useAuthStore } from "@/features/auth/store/authStore";
-import { useCartStore } from "../stores/useCartStore";
-import BusinessHeader from "./BusinessHeader"; // Importa el nuevo componente de encabezado
 import { useBusinessProfile } from "../hooks/useBusiness";
+import BusinessHeader from "@/features/business/components/components/BusinessHeader";
+import { ShoppingCart } from "lucide-react";
+import CartModal from "./cart/CartModal";
+import { useCartStore } from "../stores/useCartStore";
 
 interface Props {
   businessId: string;
@@ -16,7 +16,7 @@ interface Props {
 
 export default function Catalog({ businessId }: Props) {
   const { data, isLoading, isError, error } = useCatalg(businessId);
-    const {
+  const {
     data: dataBusiness,
     isLoading: isLoadingBusiness,
     isError: isErrorBusiness,
@@ -24,7 +24,11 @@ export default function Catalog({ businessId }: Props) {
   } = useBusinessProfile(businessId);
 
   const user = useAuthStore((state) => state.user);
-  const items = useCartStore((state) => state.items);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // 🛒 Traemos los productos del carrito
+  const cartItems = useCartStore((state) => state.items);
+  const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   if (isLoading || isLoadingBusiness) {
     return (
@@ -45,7 +49,6 @@ export default function Catalog({ businessId }: Props) {
     );
   }
 
-  // Asegúrate de que tanto el catálogo como los datos del negocio estén disponibles
   if (!data || data.length === 0 || !dataBusiness) {
     return (
       <div className="text-center py-20 text-gray-600">
@@ -55,38 +58,49 @@ export default function Catalog({ businessId }: Props) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      {/* Coloca el encabezado del negocio antes del contenedor principal */}
-      <BusinessHeader business={dataBusiness} />
-
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Columna izquierda: Catálogo */}
-        <div className="flex-1 space-y-16">
-          {data.map((menu) => (
-            <CatalogMenu key={menu.id} menu={menu} />
-          ))}
-        </div>
-
-        {/* Columna derecha: Carrito */}
-        <div className="w-full lg:w-80 xl:w-96">
-          <div className="sticky top-24">
-            {items.length === 0 ? (
-              <p className="text-center mt-8 text-gray-600">
-                Tu carrito está vacío.
-              </p>
-            ) : (
-              <CartList 
-              userId={user?.id} 
-              businessId={businessId}
-              businessAddress={dataBusiness.address}
-              businessName={dataBusiness.name}
-              businessPhone={dataBusiness.phone}
-              businessPaymentMethod={dataBusiness.businessPaymentMethod}
-               />
-            )}
-          </div>
-        </div>
+    <div className="max-w-7xl">
+      {/* Header */}
+      <div className="px-0 pt-0 sm:px-4 sm:pt-4">
+        <BusinessHeader
+          fullDescription={`${
+            dataBusiness.fullDescription ?? dataBusiness.shortDescription
+          }`}
+          logoUrl={dataBusiness.logoUrl}
+          name={dataBusiness.name}
+          businessId={dataBusiness.id}
+        />
       </div>
+
+      {/* Contenido principal */}
+      <div className="flex flex-col gap-8 mt-8">
+        {data.map((menu) => (
+          <CatalogMenu key={menu.id} menu={menu} />
+        ))}
+      </div>
+
+      <button
+        onClick={() => setIsCartOpen(true)}
+        className="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-lg transition"
+      >
+        <ShoppingCart className="w-6 h-6" />
+                {cartCount > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            {cartCount}
+          </span>
+        )}
+      </button>
+
+      {/* Modal del carrito */}
+      <CartModal
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        userId={user?.id}
+        businessId={businessId}
+        businessAddress={dataBusiness.address}
+        businessName={dataBusiness.name}
+        businessPhone={dataBusiness.phone}
+        businessPaymentMethod={dataBusiness.businessPaymentMethod || []}
+      />
     </div>
   );
 }

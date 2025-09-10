@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-// Importamos el nuevo proveedor, más preciso, de Esri.
 import { EsriProvider } from "leaflet-geosearch"; 
 import AddressInput from "../AddressInput";
 import LocationReview from "./components/LocationReview";
@@ -105,7 +104,7 @@ const LocationSelector = () => {
       notes: notes,
     };
 
-    alert(
+    console.log(
       "¡Datos listos para enviar!\n\n" + JSON.stringify(dataToSend, null, 2)
     );
     setIsConfirming(false);

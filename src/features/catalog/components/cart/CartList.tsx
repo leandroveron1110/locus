@@ -6,6 +6,7 @@ import CartItemModal from "./CartItemModal";
 import CartItemCard from "./CartItemCard";
 import OrderForm from "./order/OrderForm";
 import { BusinessPaymentMethod } from "../../types/business";
+import BackButton from "@/features/common/ui/BackButton/BackButton";
 
 interface Props {
   userId?: string;
@@ -13,12 +14,13 @@ interface Props {
   businessName: string;
   businessPhone: string;
   businessAddress: string;
-  businessPaymentMethod?: BusinessPaymentMethod[]
+  businessPaymentMethod?: BusinessPaymentMethod[];
 }
 
 export default function CartList(props: Props) {
   const { items, removeItem, clearCart, getTotal } = useCartStore();
   const [editingItem, setEditingItem] = useState<CartItem | null>(null);
+  const [step, setStep] = useState<"cart" | "summary" | "order">("cart");
 
   if (items.length === 0) {
     return (
@@ -27,25 +29,64 @@ export default function CartList(props: Props) {
   }
 
   return (
-    <div className="space-y-6 p-4 max-w-3xl mx-auto">
-      <h2 className="text-2xl font-bold">Tu carrito</h2>
+    <div className="h-screen flex flex-col overflow-y-auto p-4 box-border">
+      {/* Paso: Carrito */}
+      {step === "cart" && (
+        <>
+          <h2 className="text-xl font-semibold mb-4">Tu carrito</h2>
+          <div className="flex-1 space-y-4">
+            {items.map((item) => (
+              <CartItemCard
+                key={item.cartItemId}
+                item={item}
+                onEdit={setEditingItem}
+                onRemove={removeItem}
+              />
+            ))}
+          </div>
+          <button
+            onClick={() => setStep("summary")}
+            className="mt-6 w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition"
+          >
+            Continuar
+          </button>
+        </>
+      )}
 
-      <div className="space-y-4">
-        {items.map((item) => (
-          <CartItemCard
-            key={item.cartItemId}
-            item={item}
-            onEdit={setEditingItem}
-            onRemove={removeItem}
-          />
-        ))}
-      </div>
+      {/* Paso: Resumen */}
+      {step === "summary" && (
+        <>
+          <div className="flex items-center mb-4">
+            <BackButton onClick={() => setStep("cart")} />
+            <h2 className="text-xl font-semibold ml-4">Resumen de compra</h2>
+          </div>
 
-      <CartSummary total={getTotal()} onClear={clearCart} />
+          <CartSummary total={getTotal()} onClear={clearCart} />
 
-      {/* La parte de la orden queda afuera en su propio form */}
-      <OrderForm {...props} />
+          <div className="flex gap-2 mt-6">
+            <button
+              onClick={() => setStep("order")}
+              className="flex-1 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition"
+            >
+              Confirmar
+            </button>
+          </div>
+        </>
+      )}
 
+      {/* Paso: Orden */}
+      {step === "order" && (
+        <>
+          <div className="flex items-center mb-4">
+            <BackButton onClick={() => setStep("summary")} />
+            <h2 className="text-xl font-semibold ml-4">Finalizar compra</h2>
+          </div>
+
+          <OrderForm {...props} />
+        </>
+      )}
+
+      {/* Modal de edición */}
       {editingItem && (
         <CartItemModal item={editingItem} onClose={() => setEditingItem(null)} />
       )}

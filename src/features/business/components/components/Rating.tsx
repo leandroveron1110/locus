@@ -24,31 +24,39 @@ export default function Rating({ businessId }: Props) {
     userId,
     onSuccess: async () => {
       setComment("");
+      setValue(0);
       await refetch();
     },
   });
 
   const handleSubmit = () => {
-    submit(value, comment);
+    if (value > 0) submit(value, comment);
   };
 
   return (
-    <section className="mt-10 bg-white p-6 rounded-2xl shadow-md space-y-5">
+    <section className="mt-10 bg-white p-6 rounded-2xl shadow-md space-y-6">
       <h2 className="text-xl font-semibold text-gray-800">Calificaciones</h2>
 
+      {/* Estado de carga o error */}
       {isLoading && <p className="text-sm text-gray-500">Cargando calificaciones...</p>}
       {isError && <p className="text-sm text-red-500">Error al cargar las calificaciones.</p>}
 
-      {summary && (
+      {/* Resumen de calificación */}
+      {summary && summary.ratingsCount > 0 ? (
         <div className="flex items-center gap-3 text-yellow-500 font-semibold text-lg">
           <Star size={24} />
           <span>{summary.averageRating.toFixed(1)} / 5</span>
           <span className="text-gray-500 text-base">({summary.ratingsCount} reseñas)</span>
         </div>
+      ) : (
+        !isLoading && !isError && (
+          <p className="text-gray-400 text-sm">Este negocio aún no tiene calificaciones.</p>
+        )
       )}
 
+      {/* Formulario para calificar */}
       {userId ? (
-        <>
+        <div className="space-y-3">
           <div className="flex items-center gap-1">
             {[1, 2, 3, 4, 5].map((n) => (
               <Star
@@ -77,11 +85,12 @@ export default function Rating({ businessId }: Props) {
           >
             {loading ? "Enviando..." : "Calificar"}
           </button>
-        </>
+        </div>
       ) : (
         <p className="text-sm text-gray-500">Iniciá sesión para dejar tu reseña.</p>
       )}
 
+      {/* Comentarios */}
       <div>
         <button
           onClick={() => setShowComments((prev) => !prev)}

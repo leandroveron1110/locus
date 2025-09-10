@@ -3,6 +3,8 @@ import React, { useEffect, useState, useMemo } from "react";
 import { CartItem, useCartStore } from "../../stores/useCartStore";
 import { Option, Product } from "../../types/catlog";
 import { fetchMenuProducDetaillByProductId } from "../../api/catalog-api";
+import OptionGroup from "../product/components/OptionGroup";
+import QuantitySelector from "../product/components/QuantitySelector";
 
 interface Props {
   item: CartItem;
@@ -16,7 +18,7 @@ export default function CartItemEditor({ item, onClose }: Props) {
   const [selected, setSelected] = useState<Record<string, Option[]>>({});
   const editItem = useCartStore((state) => state.editItem);
 
-  // Fetch product actualizado
+  // Fetch producto actualizado
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -28,14 +30,12 @@ export default function CartItemEditor({ item, onClose }: Props) {
         console.error("Error al obtener producto actualizado:", err);
       }
     };
-
     fetchProduct();
   }, [item.product.id]);
 
-  // Agrupar opciones seleccionadas solo cuando el producto esté cargado
+  // Agrupar opciones seleccionadas
   useEffect(() => {
     if (!product) return;
-
     const grouped: Record<string, Option[]> = {};
     for (const opt of selectedOptions) {
       const group = product.optionGroups.find((g) =>
@@ -47,7 +47,6 @@ export default function CartItemEditor({ item, onClose }: Props) {
         if (fullOption) grouped[group.id].push(fullOption);
       }
     }
-
     setSelected(grouped);
   }, [product]);
 
@@ -59,33 +58,27 @@ export default function CartItemEditor({ item, onClose }: Props) {
       .reduce((acc, opt) => acc + Number(opt.priceFinal || 0), 0);
   }, [selected]);
 
-  const total = useMemo(() => {
-    return (basePrice + optionsTotal) * count;
-  }, [basePrice, optionsTotal, count]);
+  const total = useMemo(() => (basePrice + optionsTotal) * count, [
+    basePrice,
+    optionsTotal,
+    count,
+  ]);
 
   const toggleOption = (groupId: string, option: Option, max: number) => {
     setSelected((prev) => {
       const current = prev[groupId] || [];
       const isSelected = current.some((o) => o.id === option.id);
-
       if (isSelected) {
-        return {
-          ...prev,
-          [groupId]: current.filter((o) => o.id !== option.id),
-        };
+        return { ...prev, [groupId]: current.filter((o) => o.id !== option.id) };
       } else {
         if (current.length >= max) return prev;
-        return {
-          ...prev,
-          [groupId]: [...current, option],
-        };
+        return { ...prev, [groupId]: [...current, option] };
       }
     });
   };
 
   const handleSave = () => {
     if (!product) return;
-
     const newOptions = Object.values(selected)
       .flat()
       .map((opt) => ({
@@ -93,105 +86,62 @@ export default function CartItemEditor({ item, onClose }: Props) {
         name: opt.name,
         value: `${product.currencyMask}${Number(opt.priceFinal).toFixed(2)}`,
       }));
-
-    editItem(item.cartItemId, {
-      quantity: count,
-      selectedOptions: newOptions,
-    });
-
+    editItem(item.cartItemId, { quantity: count, selectedOptions: newOptions });
     onClose();
   };
 
   if (!product) {
-    return (
-      <div className="p-4 text-center">Cargando producto actualizado...</div>
-    );
+    return <div className="p-4 text-center text-gray-500">Cargando producto...</div>;
   }
 
   return (
-    <div className="space-y-6 p-4 border rounded shadow bg-white">
-      <h2 className="text-2xl font-bold text-gray-900">{product.name}</h2>
-      <p className="text-gray-700">{product.description}</p>
+    <div className="space-y-6 bg-white shadow-lg">
+      {/* Nombre y descripción */}
+      <div className="space-y-1">
+        <h2 className="text-2xl font-bold text-gray-900">{product.name}</h2>
+        <p className="text-gray-700 text-sm">{product.description}</p>
+      </div>
 
+      {/* Opciones */}
       {product.hasOptions && product.optionGroups.length > 0 && (
-        <div className="space-y-4">
-          {product.optionGroups.map((group) => {
-            const groupSelected = selected[group.id] || [];
-            const max = group.maxQuantity;
-
-            return (
-              <div key={group.id}>
-                <div className="flex justify-between items-center mb-1">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {group.name}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    Seleccioná hasta {max}
-                  </p>
-                </div>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {group.options.map((option) => {
-                    const isSelected = groupSelected.some(
-                      (o) => o.id === option.id
-                    );
-                    return (
-                      <li
-                        key={option.id}
-                        className={`border p-3 rounded-lg cursor-pointer transition-colors ${
-                          isSelected
-                            ? "border-blue-600 bg-blue-50"
-                            : "border-gray-300 hover:border-blue-400"
-                        }`}
-                        onClick={() => toggleOption(group.id, option, max)}
-                      >
-                        <div className="flex justify-between items-center">
-                          <span>{option.name}</span>
-                          <span className="text-sm text-gray-800">
-                            +{product.currencyMask}
-                            {Number(option.priceFinal).toFixed(2)}
-                          </span>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            );
-          })}
+        <div className="space-y-5">
+          {product.optionGroups.map((group) => (
+            <OptionGroup
+              key={group.id}
+              group={group}
+              selected={selected[group.id] || []}
+              toggleOption={(gId, option) =>
+                toggleOption(gId, option, group.maxQuantity || 1)
+              }
+              currencyMask={product.currencyMask}
+            />
+          ))}
         </div>
       )}
 
-      <div className="flex items-center space-x-4 mt-4">
-        <span className="font-medium">Unidades</span>
-        <button
-          onClick={() => setCount((c) => Math.max(1, c - 1))}
-          className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
-        >
-          -
-        </button>
-        <span className="text-lg font-semibold">{count}</span>
-        <button
-          onClick={() => setCount((c) => c + 1)}
-          className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
-        >
-          +
-        </button>
+      {/* Selector de cantidad y total */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4">
+        <QuantitySelector
+          count={count}
+          increase={() => setCount((c) => c + 1)}
+          decrease={() => setCount((c) => Math.max(1, c - 1))}
+        />
+        <div className="text-lg font-bold text-gray-900">
+          Total: {product.currencyMask} {total.toFixed(2)}
+        </div>
       </div>
 
-      <div className="mt-4 text-xl font-bold">
-        Total: {product.currencyMask} {total.toFixed(2)}
-      </div>
-
-      <div className="flex mt-4">
+      {/* Botones */}
+      <div className="flex flex-col sm:flex-row gap-3 mt-4">
         <button
           onClick={handleSave}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white px-5 py-3 rounded-xl font-medium hover:bg-blue-700 transition"
         >
           Guardar cambios
         </button>
         <button
           onClick={onClose}
-          className="ml-4 text-gray-600 hover:underline"
+          className="text-gray-600 hover:underline px-5 py-3 rounded-xl border border-gray-200"
         >
           Cancelar
         </button>

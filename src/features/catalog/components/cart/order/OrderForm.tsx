@@ -1,4 +1,3 @@
-// src/components/OrderForm.tsx
 "use client";
 import React, { useEffect, useState, useMemo } from "react";
 import { useAuthStore } from "@/features/auth/store/authStore";
@@ -7,12 +6,12 @@ import { Address, AddressCreateDto } from "../../../types/address";
 import { useCartStore } from "@/features/catalog/stores/useCartStore";
 import DeliveryOptionSelector from "./DeliveryOptionSelector";
 import AddressSelector from "./AddressSelector";
-import AddressForm from "./AddressForm";
 import SubmitOrderButton from "./SubmitOrderButton";
 import { useRouter } from "next/navigation";
 import PaymentOptionSelector from "./PaymentOptionSelector";
 import { PaymentMethodType } from "@/features/orders/types/order";
-import { BusinessPaymentMethod } from "@/features/catalog/types/business";
+import MapClientWrapper from "@/features/locationSelector/components/MapClientWrapper";
+import { X } from "lucide-react";
 
 type DeliveryOption = "pickup" | "delivery";
 
@@ -47,7 +46,8 @@ export default function OrderForm({
     text: string;
   }>();
   const [showAddressForm, setShowAddressForm] = useState(false);
-  const [orderNote, setOrderNote] = useState<string>("");
+  const [showMap, setShowMap] = useState(false); // Nuevo estado para mostrar/ocultar mapa
+  const [orderNote, setOrderNote] = useState("");
 
   const [newAddress, setNewAddress] = useState<Address>({
     city: "Concepción del Uruguay",
@@ -57,14 +57,13 @@ export default function OrderForm({
     street: "",
   });
 
-  // Si no hay direcciones guardadas y selecciona delivery → abrir form
+  // Mostrar formulario automáticamente si no hay direcciones
   useEffect(() => {
     if (addresses?.length === 0 && selectedDeliveryOption === "delivery") {
       setShowAddressForm(true);
     }
   }, [addresses, selectedDeliveryOption]);
 
-  // Guardar nueva dirección
   const handleSaveAddress = () => {
     if (!userId) {
       alert("Debes iniciar sesión para agregar una dirección");
@@ -79,6 +78,7 @@ export default function OrderForm({
           const text = `${data.street} ${data.number ?? ""}, ${data.city}`;
           setSelectedAddress({ id: data.id, text });
           setShowAddressForm(false);
+          setShowMap(false);
         },
         onError: (error) => {
           alert("Error al crear dirección: " + error.message);
@@ -87,25 +87,24 @@ export default function OrderForm({
     );
   };
 
-  // Cambiar dirección seleccionada
   const handleAddressChange = (selection: { id: string; text: string }) => {
     if (selection.id === "new") {
       setShowAddressForm(true);
+      setShowMap(true); // Abrir mapa al crear nueva dirección
       setSelectedAddress(undefined);
     } else {
       setSelectedAddress(selection);
       setShowAddressForm(false);
+      setShowMap(false);
     }
   };
 
-  // Validaciones para habilitar checkout
   const isCheckoutEnabled = useMemo(() => {
     if (!user) return false;
     if (selectedDeliveryOption === "delivery" && !selectedAddress) return false;
     return true;
   }, [user, selectedDeliveryOption, selectedAddress]);
 
-  // Payload para enviar la orden
   const orderPayload = useMemo(() => {
     if (!user) return null;
 
@@ -123,7 +122,9 @@ export default function OrderForm({
       deliveryType: selectedDeliveryOption,
       paymentType: selectedPaymentOption,
       customerAddress:
-        selectedDeliveryOption === "delivery" ? selectedAddress?.text : undefined,
+        selectedDeliveryOption === "delivery"
+          ? selectedAddress?.text
+          : undefined,
       total: getTotal(),
     };
   }, [
@@ -140,85 +141,88 @@ export default function OrderForm({
     selectedPaymentOption,
   ]);
 
-  // Checkout handler
-  const handleCheckout = () => {
-    if (!user) {
-      alert("Debes iniciar sesión para continuar");
-      router.push("/login");
-      return;
-    }
-
-    if (selectedDeliveryOption === "delivery" && !selectedAddress) {
-      alert("Debes seleccionar o agregar una dirección para delivery");
-      return;
-    }
-
-    if (
-      selectedDeliveryOption === "pickup" &&
-      selectedPaymentOption === PaymentMethodType.DELIVERY
-    ) {
-      alert("No puedes pagar al delivery si retiras el pedido.");
-      return;
-    }
-  };
-
   return (
-    <div className="space-y-6">
-      <DeliveryOptionSelector
-        selectedOption={selectedDeliveryOption}
-        onChange={setSelectedDeliveryOption}
-      />
+    <div className="space-y-6 relative">
+      {/* Opciones de entrega */}
+      <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 className="text-lg font-semibold mb-4">Opciones de entrega</h2>
+        <DeliveryOptionSelector
+          selectedOption={selectedDeliveryOption}
+          onChange={setSelectedDeliveryOption}
+        />
+      </section>
 
+      {/* Dirección */}
       {selectedDeliveryOption === "delivery" && userId && (
-        <>
-          {addresses && addresses.length > 0 && !showAddressForm && (
+        <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
+          {!showAddressForm && (
             <AddressSelector
               addresses={addresses as AddressCreateDto[]}
               selectedId={selectedAddress?.id}
               onChange={handleAddressChange}
-              onCreateNew={() => setShowAddressForm(true)}
+              onCreateNew={() => {
+                setShowAddressForm(true);
+                setShowMap(true);
+              }}
             />
           )}
 
+          {/* Si se está creando nueva dirección */}
           {showAddressForm && (
-            <AddressForm
-              address={newAddress}
-              onChange={(data) =>
-                setNewAddress((prev) => ({ ...prev, ...data }))
-              }
-              onSave={handleSaveAddress}
-            />
+            <div className="space-y-3 mt-2">
+              {showMap && (
+                <div className="relative">
+                  <button
+                    className="absolute top-0 right-0 z-10 text-gray-600 hover:text-gray-900 p-2"
+                    onClick={() => setShowMap(false)}
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                  <MapClientWrapper />
+                </div>
+              )}
+
+              {/* Si el mapa está cerrado, volver a mostrar AddressSelector */}
+              {!showMap && (
+                <AddressSelector
+                  addresses={addresses as AddressCreateDto[]}
+                  selectedId={selectedAddress?.id}
+                  onChange={handleAddressChange}
+                  onCreateNew={() => setShowMap(true)}
+                />
+              )}
+            </div>
           )}
-        </>
+        </section>
       )}
 
-      <PaymentOptionSelector
-        selectedOption={selectedPaymentOption}
-        onChange={setSelectedPaymentOption}
-        isDelivery={selectedDeliveryOption === "delivery"}
-      />
-      
-      {/* Nuevo bloque para mostrar los detalles de transferencia
-      {selectedPaymentOption === PaymentMethodType.TRANSFER && (
-        <TransferDetails paymentMethods={businessPaymentMethod || []} />
-      )} */}
+      {/* Método de pago */}
+      <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <PaymentOptionSelector
+          selectedOption={selectedPaymentOption}
+          onChange={setSelectedPaymentOption}
+          isDelivery={selectedDeliveryOption === "delivery"}
+        />
+      </section>
 
-      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      {/* Notas del pedido */}
+      <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <label htmlFor="notes" className="block font-semibold mb-2">
-          Notas adicionales para tu pedido:
+          Notas adicionales para tu pedido
         </label>
         <textarea
           id="notes"
           value={orderNote}
           onChange={(e) => setOrderNote(e.target.value)}
           rows={3}
-          className="w-full border rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full border rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500"
           placeholder="Ej: Sin cebolla, con extra de salsa..."
         />
-      </div>
+      </section>
 
+      {/* Botón de checkout */}
       {isCheckoutEnabled && orderPayload && (
-        <div onClick={handleCheckout}>
+        <div className="flex justify-end">
           <SubmitOrderButton orderPayload={orderPayload} />
         </div>
       )}

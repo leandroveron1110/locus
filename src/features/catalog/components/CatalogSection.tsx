@@ -1,9 +1,10 @@
+// src/components/CatalogSection.tsx
 "use client";
 
 import React, { useCallback, useState } from "react";
 import { Product, Section } from "../types/catlog";
 import CatalogProduct from "./CatalogProduct";
-import ProductDetails from "./ProductDetails";
+import ProductModal from "./ProductModal"; // Importación correcta
 
 interface Props {
   section: Section;
@@ -28,7 +29,7 @@ export default function CatalogSection({ section }: Props) {
 
       <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
         {section.products
-          .sort((a, b) => b.rating - a.rating)
+          .sort((a, b) => (b.rating || 0) - (a.rating || 0))
           .map((product) => (
             <CatalogProduct
               key={product.id}
@@ -41,35 +42,6 @@ export default function CatalogSection({ section }: Props) {
       {selectedProduct && (
         <ProductModal product={selectedProduct} onClose={handleCloseModal} />
       )}
-    </div>
-  );
-}
-
-interface ModalProps {
-  product: Product;
-  onClose: () => void;
-}
-
-function ProductModal({ product, onClose }: ModalProps) {
-  return (
-    <div
-      className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="product-modal-title"
-    >
-      <div className="bg-white rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-4 text-gray-500 hover:text-gray-800 text-xl"
-          aria-label="Cerrar modal"
-        >
-          ✕
-        </button>
-        <div className="p-6">
-          <ProductDetails product={product} onClose={onClose} />
-        </div>
-      </div>
     </div>
   );
 }
