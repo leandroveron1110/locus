@@ -58,18 +58,20 @@ export default function CartItemEditor({ item, onClose }: Props) {
       .reduce((acc, opt) => acc + Number(opt.priceFinal || 0), 0);
   }, [selected]);
 
-  const total = useMemo(() => (basePrice + optionsTotal) * count, [
-    basePrice,
-    optionsTotal,
-    count,
-  ]);
+  const total = useMemo(
+    () => (basePrice + optionsTotal) * count,
+    [basePrice, optionsTotal, count]
+  );
 
   const toggleOption = (groupId: string, option: Option, max: number) => {
     setSelected((prev) => {
       const current = prev[groupId] || [];
       const isSelected = current.some((o) => o.id === option.id);
       if (isSelected) {
-        return { ...prev, [groupId]: current.filter((o) => o.id !== option.id) };
+        return {
+          ...prev,
+          [groupId]: current.filter((o) => o.id !== option.id),
+        };
       } else {
         if (current.length >= max) return prev;
         return { ...prev, [groupId]: [...current, option] };
@@ -84,14 +86,16 @@ export default function CartItemEditor({ item, onClose }: Props) {
       .map((opt) => ({
         id: opt.id,
         name: opt.name,
-        value: `${product.currencyMask}${Number(opt.priceFinal).toFixed(2)}`,
+        value: Number(opt.priceFinal),
       }));
     editItem(item.cartItemId, { quantity: count, selectedOptions: newOptions });
     onClose();
   };
 
   if (!product) {
-    return <div className="p-4 text-center text-gray-500">Cargando producto...</div>;
+    return (
+      <div className="p-4 text-center text-gray-500">Cargando producto...</div>
+    );
   }
 
   return (

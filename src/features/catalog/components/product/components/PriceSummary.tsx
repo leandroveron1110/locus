@@ -19,7 +19,7 @@ export default function PriceSummary({
       <div className="flex justify-between items-center text-lg font-semibold text-gray-900">
         <span>Total</span>
         <span>
-          {currencyMask} {total.toFixed(2)}
+          {currencyMask} {total.toLocaleString("es-AR")}
         </span>
       </div>
 

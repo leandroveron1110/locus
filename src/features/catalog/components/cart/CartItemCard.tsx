@@ -10,13 +10,14 @@ interface Props {
 }
 
 export default function CartItemCard({ item, onEdit, onRemove }: Props) {
+
   const hasOptions = item.selectedOptions && item.selectedOptions.length > 0;
 
   // 🔹 Calcular el precio total del ítem
-  const basePrice = parseFloat(String(item.product.finalPrice)) || 0;
+  const basePrice = Number(item.product.finalPrice) || 0;
   const optionsPrice =
     item.selectedOptions?.reduce(
-      (acc, opt) => acc + (parseFloat(opt.value) || 0),
+      (acc, opt) => acc + (Number(opt.value) || 0),
       0
     ) || 0;
 
@@ -33,6 +34,7 @@ export default function CartItemCard({ item, onEdit, onRemove }: Props) {
           src={item.product.imageUrl}
           alt={item.product.name}
           className="w-16 h-16 rounded-lg object-cover"
+          loading="lazy"
         />
       ) : (
         <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
@@ -53,8 +55,8 @@ export default function CartItemCard({ item, onEdit, onRemove }: Props) {
               <li key={opt.id} className="flex items-center gap-1">
                 <span className="font-medium">{opt.name}:</span>
                 <span>
-                  {opt.value !== "0"
-                    ? `+ $${parseFloat(opt.value).toLocaleString("es-AR")}`
+                  {opt.value !== 0
+                    ? `+ $${opt.value.toLocaleString("es-AR")}`
                     : "Incluido"}
                 </span>
               </li>

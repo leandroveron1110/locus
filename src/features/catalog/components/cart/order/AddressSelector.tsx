@@ -5,7 +5,12 @@ import React from "react";
 interface Props {
   addresses: AddressCreateDto[];
   selectedId: string | undefined;
-  onChange: (selection: { id: string; text: string }) => void;
+  onChange: (selection: {
+    id: string;
+    text: string;
+    lat: number;
+    lng: number;
+  }) => void;
   onCreateNew: () => void;
 }
 
@@ -28,9 +33,20 @@ export default function AddressSelector({
           return (
             <button
               key={addr.id}
-              onClick={() => onChange({ id: addr.id, text })}
+              onClick={() =>
+                onChange({
+                  id: addr.id,
+                  text,
+                  lat: addr.latitude || 0,
+                  lng: addr.longitude || 0,
+                })
+              }
               className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition
-                ${isSelected ? "border-blue-600 bg-blue-50" : "border-gray-300 hover:border-blue-400"}
+                ${
+                  isSelected
+                    ? "border-blue-600 bg-blue-50"
+                    : "border-gray-300 hover:border-blue-400"
+                }
               `}
             >
               <span className="text-gray-800">{text}</span>
@@ -43,9 +59,13 @@ export default function AddressSelector({
 
         {/* Botón para crear nueva dirección */}
         <button
-          onClick={() => onChange({ id: "new", text: "" })}
+          onClick={() => onChange({ id: "new", text: "", lat: 0, lng: 0 })}
           className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition
-            ${selectedId === "new" ? "border-blue-600 bg-blue-50" : "border-gray-300 hover:border-blue-400"}
+            ${
+              selectedId === "new"
+                ? "border-blue-600 bg-blue-50"
+                : "border-gray-300 hover:border-blue-400"
+            }
           `}
         >
           <span className="text-gray-800">+ Agregar nueva dirección</span>

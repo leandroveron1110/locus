@@ -60,13 +60,10 @@ export const fetchFollowers = async (
   businessId: string,
   userId: string | undefined
 ): Promise<BusinessFollow> => {
-  console.log(businessId, userId);
   if (!userId) {
-    console.log(businessId, userId);
     const res = await axios.get(`/follow/business/${businessId}`); // endpoint de tu API
     return res.data;
   } else {
-    console.log("followe LOGEADOOO");
     const res = await axios.get(`/follow/business/${businessId}/${userId}`); // endpoint de tu API
     return res.data;
   }

@@ -24,7 +24,6 @@ export const LoginForm = () => {
 
   // Función que se ejecuta al enviar el formulario
   const onSubmit = (data: Omit<LoginPayload, "role">) => {
-    console.log("Payload:", data); // ✅ siempre log para debug
     loginUser(
       { ...data, role: "CLIENT" },
       {

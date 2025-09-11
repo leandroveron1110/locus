@@ -67,7 +67,7 @@ const ProductDetails = ({ product, onClose }: Props) => {
       .map((opt) => ({
         id: opt.id,
         name: opt.name,
-        value: `${(Number(opt.priceFinal) || 0).toFixed(2)}`,
+        value: (Number(opt.priceFinal) || 0),
       }));
 
     addToCart({

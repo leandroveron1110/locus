@@ -12,7 +12,6 @@ export function initOrdersSocket(userId: string) {
   }
 
   if (socket) {
-    console.log("Socket de usuario ya inicializado");
     return socket;
   }
 
@@ -24,19 +23,16 @@ export function initOrdersSocket(userId: string) {
   });
 
   socket.on("connect", () => {
-    console.log("Conectado al socket como user", socket!.id);
     socket!.emit("join_role", { role: "user", id: userId });
   });
 
   socket.on("order_created", (order: Order) => {
-    console.log("Nueva orden recibida:", order);
     addOrder(order);
   });
 
   socket.on(
     "order_status_updated",
     (data: { orderId: string; status: string }) => {
-      console.log("Estado de orden actualizado:", data);
       updateOrderStatus(data.orderId, data.status);
     }
   );
@@ -48,7 +44,6 @@ export function initOrdersSocket(userId: string) {
       paymentStatus: string;
       paymentReceiptUrl: string;
     }) => {
-      console.log("Estado de pago actualizado:", data);
       updatePaymentStatus(
         data.orderId,
         data.paymentStatus as PaymentStatus,

@@ -62,7 +62,7 @@ export default function OptionItem({
           }`}
         >
           {price > 0
-            ? `+${currencyMask} ${price.toFixed(2)}`
+            ? `+${currencyMask} ${price.toLocaleString("es-AR")}`
             : "Incluido"}
         </span>
       </div>

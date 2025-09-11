@@ -5,7 +5,7 @@ import { Product } from "../types/catlog";
 export type SelectedOption = {
   id: string;
   name: string;
-  value: string;
+  value: number;
 };
 
 export type CartItem = {
@@ -16,45 +16,59 @@ export type CartItem = {
 };
 
 interface CartState {
-  items: CartItem[];
+  items: ReadonlyArray<CartItem>;
   addToCart: (item: Omit<CartItem, "cartItemId">) => void;
   removeItem: (cartItemId: string) => void;
-  editItem: (
-    cartItemId: string,
-    data: Partial<Omit<CartItem, "cartItemId">>
-  ) => void;
+  editItem: (cartItemId: string, data: Partial<Omit<CartItem, "cartItemId">>) => void;
   clearCart: () => void;
   getTotal: () => number;
 }
+
+// ✅ Función utilitaria para comparar opciones
+const areOptionsEqual = (a?: SelectedOption[], b?: SelectedOption[]) => {
+  if (!a && !b) return true;
+  if (!a || !b || a.length !== b.length) return false;
+  return a.every((opt) => b.some((bOpt) => bOpt.id === opt.id && bOpt.value === opt.value));
+};
+
+// ✅ Función utilitaria para calcular total de un item
+const calculateItemTotal = (item: CartItem): number => {
+  const basePrice = Number(item.product.finalPrice) || 0;
+  const optionsTotal =
+    item.selectedOptions?.reduce((acc, opt) => acc + (Number(opt.value) || 0), 0) ?? 0;
+
+  return (basePrice + optionsTotal) * (Number(item.quantity) || 0);
+};
+
 
 export const useCartStore = create<CartState>((set, get) => ({
   items: [],
 
   addToCart: (newItem) => {
-    const existingItem = get().items.find(
-      (i) =>
-        i.product.id === newItem.product.id &&
-        JSON.stringify(i.selectedOptions) ===
-          JSON.stringify(newItem.selectedOptions)
-    );
+    set((state) => {
+      const existingItem = state.items.find(
+        (i) =>
+          i.product.id === newItem.product.id &&
+          areOptionsEqual(i.selectedOptions, newItem.selectedOptions)
+      );
 
-    if (existingItem) {
-      set((state) => ({
-        items: state.items.map((i) =>
-          i.cartItemId === existingItem.cartItemId
-            ? { ...i, quantity: i.quantity + newItem.quantity }
-            : i
-        ),
-      }));
-    } else {
+      if (existingItem) {
+        return {
+          items: state.items.map((i) =>
+            i.cartItemId === existingItem.cartItemId
+              ? { ...i, quantity: i.quantity + newItem.quantity }
+              : i
+          ),
+        };
+      }
+
       const cartItem: CartItem = {
         ...newItem,
         cartItemId: uuid(),
       };
-      set((state) => ({
-        items: [...state.items, cartItem],
-      }));
-    }
+
+      return { items: [...state.items, cartItem] };
+    });
   },
 
   removeItem: (cartItemId) =>
@@ -71,30 +85,5 @@ export const useCartStore = create<CartState>((set, get) => ({
 
   clearCart: () => set({ items: [] }),
 
-  // ... the rest of your Zustand store
-
-  getTotal: () =>
-    get().items.reduce((acc, item) => {
-      // 1. Get the base product price, defaulting to 0 if not a valid number
-      const productPrice = parseFloat(String(item.product.finalPrice)) || 0;
-
-      let itemTotal = productPrice * item.quantity;
-
-      // 2. Sum the value of selected options
-      if (item.selectedOptions && item.selectedOptions.length > 0) {
-        console.log(item.selectedOptions)
-        const optionsTotal = item.selectedOptions.reduce(
-          (optionsAcc, option) => {
-            // Get the option value, defaulting to 0 if not a valid number
-            const optionValue = parseFloat(option.value) || 0;
-            return optionsAcc + optionValue;
-          },
-          0
-        );
-        itemTotal += optionsTotal * item.quantity;
-      }
-
-      // 3. Add the item's total to the accumulator
-      return acc + itemTotal;
-    }, 0),
+  getTotal: () => get().items.reduce((acc, item) => acc + calculateItemTotal(item), 0),
 }));

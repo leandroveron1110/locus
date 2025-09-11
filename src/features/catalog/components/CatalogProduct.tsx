@@ -100,11 +100,11 @@ export default function CatalogProduct({ product, onClick }: Props) {
           <div className="flex flex-col items-end">
             {hasDiscount && (
               <span className="text-xs line-through text-gray-400 leading-none">
-                {currencyMask} {(Number(originalPrice) || 0).toFixed(2)}
+                {currencyMask} {(Number(originalPrice) || 0).toLocaleString("es-AR")}
               </span>
             )}
             <span className="text-lg font-bold text-gray-900 leading-none">
-              {currencyMask} {(Number(finalPrice) || 0).toFixed(2)}
+              {currencyMask} {(Number(finalPrice) || 0).toLocaleString("es-AR")}
             </span>
           </div>
         </div>

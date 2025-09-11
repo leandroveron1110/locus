@@ -11,3 +11,22 @@ export interface AddressData {
   notes?: string | null;
   apartment?: string | null;
 }
+
+export interface CreateAddress {
+  street: string;
+  number?: string;
+  apartment?: string;
+  city: string;
+  province: string;
+  country?: string; // por defecto "Argentina"
+  postalCode?: string;
+  latitude?: number;
+  longitude?: number;
+  notes?: string;
+  isDefault?: boolean;
+  userId?: string; // uuid
+}
+
+export interface FullAddress extends CreateAddress {
+  id: string;
+}

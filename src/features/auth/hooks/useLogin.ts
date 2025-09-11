@@ -19,7 +19,6 @@ export const useLogin = () => {
     onSuccess: (data) => {
       // Esta función se ejecuta si la mutación (login) es exitosa
       authStoreLogin(data); // Actualiza el store de Zustand con los datos del usuario
-      console.log('Login exitoso:', data);
       // Redirige al usuario a la página principal o a la que intentaba acceder
       const redirectPath = new URLSearchParams(window.location.search).get('redirect') || '/';
       router.push(redirectPath);

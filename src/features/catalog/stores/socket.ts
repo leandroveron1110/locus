@@ -12,13 +12,11 @@ export const getSocket = (userId: string): Socket => {
 
     socket.on("connect", () => {
       if (socket) {
-        console.log("Conectado al socket", socket.id);
         socket.emit("join_role", { role: "user", id: userId });
       }
     });
 
     socket.on("disconnect", (reason) => {
-      console.log("Socket desconectado:", reason);
     });
   }
   if (!socket.connected) {

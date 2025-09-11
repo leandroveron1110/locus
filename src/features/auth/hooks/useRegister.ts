@@ -19,7 +19,6 @@ export const useRegister = () => {
     onSuccess: (user) => {
       // Esta función se ejecuta si la mutación (registro) es exitosa
       authStoreRegister(user); // Actualiza el store de Zustand con los datos del usuario
-      console.log('Registro exitoso:', user);
       // Redirige al usuario a la página principal o a donde sea apropiado después del registro
       router.push('/');
     },

@@ -92,6 +92,7 @@ export default function Gallery({ businessId }: Props) {
             src={data[selectedIndex].url}
             alt={`Imagen negocio ${selectedIndex + 1}`}
             className="max-h-[80vh] max-w-[90vw] rounded-lg shadow-lg"
+            loading="lazy"
           />
 
           {/* Imagen siguiente */}

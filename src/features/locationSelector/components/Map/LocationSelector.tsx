@@ -8,10 +8,13 @@ import AddressInput from "../AddressInput";
 import LocationReview from "./components/LocationReview";
 import ConfirmationCard from "../ConfirmationCard";
 import { AddressData } from "../../types/address-data";
+import { useSaveAddress } from "../../hooks/useSaveAddress";
 
 const MapComponent = dynamic(() => import("./components/Map"), { ssr: false });
-
-const LocationSelector = () => {
+interface LocationSelectorProps {
+  saveAddress: (address: AddressData) => void;
+}
+const LocationSelector = ({ saveAddress }: LocationSelectorProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [initialPosition, setInitialPosition] = useState<
@@ -104,9 +107,7 @@ const LocationSelector = () => {
       notes: notes,
     };
 
-    console.log(
-      "¡Datos listos para enviar!\n\n" + JSON.stringify(dataToSend, null, 2)
-    );
+    saveAddress(dataToSend)
     setIsConfirming(false);
   };
 
