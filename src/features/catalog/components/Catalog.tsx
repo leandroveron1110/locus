@@ -99,6 +99,8 @@ export default function Catalog({ businessId }: Props) {
         businessAddress={dataBusiness.address}
         businessName={dataBusiness.name}
         businessPhone={dataBusiness.phone}
+        businessAddresslatitude={Number(dataBusiness.latitude) || 0}
+        businessAddresslongitude={Number(dataBusiness.longitude) || 0}
         businessPaymentMethod={dataBusiness.businessPaymentMethod || []}
       />
     </div>

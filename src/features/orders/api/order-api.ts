@@ -1,15 +1,6 @@
 import axios from "@/lib/api";
-import { CreateOrderFull, Order, PaymentMethodType, PaymentStatus } from "../types/order";
+import { Order, PaymentMethodType, PaymentStatus } from "../types/order";
 import { BusinessPaymentMethod } from "../types/business-payment-methods";
-
-
-export const fetchCreateOrder = async (
-  payload: CreateOrderFull
-): Promise<any> => {
-  const { data } = await axios.post("/orders/full", payload);
-  return data;
-};
-
 
 export async function getUserOrders(userId: string): Promise<Order[]> {
   const res = await axios.get(`/orders/user/${userId}`);

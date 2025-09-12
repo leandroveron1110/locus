@@ -1,10 +1,11 @@
 // components/DeliveryOptionSelector.tsx
 
+import { DeliveryOption } from "@/features/catalog/types/order";
 import React from "react";
 
 interface Props {
-  selectedOption: "pickup" | "delivery";
-  onChange: (option: "pickup" | "delivery") => void;
+  selectedOption: DeliveryOption;
+  onChange: (option: DeliveryOption) => void;
 }
 
 export default function DeliveryOptionSelector({
@@ -18,9 +19,9 @@ export default function DeliveryOptionSelector({
       </h3>
       <div className="flex gap-4">
         <button
-          onClick={() => onChange("pickup")}
+          onClick={() => onChange("PICKUP")}
           className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors ${
-            selectedOption === "pickup"
+            selectedOption === "PICKUP"
               ? "bg-blue-600 text-white shadow-md"
               : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}
@@ -28,9 +29,9 @@ export default function DeliveryOptionSelector({
           Retiro en el local
         </button>
         <button
-          onClick={() => onChange("delivery")}
+          onClick={() => onChange("DELIVERY")}
           className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors ${
-            selectedOption === "delivery"
+            selectedOption === "DELIVERY"
               ? "bg-blue-600 text-white shadow-md"
               : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}

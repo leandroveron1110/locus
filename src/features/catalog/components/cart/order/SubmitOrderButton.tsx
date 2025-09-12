@@ -1,104 +1,79 @@
 "use client";
-import { useState } from "react";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { useCartStore } from "@/features/catalog/stores/useCartStore";
 import { useCreateOrder } from "@/features/catalog/hooks/useCreateOrder";
-import { mapCartToOrderPayload } from "@/features/catalog/stores/createOrderFull";
+import { CreateOrderFull, CreateOrderItem } from "@/features/catalog/types/order";
 
 interface Props {
-  orderPayload: {
-    userId: string;
-    businessId: string;
-    note: string;
-    deliveryAddressId?: string;
-    pickupAddressId?: string;
-    customerAddress?: string;
-    customerObservations?: string;
-    businessName: string;
-    businessPhone: string;
-    businessAddress: string;
-    businessObservations?: string;
-    paymentType?: "CASH" | "TRANSFER" | "DELIVERY";
-    paymentInstructions?: string;
-    paymentHolderName?: string;
-  };
+  orderPayload: CreateOrderFull;
 }
 
-export default function SubmitOrderButton({
-  orderPayload: {
-    userId,
-    businessId,
-    note,
-    deliveryAddressId,
-    pickupAddressId,
-    customerAddress,
-    customerObservations,
-    businessName,
-    businessPhone,
-    businessAddress,
-    businessObservations,
-    paymentType,
-    paymentInstructions,
-    paymentHolderName,
-  },
-}: Props) {
+export default function SubmitOrderButton({ orderPayload }: Props) {
   const [error, setError] = useState("");
-  const { clearCart } = useCartStore();
+  const { items, getTotal, clearCart } = useCartStore.getState();
   const createOrderMutation = useCreateOrder();
   const router = useRouter();
-  const userStore = useAuthStore((state) => state.user);
+  const user = useAuthStore((state) => state.user);
 
   const handleSubmitOrder = async () => {
     setError("");
 
-    if (
-      !userId ||
-      !businessId ||
-      !userStore
-    ) {
+    if (!orderPayload.userId || !orderPayload.businessId || !user) {
       setError("Faltan datos para completar la orden.");
       return;
     }
 
     try {
-      // 1️⃣ Construir payload
-      const payload = mapCartToOrderPayload({
-        userId,
-        businessId,
-        customerName: `${userStore.firstName} ${userStore.lastName}`,
-        customerPhone: userStore.email,
-        customerAddress,
-        customerObservations,
-        businessName,
-        businessPhone,
-        businessAddress,
-        businessObservations,
-        deliveryAddressId,
-        pickupAddressId,
-        notes: note,
-        paymentType,
-        paymentInstructions,
-        paymentHolderName,
-      });
+      // 1️⃣ Mapear productos del carrito
+      const mappedItems: CreateOrderItem[] = items.map((cartItem) => ({
+        menuProductId: cartItem.product.id,
+        productName: cartItem.product.name,
+        productDescription: cartItem.product.description,
+        productImageUrl: cartItem.product.imageUrl || undefined,
+        quantity: cartItem.quantity,
+        priceAtPurchase: Number(cartItem.product.finalPrice).toFixed(2), // string decimal
+        notes: "", // si agregas observaciones de producto podrías pasarlas aquí
+        optionGroups: cartItem.product.optionGroups.map((group) => ({
+          groupName: group.name,
+          minQuantity: group.minQuantity,
+          maxQuantity: group.maxQuantity,
+          quantityType: group.quantityType,
+          opcionGrupoId: group.id,
+          options: group.options.map((opt) => ({
+            optionName: opt.name,
+            priceModifierType: opt.priceModifierType,
+            quantity: 1, // default
+            priceFinal: opt.priceFinal,
+            priceWithoutTaxes: opt.priceWithoutTaxes,
+            taxesAmount: opt.taxesAmount,
+            opcionId: opt.id,
+          })),
+        })),
+      }));
 
-      // 2️⃣ Crear orden vía API
-      const order = await createOrderMutation.mutateAsync(payload);
-      // 3️⃣ Limpiar carrito
+      // 2️⃣ Armar payload completo
+      const payload: CreateOrderFull = {
+        ...orderPayload,
+        items: mappedItems,
+        total: Number(getTotal().toFixed(2)),
+      };
+
+      // 3️⃣ Llamar API
+      await createOrderMutation.mutateAsync(payload);
+
+      // 4️⃣ Limpiar carrito y redirigir
       clearCart();
       router.push(`/orders`);
-
-      // ✅ Ya no necesitamos iniciar el socket aquí.
-      // La página de órdenes (`useOrders`) lo maneja de forma global
-      // y agregará esta orden automáticamente cuando el backend emita `order_created`.
     } catch (err: any) {
-      console.error(err);
-      const message =
+      console.error("Error al enviar orden:", err);
+      setError(
         err?.response?.data?.message ||
-        err?.message ||
-        "Hubo un error al enviar la orden.";
-      setError(message);
+          err?.message ||
+          "Hubo un error al enviar la orden."
+      );
     }
   };
 
@@ -107,10 +82,10 @@ export default function SubmitOrderButton({
       <button
         onClick={handleSubmitOrder}
         disabled={createOrderMutation.isPending}
-        className={`px-4 py-2 rounded text-white ${
+        className={`px-4 py-2 rounded text-white transition ${
           createOrderMutation.isPending
             ? "bg-gray-400 cursor-not-allowed"
-            : "bg-blue-500"
+            : "bg-blue-500 hover:bg-blue-600"
         }`}
       >
         {createOrderMutation.isPending ? "Enviando..." : "Enviar orden"}

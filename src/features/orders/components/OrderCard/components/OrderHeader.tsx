@@ -1,34 +1,16 @@
-// src/components/components/OrderHeader.tsx
-import React, { useMemo } from "react";
-import {
-  Clock,
-  MapPin,
-  Store,
-  Truck,
-  DollarSign,
-  Wallet,
-  Clipboard,
-} from "lucide-react";
+import React from "react";
+import { Clock, Store, MapPin, Copy } from "lucide-react";
 import {
   DeliveryType,
   PaymentMethodType,
   OrderStatus,
   PaymentStatus,
+  Business,
 } from "../../../types/order";
+
 import OrderStatusBadge from "./OrderStatusBadge";
 
-interface Props {
-  orderId: string;
-  businessName: string;
-  businessAddress: string;
-  deliveryType: DeliveryType;
-  paymentType: PaymentMethodType;
-  createdAt: string;
-  total: number;
-  status: OrderStatus;
-  paymentStatus?: string;
-}
-
+// Mueve las funciones de utilidad fuera del componente
 const formatDate = (isoDate: string) =>
   new Date(isoDate).toLocaleDateString("es-AR", {
     day: "2-digit",
@@ -38,129 +20,89 @@ const formatDate = (isoDate: string) =>
     minute: "2-digit",
   });
 
-const getDeliveryInfo = (deliveryType: DeliveryType) => {
-  switch (deliveryType) {
-    case DeliveryType.PICKUP:
-      return {
-        icon: <Store className="w-4 h-4 mr-2" />,
-        text: "Retiro en el local",
-      };
-    default:
-      return {
-        icon: <Truck className="w-4 h-4 mr-2" />,
-        text: "Envío a domicilio",
-      };
-  }
+const getShortId = (id: string) => {
+  if (!id) return "";
+  return `#${id.substring(0, 8)}`;
 };
 
-const getPaymentInfo = (paymentType: PaymentMethodType) => {
-  switch (paymentType) {
-    case PaymentMethodType.CASH:
-      return {
-        icon: <DollarSign className="w-4 h-4 mr-2" />,
-        text: "Efectivo",
-      };
-    case PaymentMethodType.TRANSFER:
-      return {
-        icon: <Wallet className="w-4 h-4 mr-2" />,
-        text: "Transferencia",
-      };
-    case PaymentMethodType.DELIVERY:
-      return {
-        icon: <Clipboard className="w-4 h-4 mr-2" />,
-        text: "Pago al delivery",
-      };
-    default:
-      return { icon: null, text: "Método de pago no definido" };
-  }
-};
+interface Props {
+  orderId: string;
+  business: Business;
+  deliveryType: DeliveryType;
+  paymentType: PaymentMethodType;
+  createdAt: string;
+  total: number;
+  status: OrderStatus;
+  paymentStatus?: string;
+}
 
 export default function OrderHeader({
   orderId,
-  businessName,
-  businessAddress,
-  deliveryType,
+  business,
   paymentType,
   createdAt,
-  total,
   status,
   paymentStatus,
 }: Props) {
-  const deliveryInfo = useMemo(
-    () => getDeliveryInfo(deliveryType),
-    [deliveryType]
-  );
-  const paymentInfo = useMemo(() => getPaymentInfo(paymentType), [paymentType]);
-
-  const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    businessAddress
-  )}`;
+  // Construir URL para Google Maps de manera más robusta
+  const mapsUrl = business.latitude && business.longitude
+    ? `http://maps.google.com/?q=${business.latitude},${business.longitude}`
+    : `http://maps.google.com/?q=${encodeURIComponent(
+        business.address ?? ""
+      )}`;
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Header: negocio + total */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
-        {/* Info principal */}
-        {/* <span className="truncate">{orderId}</span> */}
-        <div className="flex flex-col gap-1 min-w-0">
-
-          <h2 className="flex items-center font-semibold text-gray-900 text-base leading-tight truncate">
-            <Store className="w-5 h-5 mr-2 text-gray-500 flex-shrink-0" />
-            <span className="truncate">{businessName}</span>
-          </h2>
-          <p className="flex items-center text-xs text-gray-500">
-            <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
-            <span className="truncate">{formatDate(createdAt)}</span>
-          </p>
-          
-        </div>
-
-        {/* Total + Status */}
-        <div className="flex flex-col items-start sm:items-end gap-1 sm:flex-shrink-0">
-          <p className="font-bold text-xl text-gray-900 leading-tight whitespace-nowrap">
-            ${total.toFixed(2)}
-          </p>
-          <OrderStatusBadge
-            status={status}
-            paymentStatus={paymentStatus as PaymentStatus}
-            paymentType={paymentType}
-          />
+    <div className="flex flex-col gap-3">
+      {/* 🟢 Estado de la orden y ID */}
+      <div className="flex items-start justify-between">
+        <OrderStatusBadge
+          status={status}
+          paymentStatus={paymentStatus as PaymentStatus}
+          paymentType={paymentType}
+        />
+        <div className="flex items-center">
+          <span className="text-xs text-gray-500 font-mono select-none">
+            {getShortId(orderId)}
+          </span>
+          <button
+            onClick={() => navigator.clipboard.writeText(orderId)}
+            className="ml-2 flex items-center gap-1 text-xs text-gray-400 hover:text-gray-700 transition-colors"
+            title="Copiar ID completo"
+            aria-label="Copiar ID de la orden"
+          >
+            <Copy className="w-3 h-3" />
+          </button>
         </div>
       </div>
 
-          <div className="flex items-center gap-2">
-            <span className="truncate font-mono text-sm text-gray-700">
-              {orderId}
-            </span>
-            <button
-              onClick={() => navigator.clipboard.writeText(orderId)}
-              className="text-gray-500 hover:text-gray-900 transition-colors"
-              title="Copiar ID"
-            >
-              📋
-            </button>
-          </div>
-
-      {/* Detalles del Pedido */}
-      <div className="flex flex-col gap-2 pt-4 border-t border-dashed">
-        <div className="flex flex-wrap items-center text-sm text-gray-600 gap-1 min-w-0">
-          {deliveryInfo.icon}
-          <span className="truncate">{deliveryInfo.text}</span>
-          {deliveryType === DeliveryType.PICKUP && (
-            <a
-              href={mapsLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center text-blue-600 hover:underline ml-2 flex-shrink-0"
-            >
-              <MapPin className="w-3 h-3 mr-1" />
-              Ver dirección
-            </a>
-          )}
+      {/* 🏪 Nombre del negocio */}
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2">
+          <Store className="w-4 h-4 text-gray-500" />
+          <span className="font-semibold text-gray-900 truncate">
+            {business.name}
+          </span>
         </div>
-        <div className="flex items-center text-sm text-gray-600 min-w-0">
-          {paymentInfo.icon}
-          <span className="truncate">{paymentInfo.text}</span>
+
+        {/* 📍 Dirección clickeable */}
+        {business.address && (
+          <a
+            href={mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <MapPin className="w-3 h-3 flex-shrink-0" />
+            <span className="truncate">{business.address}</span>
+          </a>
+        )}
+      </div>
+
+      {/* 🕒 Fecha de la orden */}
+      <div className="flex justify-between items-center text-sm text-gray-700">
+        <div className="flex items-center text-xs text-gray-500">
+          <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
+          {formatDate(createdAt)}
         </div>
       </div>
     </div>

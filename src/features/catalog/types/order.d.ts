@@ -34,34 +34,43 @@ export interface AddressId {
   id: string;
 }
 
+export type DeliveryOption = "PICKUP" | "DELIVERY";
+
 export interface CreateOrderFull {
   userId: string;
   businessId: string;
-  deliveryAddress?: AddressId;
-  pickupAddress?: AddressId;
+  deliveryAddressId?: string; // id de la tabla adrress del negocio
+  pickupAddressId?: string;
+  deliveryCompanyId?: string;
 
-  // --- snapshot cliente ---
+  // --- Snapshot del cliente ---
   customerName: string;
   customerPhone: string;
   customerAddress?: string;
   customerObservations?: string;
+  customerAddresslatitude?: number;
+  customerAddresslongitude?: number;
 
-  // --- snapshot negocio ---
+  // --- Snapshot del negocio ---
   businessName: string;
   businessPhone: string;
   businessAddress: string;
   businessObservations?: string;
+  businessAddresslatitude: number;
+  businessAddresslongitude: number;
 
-  status?: OrderStatus;
-  isTest?: boolean;
-  total: number;
+  // --- Snapshot de delivery ---
+  deliveryCompanyName?: string;
+  deliveryCompanyPhone?: string;
+  totalDelivery?: number; // máx. 2 decimales
+
+  // --- Pagos ---
+  paymentType: PaymentMethodType;
+  paymentStatus: PaymentStatus;
+
+  deliveryType: DeliveryOption;
+  total: number; // máx. 2 decimales
   notes?: string;
-  items: CreateOrderItem[];
 
-  // --- pagos ---
-  paymentType?: PaymentMethodType;       // CASH, TRANSFER, DELIVERY
-  paymentStatus?: PaymentStatus;         // PENDING, IN_PROGRESS, CONFIRMED, REJECTED
-  paymentReceiptUrl?: string;            // URL del comprobante
-  paymentInstructions?: string;          // solo si es transferencia
-  paymentHolderName?: string;            // titular del cliente (transferencias)
+  items: CreateOrderItem[];
 }

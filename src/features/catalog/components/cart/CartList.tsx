@@ -15,6 +15,8 @@ interface Props {
   businessName: string;
   businessPhone: string;
   businessAddress: string;
+  businessAddresslatitude: number;
+  businessAddresslongitude: number;
   businessPaymentMethod?: BusinessPaymentMethod[];
 }
 

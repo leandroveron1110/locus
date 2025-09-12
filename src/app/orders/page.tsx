@@ -21,7 +21,7 @@ export default function OrdersPage() {
     );
 
   return (
-    <main className="p-6 lg:p-10 max-w-6xl mx-auto">
+    <main className="lg:p-10 w-full max-w-6xl mx-auto px-4">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Mis Órdenes</h1>
@@ -31,7 +31,7 @@ export default function OrdersPage() {
       </div>
 
       {/* Orders List */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+      <div className="w-full">
         <OrdersList userId={user.id} />
       </div>
     </main>

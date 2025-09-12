@@ -1,3 +1,4 @@
+// src/components/TransferPaymentSection.tsx
 "use client";
 
 import React, { useState, useCallback, useMemo } from "react";
@@ -6,7 +7,7 @@ import { useUpdatePayment } from "../../../hooks/useUpdatePayment";
 import { useBusinessPaymentMethods } from "../../../hooks/useBusinessPaymentMethods";
 import PaymentStatusSection from "./PaymentStatusSection";
 import UploadReceiptSection from "./UploadReceiptSection";
-import { ChevronUp, ChevronDown } from "lucide-react";
+// Se eliminan los íconos de Chevron
 
 interface Props {
   orderId: string;
@@ -24,7 +25,7 @@ export default function TransferPaymentSection({
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [showTransferInfo, setShowTransferInfo] = useState(false);
-  const [showOrderDetails, setShowOrderDetails] = useState(false);
+  // Se elimina el estado showOrderDetails
 
   const updatePaymentMutation = useUpdatePayment();
   const { data: paymentMethods } = useBusinessPaymentMethods(businessId);
@@ -90,43 +91,25 @@ export default function TransferPaymentSection({
 
   return (
     <div className="mt-4 rounded-xl">
-      <button
-        className="flex items-center justify-between w-full font-semibold text-gray-800 hover:text-gray-600 transition-colors"
-        onClick={() => setShowOrderDetails(!showOrderDetails)}
-      >
-        <span>
-          {canUpload || isPaymentRejected ? "Pagar" : "Ver comprobante"}
-        </span>
-        {showOrderDetails ? (
-          <ChevronUp className="w-4 h-4 text-gray-500" />
-        ) : (
-          <ChevronDown className="w-4 h-4 text-gray-500" />
-        )}
-      </button>
+      {/* Estado del pago */}
+      <PaymentStatusSection
+        status={paymentStatus}
+        paymentReceiptUrl={paymentReceiptUrl}
+      />
 
-      {showOrderDetails && (
-        <div className="mt-2 space-y-4 text-sm text-gray-700 animate-slide-down">
-          {/* Estado del pago */}
-          <PaymentStatusSection
-            status={paymentStatus}
-            paymentReceiptUrl={paymentReceiptUrl}
-          />
-
-          {/* Subida de comprobante */}
-          {(canUpload || isPaymentRejected) && (
-            <UploadReceiptSection
-              orderId={orderId}
-              file={file}
-              error={fileError}
-              onFileChange={handleFileChange}
-              onUpload={handleUpload}
-              loading={updatePaymentMutation.isPending}
-              paymentMethods={paymentMethods}
-              showTransferInfo={showTransferInfo}
-              setShowTransferInfo={setShowTransferInfo}
-            />
-          )}
-        </div>
+      {/* Subida de comprobante */}
+      {(canUpload || isPaymentRejected) && (
+        <UploadReceiptSection
+          orderId={orderId}
+          file={file}
+          error={fileError}
+          onFileChange={handleFileChange}
+          onUpload={handleUpload}
+          loading={updatePaymentMutation.isPending}
+          paymentMethods={paymentMethods}
+          showTransferInfo={showTransferInfo}
+          setShowTransferInfo={setShowTransferInfo}
+        />
       )}
     </div>
   );

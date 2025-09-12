@@ -14,6 +14,7 @@ import { usePriceZone } from "@/features/catalog/hooks/usePriceZone";
 import { PaymentMethodType } from "@/features/orders/types/order";
 import { CompanyDelivery } from "@/features/catalog/types/zone";
 import { AddressData } from "@/features/locationSelector/types/address-data";
+import { CreateOrderFull } from "@/features/catalog/types/order";
 
 // 🟢 Componentes UI
 import DeliveryOptionSelector from "./DeliveryOptionSelector";
@@ -22,8 +23,9 @@ import PaymentOptionSelector from "./PaymentOptionSelector";
 import SubmitOrderButton from "./SubmitOrderButton";
 import MapClientWrapper from "@/features/locationSelector/components/MapClientWrapper";
 import CompanyDeliverySelector from "./CompanyDeliverySelector";
+import { formatPrice } from "@/features/common/utils/formatPrice";
+import { DeliveryOption } from "@/features/catalog/types/order";
 
-type DeliveryOption = "pickup" | "delivery";
 type Step = "delivery" | "address" | "deliveryCompany" | "payment";
 
 interface Props {
@@ -32,6 +34,8 @@ interface Props {
   businessName: string;
   businessPhone: string;
   businessAddress: string;
+  businessAddresslatitude: number,
+  businessAddresslongitude: number,
 }
 
 export default function OrderForm({
@@ -40,6 +44,8 @@ export default function OrderForm({
   businessName,
   businessPhone,
   businessAddress,
+  businessAddresslatitude,
+  businessAddresslongitude
 }: Props) {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
@@ -52,7 +58,7 @@ export default function OrderForm({
   // 🟢 Estados principales
   const [activeStep, setActiveStep] = useState<Step>("delivery");
   const [selectedDeliveryOption, setSelectedDeliveryOption] =
-    useState<DeliveryOption>("delivery");
+    useState<DeliveryOption>("DELIVERY");
   const [selectedPaymentOption, setSelectedPaymentOption] =
     useState<PaymentMethodType>(PaymentMethodType.TRANSFER);
   const [selectedAddress, setSelectedAddress] = useState<{
@@ -65,7 +71,6 @@ export default function OrderForm({
     useState<CompanyDelivery | null>(null);
   const [orderNote, setOrderNote] = useState("");
 
-  // 📌 Modal & address state
   const [showAddressModal, setShowAddressModal] = useState(false);
 
   // Hook para precio del envío
@@ -79,24 +84,22 @@ export default function OrderForm({
       : ({} as any)
   );
 
-  // Si no hay direcciones, abrimos modal automáticamente
+  // Abrir modal si no hay direcciones guardadas
   useEffect(() => {
-    if (addresses?.length === 0 && selectedDeliveryOption === "delivery") {
+    if (addresses?.length === 0 && selectedDeliveryOption === "DELIVERY") {
       setShowAddressModal(true);
     }
   }, [addresses, selectedDeliveryOption]);
 
-  // 🔁 Recalcular costo de envío
+  // Refetch del precio de envío
   useEffect(() => {
     if (selectedCompanyDelivery && selectedAddress) {
       refetch();
     }
   }, [selectedCompanyDelivery, selectedAddress, refetch]);
 
-  // 🟢 Handlers
   const handleSaveAddress = async (address: AddressData) => {
     if (!userId) {
-      alert("Debes iniciar sesión para agregar una dirección");
       router.push("/login");
       return;
     }
@@ -145,270 +148,251 @@ export default function OrderForm({
 
   const isCheckoutEnabled = useMemo(() => {
     if (!user) return false;
-    if (selectedDeliveryOption === "delivery") {
+    if (selectedDeliveryOption === "DELIVERY") {
       return !!selectedAddress && !!selectedCompanyDelivery;
     }
     return true;
   }, [user, selectedDeliveryOption, selectedAddress, selectedCompanyDelivery]);
 
-  const orderPayload = useMemo(() => {
-    if (!user) return null;
-    const subtotal = getTotal();
-    const deliveryPrice =
-      selectedDeliveryOption === "delivery" && priceZone?.price
-        ? priceZone.price
-        : 0;
-    const total = subtotal + deliveryPrice;
+  const isSelectedDeliveryOption = ()=> {
+    return selectedDeliveryOption === "DELIVERY"
+  }
 
-    return {
-      userId: userId ?? "",
-      businessId,
-      customerName: `${user.firstName} ${user.lastName}`,
-      customerPhone: user.email,
-      businessName,
-      businessPhone,
-      note: orderNote,
-      businessAddress,
-      deliveryAddressId:
-        selectedDeliveryOption === "delivery" ? selectedAddress?.id : undefined,
-      deliveryType: selectedDeliveryOption,
-      paymentType: selectedPaymentOption,
-      customerAddress:
-        selectedDeliveryOption === "delivery"
-          ? selectedAddress?.text
-          : undefined,
-      total: total, // 💡 Incluimos el costo de envío aquí
-      subtotal: subtotal,
-      deliveryPrice: deliveryPrice,
-    };
-  }, [
-    user,
-    userId,
+
+const orderPayload: CreateOrderFull | null = useMemo(() => {
+  if (!user) return null;
+
+  const subtotal = getTotal();
+  const deliveryPrice =
+    isSelectedDeliveryOption() && priceZone?.price ? priceZone.price : 0;
+  const total = subtotal + deliveryPrice;
+
+  return {
+    userId: userId ?? "",
     businessId,
+    deliveryAddressId: undefined, // donde busca el pedido el cadete
+    pickupAddressId: isSelectedDeliveryOption() ? selectedAddress?.id : undefined, // donde tiene que llevarlo
+    deliveryCompanyId: isSelectedDeliveryOption()
+      ? selectedCompanyDelivery?.id
+      : undefined,
+
+    // --- Snapshot del cliente ---
+    customerName: `${user.firstName} ${user.lastName}`,
+    customerPhone: user.email,
+    customerAddress: isSelectedDeliveryOption()
+      ? selectedAddress?.text
+      : undefined,
+    customerObservations: undefined,
+    customerAddresslatitude: isSelectedDeliveryOption()
+      ? selectedAddress?.lat
+      : undefined,
+    customerAddresslongitude: isSelectedDeliveryOption()
+      ? selectedAddress?.lng
+      : undefined,
+
+    // --- Snapshot del negocio ---
     businessName,
     businessPhone,
     businessAddress,
-    orderNote,
-    selectedDeliveryOption,
-    selectedAddress,
-    getTotal,
-    selectedPaymentOption,
-    priceZone,
-  ]);
+    businessAddresslatitude: businessAddresslatitude,
+    businessAddresslongitude: businessAddresslongitude,
 
-  const formatPrice = (price: number) =>
-    price.toLocaleString("es-AR", {
-      style: "currency",
-      currency: "ARS",
-    });
+    // --- Snapshot de delivery ---
+    deliveryCompanyName: selectedCompanyDelivery?.name,
+    deliveryCompanyPhone: selectedCompanyDelivery?.phone,
+    totalDelivery: isSelectedDeliveryOption() ? deliveryPrice : undefined,
 
-  const renderStepContent = (stepName: Step) => {
-    switch (stepName) {
-      case "delivery":
-        return (
-          <DeliveryOptionSelector
-            selectedOption={selectedDeliveryOption}
-            onChange={(option) => {
-              setSelectedDeliveryOption(option);
-              if (option === "delivery") {
-                setActiveStep("address");
-              } else {
-                setActiveStep("payment");
-              }
-            }}
+    // --- Pagos ---
+    paymentType: selectedPaymentOption,
+    paymentStatus: "PENDING", // 🔹 obligatorio
+
+    deliveryType: selectedDeliveryOption,
+    total,
+    notes: orderNote,
+
+    items: [], // se rellenan en SubmitOrderButton
+  };
+}, [
+  user,
+  userId,
+  businessId,
+  businessName,
+  businessPhone,
+  businessAddress,
+  orderNote,
+  selectedDeliveryOption,
+  selectedAddress,
+  selectedPaymentOption,
+  selectedCompanyDelivery,
+  getTotal,
+  priceZone,
+]);
+
+
+  // Pasos
+  const steps: { key: Step; title: string; content: React.ReactNode }[] = [
+    {
+      key: "delivery",
+      title: "1. Elige tu opción de entrega",
+      content: (
+        <DeliveryOptionSelector
+          selectedOption={selectedDeliveryOption}
+          onChange={(option) => {
+            setSelectedDeliveryOption(option);
+            setActiveStep(option === "DELIVERY" ? "address" : "payment");
+          }}
+        />
+      ),
+    },
+    {
+      key: "address",
+      title: "2. Selecciona tu dirección",
+      content: (
+        <AddressSelector
+          addresses={addresses || []}
+          selectedId={selectedAddress?.id}
+          onChange={handleAddressChange}
+          onCreateNew={() => setShowAddressModal(true)}
+        />
+      ),
+    },
+    {
+      key: "deliveryCompany",
+      title: "3. Elige la cadetería",
+      content: (
+        <>
+          <CompanyDeliverySelector
+            selectedCompanyId={selectedCompanyDelivery?.id}
+            onChange={(company) => setSelectedCompanyDelivery(company)}
           />
-        );
-      case "address":
-        if (selectedDeliveryOption !== "delivery") return null;
-        return (
-          <AddressSelector
-            addresses={addresses || []}
-            selectedId={selectedAddress?.id}
-            onChange={handleAddressChange}
-            onCreateNew={() => setShowAddressModal(true)}
+          {selectedCompanyDelivery && (
+            <button
+              onClick={() => setActiveStep("payment")}
+              className="mt-4 w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              Continuar
+            </button>
+          )}
+        </>
+      ),
+    },
+    {
+      key: "payment",
+      title: "4. Selecciona el método de pago",
+      content: (
+        <>
+          <PaymentOptionSelector
+            selectedOption={selectedPaymentOption}
+            onChange={setSelectedPaymentOption}
+            isDelivery={selectedDeliveryOption === "DELIVERY"}
           />
-        );
-      case "deliveryCompany":
-        if (selectedDeliveryOption !== "delivery" || !selectedAddress)
-          return null;
-        return (
-          <>
-            <CompanyDeliverySelector
-              selectedCompanyId={selectedCompanyDelivery?.id}
-              onChange={(company) => setSelectedCompanyDelivery(company)}
-            />
-            {selectedCompanyDelivery && (
-              <div className="mt-4 text-center">
-                <button
-                  onClick={() => setActiveStep("payment")}
-                  className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                  Continuar
-                </button>
-              </div>
-            )}
-          </>
-        );
-      case "payment":
-        return (
-          <>
-            <PaymentOptionSelector
-              selectedOption={selectedPaymentOption}
-              onChange={setSelectedPaymentOption}
-              isDelivery={selectedDeliveryOption === "delivery"}
-            />
 
-            {/* Nuevo: Resumen de la orden */}
-            <div className="mt-6 p-4 rounded-xl border border-gray-200">
-              <h3 className="text-lg font-bold mb-2">Resumen de la Orden</h3>
-              <div className="flex justify-between text-gray-700">
-                <span>Subtotal:</span>
-                <span className="font-medium">{formatPrice(getTotal())}</span>
-              </div>
-              {selectedDeliveryOption === "delivery" && (
+          <div className="mt-6 p-4 rounded-xl border border-gray-200">
+            <h3 className="text-lg font-bold mb-2">Resumen de la Orden</h3>
+            <div className="flex justify-between text-gray-700">
+              <span>Subtotal:</span>
+              <span className="font-medium">{formatPrice(getTotal())}</span>
+            </div>
+            {selectedDeliveryOption === "DELIVERY" && (
+              <>
                 <div className="flex justify-between text-gray-700">
                   <span>Costo de envío:</span>
                   <span className="font-medium">
-                    {isPriceLoading ? (
-                      "Calculando..."
-                    ) : priceZone?.price ? (
-                      formatPrice(priceZone.price)
-                    ) : (
-                      "N/A"
-                    )}
+                    {isPriceLoading
+                      ? "Calculando..."
+                      : priceZone?.price
+                      ? formatPrice(priceZone.price)
+                      : "N/A"}
                   </span>
                 </div>
-              )}
-              <div className="flex justify-between font-bold text-xl mt-2 pt-2 border-t border-gray-300">
-                <span>Total:</span>
-                <span>{orderPayload?.total ? formatPrice(orderPayload.total) : formatPrice(0)}</span>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <label htmlFor="notes" className="block font-semibold mb-2">
-                Notas adicionales para tu pedido
-              </label>
-              <textarea
-                id="notes"
-                value={orderNote}
-                onChange={(e) => setOrderNote(e.target.value)}
-                rows={3}
-                className="w-full border rounded-xl p-3 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-                placeholder="Ej: Sin cebolla, con extra de salsa..."
-              />
-            </div>
-            {isCheckoutEnabled && orderPayload && (
-              <div className="mt-6">
-                <SubmitOrderButton orderPayload={orderPayload} />
-              </div>
+                <p className="mt-2 text-sm text-gray-500 italic">
+                  El costo de envío mostrado es un{" "}
+                  <strong className="font-semibold">precio base</strong>, puede
+                  variar si el pedido excede las condiciones estándar (peso,
+                  tamaño u otros ajustes).
+                </p>
+              </>
             )}
-          </>
-        );
-      default:
-        return null;
-    }
-  };
+            <div className="flex justify-between font-bold text-xl mt-2 pt-2 border-t border-gray-300">
+              <span>Total:</span>
+              <span>{formatPrice(orderPayload?.total ?? 0)}</span>
+            </div>
+          </div>
 
-  const getStepTitle = (stepName: Step) => {
-    switch (stepName) {
-      case "delivery":
-        return "1. Elige tu opción de entrega";
-      case "address":
-        return "2. Selecciona tu dirección";
-      case "deliveryCompany":
-        return "3. Elige la cadetería";
-      case "payment":
-        return "4. Selecciona el método de pago";
-      default:
-        return "";
-    }
-  };
+          <div className="mt-6">
+            <label htmlFor="notes" className="block font-semibold mb-2">
+              Notas adicionales para tu pedido
+            </label>
+            <textarea
+              id="notes"
+              value={orderNote}
+              onChange={(e) => setOrderNote(e.target.value)}
+              rows={3}
+              className="w-full border rounded-xl p-3 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Ej: Sin cebolla, con extra de salsa..."
+            />
+          </div>
 
-  const isStepComplete = (stepName: Step): boolean => {
-    switch (stepName) {
-      case "delivery":
-        return !!selectedDeliveryOption;
-      case "address":
-        return selectedDeliveryOption === "pickup" || !!selectedAddress;
-      case "deliveryCompany":
-        return selectedDeliveryOption === "pickup" || !!selectedCompanyDelivery;
-      case "payment":
-        return !!selectedPaymentOption;
-      default:
-        return false;
-    }
-  };
+          {isCheckoutEnabled && orderPayload && (
+            <div className="mt-6">
+              <SubmitOrderButton orderPayload={orderPayload} />
+            </div>
+          )}
+        </>
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-6 md:space-y-8 relative max-w-2xl mx-auto">
-      {["delivery", "address", "deliveryCompany", "payment"].map((step, index) => {
-        const stepName = step as Step;
-        const isStepActive = activeStep === stepName;
-        const isStepDone =
-          isStepComplete(stepName) &&
-          (activeStep !== stepName ||
-            (isStepActive &&
-              (stepName === "address" || stepName === "deliveryCompany")));
+      {steps
+        .filter(
+          (s) =>
+            selectedDeliveryOption === "PICKUP"
+              ? s.key !== "address" && s.key !== "deliveryCompany"
+              : true
+        )
+        .map(({ key, title, content }) => {
+          const isActive = activeStep === key;
+          const isDone = key !== "payment" && key !== "delivery" && isActive;
 
-        const shouldDisplay =
-          selectedDeliveryOption === "pickup"
-            ? stepName !== "address" && stepName !== "deliveryCompany"
-            : true;
-
-        if (!shouldDisplay) {
-          return null;
-        }
-
-        return (
-          <div
-            key={stepName}
-            className={`
-              p-6 rounded-2xl shadow-lg border transition-all duration-300
-              ${isStepActive ? "bg-white border-indigo-500" : "bg-gray-50 border-gray-200"}
-              ${!isStepActive && !isStepDone ? "opacity-50 pointer-events-none" : ""}
-            `}
-          >
+          return (
             <div
-              className="flex items-center justify-between cursor-pointer"
-              onClick={() => {
-                if (isStepActive) return;
-                setActiveStep(stepName);
-              }}
+              key={key}
+              className={`p-6 rounded-2xl shadow-lg border transition-all ${
+                isActive
+                  ? "bg-white border-indigo-500"
+                  : "bg-gray-50 border-gray-200"
+              }`}
             >
-              <h2 className="text-xl font-bold flex items-center gap-2">
-                {isStepDone && (
-                  <CheckCircle2 className="text-green-500 w-6 h-6" />
-                )}
-                {getStepTitle(stepName)}
-              </h2>
-            </div>
-            {isStepActive && (
-              <div className="mt-4 border-t border-gray-200 pt-4">
-                {renderStepContent(stepName)}
+              <div
+                className="flex items-center justify-between cursor-pointer"
+                onClick={() => setActiveStep(key)}
+              >
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  {isDone && <CheckCircle2 className="text-green-500 w-6 h-6" />}
+                  {title}
+                </h2>
               </div>
-            )}
-          </div>
-        );
-      })}
+              {isActive && <div className="mt-4">{content}</div>}
+            </div>
+          );
+        })}
 
-      <div
-        className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300 ${
-          showAddressModal
-            ? "opacity-100 visible"
-            : "opacity-0 invisible pointer-events-none"
-        }`}
-      >
-        <div className="bg-white w-full max-w-lg mx-4 rounded-3xl overflow-hidden relative transform transition-transform duration-300 scale-95">
-          <button
-            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 z-10"
-            onClick={() => setShowAddressModal(false)}
-          >
-            <X className="w-6 h-6" />
-          </button>
-          <MapClientWrapper saveAddress={handleSaveAddress} />
+      {/* Modal dirección */}
+      {showAddressModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white w-full max-w-lg mx-4 rounded-3xl overflow-hidden relative">
+            <button
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+              onClick={() => setShowAddressModal(false)}
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <MapClientWrapper saveAddress={handleSaveAddress} />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

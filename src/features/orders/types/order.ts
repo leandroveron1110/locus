@@ -1,15 +1,28 @@
+// Interfaces que coinciden con el JSON de ejemplo
+
 export interface User {
   id: string;
   fullName: string;
   phone: string;
-  address?: string | null; // dirección completa como string
-  avatarId?: string | null;
+  address?: string | null;
+  latitude?: string | null;
+  longitude?: string | null;
 }
 
-export interface Bussiness {
+export interface Business {
   name: string;
-  address: string; // dirección completa como string
+  address: string;
   phone: string;
+  latitude?: number | null;
+  longitude?: number | null;
+}
+
+export interface DeliveryCompany {
+  id: string;
+  name: string;
+  phone: string;
+  totalDelivery?: number | null;
+  isAvailable: boolean;
 }
 
 export interface OrderOption {
@@ -56,14 +69,16 @@ export interface Order {
   id: string;
   businessId: string;
   userId: string;
+  deliveryAddressId?: string | null;
+  pickupAddressId?: string | null;
   deliveryCompanyId?: string | null;
   status: OrderStatus;
   origin: string;
   isTest: boolean;
   total: number;
   notes?: string | null;
-  createdAt: string; // ISO string
-  updatedAt: string; // ISO string
+  createdAt: string;
+  updatedAt: string;
   deliveryType: DeliveryType;
   paymentType: PaymentMethodType;
   paymentStatus: PaymentStatus;
@@ -74,11 +89,31 @@ export interface Order {
   businessObservations?: string | null;
 
   user: User;
-  bussiness: Bussiness;
+  business: Business;
+
+  deliveryAddress: Address | null; // Nuevo campo
+  pickupAddress: Address | null; // Nuevo campo
+  deliveryCompany: DeliveryCompany | null; // Nuevo campo
 
   items: OrderItem[];
   discounts: OrderDiscount[];
 }
+
+// Interfaces adicionales que faltaban en el JSON pero son necesarias para los campos de relación
+export interface Address {
+  id: string;
+  street: string;
+  number?: string | null;
+  city: string;
+  province: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+}
+
+
+
+
 
 export  enum DeliveryType {
     PICKUP = "PICKUP", // El cliente retira en el local
@@ -147,53 +182,3 @@ export enum OrderStatus {
   FAILED = "FAILED"                              // Error general (pago rechazado, problema interno)
 }
 
-
-
-// Interfaces para crear una orden
-// interfaces/order.ts
-
-export interface CreateOrderOption {
-  optionName: string;
-  priceModifierType: string;
-  quantity: number;
-  priceFinal: string;
-  priceWithoutTaxes: string;
-  taxesAmount: string;
-  opcionId?: string;
-}
-
-export interface CreateOrderOptionGroup {
-  groupName: string;
-  minQuantity: number;
-  maxQuantity: number;
-  quantityType: string;
-  opcionGrupoId?: string;
-  options: CreateOrderOption[];
-}
-
-export interface CreateOrderItem {
-  menuProductId: string;
-  productName: string;
-  productDescription?: string;
-  productImageUrl?: string;
-  quantity: number;
-  priceAtPurchase: string;
-  notes?: string;
-  optionGroups: CreateOrderOptionGroup[];
-}
-
-export interface AddressId {
-  id: string;
-}
-
-export interface CreateOrderFull {
-  userId: string;
-  businessId: string;
-  deliveryAddress?: AddressId;
-  pickupAddress?: AddressId;
-  status?: string;
-  isTest?: boolean;
-  total: number;
-  notes?: string;
-  items: CreateOrderItem[];
-}

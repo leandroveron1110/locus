@@ -11,6 +11,8 @@ interface Props {
   businessAddress: string;
   businessName: string;
   businessPhone: string;
+  businessAddresslatitude: number;
+  businessAddresslongitude: number;
   businessPaymentMethod: BusinessPaymentMethod[];
   isOpen: boolean;
   onClose: () => void;
@@ -23,6 +25,8 @@ export default function CartModal({
   businessName,
   businessPhone,
   businessPaymentMethod,
+  businessAddresslatitude,
+  businessAddresslongitude,
   isOpen,
   onClose,
 }: Props) {
@@ -49,6 +53,8 @@ export default function CartModal({
             userId={userId}
             businessId={businessId}
             businessAddress={businessAddress}
+            businessAddresslatitude={businessAddresslatitude}
+            businessAddresslongitude={businessAddresslongitude}
             businessName={businessName}
             businessPhone={businessPhone}
             businessPaymentMethod={businessPaymentMethod}
