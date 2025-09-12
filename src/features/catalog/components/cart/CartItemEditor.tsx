@@ -5,6 +5,7 @@ import { Option, Product } from "../../types/catlog";
 import { fetchMenuProducDetaillByProductId } from "../../api/catalog-api";
 import OptionGroup from "../product/components/OptionGroup";
 import QuantitySelector from "../product/components/QuantitySelector";
+import ProductHeader from "../product/components/ProductHeader";
 
 interface Props {
   item: CartItem;
@@ -94,17 +95,15 @@ export default function CartItemEditor({ item, onClose }: Props) {
 
   if (!product) {
     return (
-      <div className="p-4 text-center text-gray-500">Cargando producto...</div>
+      <div className="p-6 text-center text-gray-500">Cargando producto...</div>
     );
   }
 
   return (
-    <div className="space-y-6 bg-white shadow-lg">
+    <div className="space-y-6 bg-white rounded-2xl p-5 sm:p-6 shadow-md">
       {/* Nombre y descripción */}
-      <div className="space-y-1">
-        <h2 className="text-2xl font-bold text-gray-900">{product.name}</h2>
-        <p className="text-gray-700 text-sm">{product.description}</p>
-      </div>
+      <ProductHeader product={product} />
+
 
       {/* Opciones */}
       {product.hasOptions && product.optionGroups.length > 0 && (
@@ -130,7 +129,7 @@ export default function CartItemEditor({ item, onClose }: Props) {
           increase={() => setCount((c) => c + 1)}
           decrease={() => setCount((c) => Math.max(1, c - 1))}
         />
-        <div className="text-lg font-bold text-gray-900">
+        <div className="text-lg sm:text-xl font-bold text-gray-900">
           Total: {product.currencyMask} {total.toFixed(2)}
         </div>
       </div>
@@ -139,13 +138,13 @@ export default function CartItemEditor({ item, onClose }: Props) {
       <div className="flex flex-col sm:flex-row gap-3 mt-4">
         <button
           onClick={handleSave}
-          className="bg-blue-600 text-white px-5 py-3 rounded-xl font-medium hover:bg-blue-700 transition"
+          className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition"
         >
           Guardar cambios
         </button>
         <button
           onClick={onClose}
-          className="text-gray-600 hover:underline px-5 py-3 rounded-xl border border-gray-200"
+          className="flex-1 text-gray-600 hover:underline py-3 rounded-xl border border-gray-200"
         >
           Cancelar
         </button>

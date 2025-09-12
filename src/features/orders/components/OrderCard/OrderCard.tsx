@@ -6,7 +6,6 @@ import {
   PaymentMethodType,
   DeliveryType,
   PaymentStatus,
-  OrderStatus,
 } from "../../types/order";
 import OrderHeader from "./components/OrderHeader";
 import { ChevronRight, Truck, DollarSign } from "lucide-react";
@@ -22,10 +21,8 @@ export default function OrderCard({ order }: Props) {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
-  // Determinar si el botón para el modal de pago debe mostrarse
   const showPaymentButton = order.paymentType === PaymentMethodType.TRANSFER;
 
-  // Helper para determinar el texto de entrega
   const getDeliveryText = (type: DeliveryType) => {
     switch (type) {
       case DeliveryType.PICKUP:
@@ -39,7 +36,6 @@ export default function OrderCard({ order }: Props) {
     }
   };
 
-  // Helper para determinar el texto del método de pago
   const getPaymentText = (type: PaymentMethodType) => {
     switch (type) {
       case PaymentMethodType.CASH:
@@ -51,11 +47,21 @@ export default function OrderCard({ order }: Props) {
     }
   };
 
+  const getPaymentButtonText = () =>
+    order.paymentStatus === PaymentStatus.PENDING
+      ? "Realizar pago"
+      : "Ver comprobante";
+
+  const getPaymentButtonHint = () =>
+    order.paymentStatus === PaymentStatus.PENDING
+      ? "Carga el comprobante y completa el pago aquí."
+      : "Consulta el comprobante de la transferencia realizada.";
+
   return (
     <>
-      <div className="w-full max-w-lg mx-auto bg-white rounded-xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-2xl hover:border-blue-300">
-        <div className="p-4 sm:p-6">
-          {/* Encabezado Principal */}
+      <div className="h-full flex flex-col bg-white rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
+        <div className="flex flex-col flex-grow p-4 sm:p-6">
+          {/* Encabezado principal */}
           <div
             className="cursor-pointer"
             onClick={() => setIsDetailsModalOpen(true)}
@@ -74,74 +80,69 @@ export default function OrderCard({ order }: Props) {
 
           <hr className="my-4 border-t border-dashed border-gray-200" />
 
-          {/* Cards de Entrega, Pago y Envío */}
-          <div className="flex flex-col gap-4">
-            {/* Tarjeta de Entrega */}
+          {/* Información de entrega, pago y envío */}
+          <div className="flex flex-col gap-3">
+            {/* Entrega */}
             <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-              <div className="flex-shrink-0 p-2 bg-blue-100 rounded-full">
+              <div className="p-2 bg-blue-100 rounded-full">
                 <Truck size={18} className="text-blue-600" />
               </div>
               <div className="flex-grow">
                 <span className="text-xs text-gray-500 font-medium block">
                   Entrega
                 </span>
-                <span className="font-semibold text-sm text-gray-900 truncate block">
+                <span className="text-sm font-semibold text-gray-900 block">
                   {getDeliveryText(order.deliveryType)}
                 </span>
               </div>
             </div>
 
-            {/* Tarjeta de Pago */}
+            {/* Pago */}
             <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg">
-              <div className="flex-shrink-0 p-2 bg-emerald-100 rounded-full">
+              <div className="p-2 bg-emerald-100 rounded-full">
                 <DollarSign size={18} className="text-emerald-600" />
               </div>
               <div className="flex-grow">
                 <span className="text-xs text-gray-500 font-medium block">
                   Pago
                 </span>
-                <span className="font-semibold text-sm text-gray-900 truncate block">
+                <span className="text-sm font-semibold text-gray-900 block">
                   {getPaymentText(order.paymentType)}
                 </span>
               </div>
             </div>
 
-            {/* Tarjeta de Envío Mejorada */}
-            {/* Tarjeta de Envío Mejorada con Aclaración Arriba */}
-            {order.deliveryCompany && order.deliveryCompany.totalDelivery && (
-              <div className="flex flex-col gap-2 p-3 bg-yellow-50 rounded-lg shadow-sm">
-                {/* Contenido principal: icono + cadetería + precio */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 flex-grow min-w-0">
-                    <div className="flex-shrink-0 p-2 bg-yellow-100 rounded-full">
+            {/* Envío */}
+            {order.deliveryCompany?.totalDelivery && (
+              <div className="flex flex-col gap-2 p-3 bg-yellow-50 rounded-lg">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="p-2 bg-yellow-100 rounded-full">
                       <DollarSign size={18} className="text-yellow-600" />
                     </div>
                     <div className="flex flex-col min-w-0">
                       <span className="text-xs text-gray-500 font-medium">
                         Envío
                       </span>
-                      <span className="font-semibold text-sm text-gray-900 truncate">
+                      <span className="text-sm font-semibold text-gray-900 truncate">
                         {order.deliveryCompany.name}
                       </span>
                     </div>
                   </div>
-                  <div className="mt-2 sm:mt-0">
-                    <span className="font-semibold text-sm text-gray-900">
-                      {formatPrice(Number(order.deliveryCompany.totalDelivery))}
-                    </span>
-                  </div>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {formatPrice(Number(order.deliveryCompany.totalDelivery))}
+                  </span>
                 </div>
-                {/* Texto aclaratorio arriba */}
                 <span className="text-xs text-gray-500">
-                  Este el valor base del envío, puede variar según las reglas de
-                  la cadetería.
+                  Este es el valor base, puede variar según la cadetería.
                 </span>
               </div>
             )}
           </div>
 
-          <div className="mt-4 p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
-            <div className="flex justify-between items-center mb-1">
+          {/* Total */}
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            <div className="flex justify-between items-center">
               <span className="text-sm text-gray-500 font-medium">
                 Total del pedido
               </span>
@@ -149,14 +150,17 @@ export default function OrderCard({ order }: Props) {
                 {formatPrice(order.total)}
               </span>
             </div>
-            <div className="text-xs text-gray-400 italic">
-              * El envío se paga al cadete y no está incluido en este total
-            </div>
+            {
+              order.deliveryCompany?.totalDelivery && (<p className="text-xs text-gray-400 italic mt-1">
+              * Envío no incluido, se abona al cadete.
+            </p>)
+            }
+            
           </div>
 
-          {/* Botón para ver productos */}
+          {/* Botón ver productos */}
           <div
-            className="mt-4 flex items-center justify-end cursor-pointer"
+            className="mt-3 flex items-center justify-end cursor-pointer"
             onClick={() => setIsDetailsModalOpen(true)}
           >
             <span className="text-sm font-medium text-blue-600">
@@ -165,14 +169,20 @@ export default function OrderCard({ order }: Props) {
             <ChevronRight size={16} className="ml-1 text-blue-600" />
           </div>
 
-          {/* Botón de gestionar pago si es transferencia */}
+          {/* Botón de pago minimalista */}
           {showPaymentButton && (
-            <div className="mt-4 flex justify-center sm:justify-end">
+            <div className="mt-3 flex flex-col gap-2">
+              <p className="text-xs text-gray-500 leading-snug pl-1">{getPaymentButtonHint()}</p>
               <button
                 onClick={() => setIsPaymentModalOpen(true)}
-                className="w-full sm:w-auto px-6 py-2 rounded-full font-medium text-white bg-green-600 hover:bg-green-700 transition-colors"
+                className={`self-start px-4 py-1.5 rounded-full text-sm font-medium transition-colors
+                  ${
+                    order.paymentStatus === PaymentStatus.PENDING
+                      ? "bg-green-100 text-green-700 hover:bg-green-200"
+                      : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                  }`}
               >
-                Gestionar Pago
+                {getPaymentButtonText()}
               </button>
             </div>
           )}

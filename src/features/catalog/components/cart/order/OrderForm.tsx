@@ -344,7 +344,7 @@ const orderPayload: CreateOrderFull | null = useMemo(() => {
   ];
 
   return (
-    <div className="space-y-6 md:space-y-8 relative max-w-2xl mx-auto">
+    <div className="space-y-6 md:space-y-8 relative">
       {steps
         .filter(
           (s) =>

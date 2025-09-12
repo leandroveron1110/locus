@@ -1,3 +1,4 @@
+// src/features/business/components/FollowButton.tsx
 "use client";
 
 import { Loader2, Heart } from "lucide-react";
@@ -32,6 +33,12 @@ export default function FollowButton({ businessId }: Props) {
   if (isLoading) return <SkeletonFollowButton />;
   if (isError || !data) return null;
 
+  const buttonText = isMutating
+    ? "Cargando..." // ⬅️ Nuevo texto para el estado de carga
+    : data.isFollowing
+    ? "Siguiendo"
+    : "Seguir negocio";
+
   return (
     <div className="flex flex-row flex-wrap items-center gap-2">
       {/* Botón seguir */}
@@ -39,7 +46,9 @@ export default function FollowButton({ businessId }: Props) {
         onClick={handleFollowToggle}
         disabled={isMutating}
         aria-pressed={data.isFollowing}
-        aria-label={data.isFollowing ? "Dejar de seguir negocio" : "Seguir negocio"}
+        aria-label={
+          data.isFollowing ? "Dejar de seguir negocio" : "Seguir negocio"
+        }
         className={`
           flex items-center justify-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold
           transition-all duration-200 ease-in-out
@@ -55,20 +64,19 @@ export default function FollowButton({ businessId }: Props) {
         {isMutating ? (
           <Loader2 className="animate-spin h-4 w-4 text-current" />
         ) : (
-          <>
-            <Heart
-              size={16}
-              className={`transition-colors duration-200 ${
-                data.isFollowing ? "text-red-500" : "text-white group-hover:text-red-400"
-              }`}
-              fill={data.isFollowing ? "currentColor" : "none"}
-              strokeWidth={2}
-            />
-            {data.isFollowing ? "Siguiendo" : "Seguir negocio"}
-          </>
+          <Heart
+            size={16}
+            className={`transition-colors duration-200 ${
+              data.isFollowing
+                ? "text-red-500"
+                : "text-white group-hover:text-red-400"
+            }`}
+            fill={data.isFollowing ? "currentColor" : "none"}
+            strokeWidth={2}
+          />
         )}
+        {buttonText}
       </button>
-
     </div>
   );
 }

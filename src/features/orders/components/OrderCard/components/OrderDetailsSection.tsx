@@ -16,6 +16,21 @@ export default function OrderDetailsSection({ items }: Props) {
     }).format(price);
   };
 
+  // Función corregida para calcular el precio total de un ítem
+  const calculateItemTotal = (item: OrderItem) => {
+    const optionsPrice = item.optionGroups
+      ? item.optionGroups.reduce((acc, group) => {
+          const groupOptionsPrice = group.options.reduce(
+            (optionAcc, option) => optionAcc + option.priceFinal,
+            0
+          );
+          return acc + groupOptionsPrice;
+        }, 0)
+      : 0;
+
+    return (item.priceAtPurchase + optionsPrice) * item.quantity;
+  };
+
   return (
     <div className="space-y-6 pt-4">
       {items.map((item) => (
@@ -40,7 +55,9 @@ export default function OrderDetailsSection({ items }: Props) {
 
           {/* Detalles del producto y opciones */}
           <div className="flex-grow flex-shrink-0 w-full sm:w-auto">
-            <h4 className="font-semibold text-gray-900 text-base">{item.productName}</h4>
+            <h4 className="font-semibold text-gray-900 text-base">
+              {item.productName}
+            </h4>
             <p className="text-sm text-gray-500">
               {item.quantity} x {formatPrice(item.priceAtPurchase)}
             </p>
@@ -50,10 +67,17 @@ export default function OrderDetailsSection({ items }: Props) {
               <div className="mt-2 space-y-1">
                 {item.optionGroups.map((group) => (
                   <div key={group.id} className="text-xs text-gray-600">
-                    <p className="font-medium text-gray-700">{group.groupName}</p>
+                    <p className="font-medium text-gray-700">
+                      {group.groupName}
+                    </p>
                     {group.options.map((option) => (
                       <p key={option.id} className="text-gray-500 ml-2">
                         + {option.optionName}
+                        {option.priceFinal > 0 && (
+                          <span className="ml-1">
+                            ({formatPrice(option.priceFinal)})
+                          </span>
+                        )}
                       </p>
                     ))}
                   </div>
@@ -64,7 +88,7 @@ export default function OrderDetailsSection({ items }: Props) {
 
           {/* Precio total del ítem */}
           <span className="text-lg font-bold text-gray-900 flex-shrink-0 ml-auto mt-2 sm:mt-0">
-            {formatPrice(item.quantity * item.priceAtPurchase)}
+            {formatPrice(calculateItemTotal(item))}
           </span>
         </div>
       ))}

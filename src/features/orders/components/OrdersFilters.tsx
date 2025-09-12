@@ -28,12 +28,19 @@ export default function OrdersFilters({
   orders,
 }: OrdersFiltersProps) {
   return (
-    <div className="flex flex-wrap gap-2 mb-4">
+    <div 
+      className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide lg:overflow-x-visible lg:flex-wrap"
+      style={{ WebkitOverflowScrolling: "touch" }} // Para un desplazamiento más suave en iOS
+    >
       {quickFilters.map((filter) => {
-        const count = orders.filter((o) =>
-          filter.condition ? filter.condition(o) : filter.statuses.includes(o.status)
-        ).length;
-
+        let count = 0;
+        if (filter.label === "Todos") {
+          count = orders.length;
+        } else {
+          count = orders.filter((o) =>
+            filter.condition ? filter.condition(o) : filter.statuses.includes(o.status)
+          ).length;
+        }
         return (
           <FilterButton
             key={filter.label}
@@ -62,10 +69,10 @@ function FilterButton({ label, count, active, onClick }: FilterButtonProps) {
     <button
       onClick={onClick}
       className={`
-        flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium
+        flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium
         transition-colors duration-200 ease-in-out
         ${active
-          ? "bg-blue-600 text-white"
+          ? "bg-blue-600 text-white shadow-md"
           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
         }
       `}
@@ -85,3 +92,9 @@ function FilterButton({ label, count, active, onClick }: FilterButtonProps) {
     </button>
   );
 }
+
+// Nota sobre scrollbar-hide:
+// Requiere una utilidad de Tailwind CSS (por ejemplo, 'tailwind-scrollbar-hide').
+// Si no la tienes, puedes ocultar el scrollbar con CSS personalizado:
+// .scrollbar-hide::-webkit-scrollbar { display: none; }
+// .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

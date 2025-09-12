@@ -1,5 +1,7 @@
+// src/features/business/components/BusinessHeader.tsx
+import Image from "next/image";
 import { Globe } from "lucide-react";
-import FollowButton from "./FollowButton"; // ajusta la ruta según tu proyecto
+import FollowButton from "./FollowButton";
 
 interface BusinessHeaderProps {
   logoUrl: string | undefined;
@@ -14,26 +16,29 @@ export default function BusinessHeader({
   fullDescription,
   businessId,
 }: BusinessHeaderProps) {
+  const commonClasses = "object-cover shadow-md";
+
   return (
     <header className="w-full flex flex-col sm:flex-row sm:items-start">
-      {/* Imagen grande en móvil / lateral en desktop */}
-      <div className="w-full sm:w-40 relative flex-shrink-0">
+      {/* Contenedor para vista móvil (imagen grande) */}
+      <div className="w-full h-64 relative flex-shrink-0 sm:hidden">
         {logoUrl ? (
-          <img
+          <Image
             src={logoUrl}
             alt={`${name} logo`}
-            className="w-full h-64 sm:h-40 object-cover sm:rounded-3xl shadow-md"
-            loading="lazy"
+            fill
+            className={`${commonClasses} rounded-b-3xl`}
+            sizes="100vw"
+            priority
           />
         ) : (
-          <div className="w-full h-64 sm:h-40 flex items-center justify-center bg-gray-100 sm:rounded-3xl rounded-b-3xl">
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-b-3xl">
             <Globe className="w-16 h-16 text-gray-400" />
           </div>
         )}
-
-        {/* Overlay en móvil */}
-        {/* Overlay en móvil */}
-        <div className="absolute inset-0 sm:hidden flex flex-col justify-end bg-gradient-to-t from-black/100 to-transparent p-4">
+        
+        {/* Overlay con texto y botón en móvil */}
+        <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/100 to-transparent p-4">
           <h1 className="text-2xl font-extrabold text-white drop-shadow-lg">
             {name}
           </h1>
@@ -42,15 +47,32 @@ export default function BusinessHeader({
               {fullDescription}
             </p>
           )}
-
           <div className="mt-3">
             <FollowButton businessId={businessId} />
           </div>
         </div>
       </div>
 
-      {/* Texto y botón en desktop */}
-      <div className="flex-1 mt-4 sm:mt-0 hidden sm:flex flex-col justify-center px-4">
+      {/* Contenedor para vista de escritorio (imagen pequeña) */}
+      <div className="hidden sm:block sm:w-40 sm:h-40 relative flex-shrink-0">
+        {logoUrl ? (
+          <Image
+            src={logoUrl}
+            alt={`${name} logo`}
+            fill
+            className={`${commonClasses} rounded-3xl`}
+            sizes="160px"
+            priority
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-3xl">
+            <Globe className="w-16 h-16 text-gray-400" />
+          </div>
+        )}
+      </div>
+
+      {/* Texto y botón en escritorio */}
+      <div className="flex-1 mt-4 px-4 hidden sm:flex flex-col justify-center">
         <h1 className="text-3xl font-extrabold text-gray-900 break-words">
           {name}
         </h1>
@@ -59,7 +81,6 @@ export default function BusinessHeader({
             {fullDescription}
           </p>
         )}
-
         <div className="mt-4 w-max">
           <FollowButton businessId={businessId} />
         </div>

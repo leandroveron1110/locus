@@ -1,6 +1,9 @@
-import React, { useMemo } from 'react';
+// src/features/business/components/CatalogProduct.tsx
+import React from 'react';
+import Image from 'next/image'; // ⬅️ Importamos el componente Image
 import { Star } from 'lucide-react';
 import { Product } from '../types/catlog';
+import { formatPrice } from '@/features/common/utils/formatPrice';
 
 interface Props {
   product: Product;
@@ -8,6 +11,7 @@ interface Props {
 }
 
 const SoldOutLabel = 'Agotado';
+
 
 export default function CatalogProduct({ product, onClick }: Props) {
   const {
@@ -23,19 +27,13 @@ export default function CatalogProduct({ product, onClick }: Props) {
     stock
   } = product;
 
-  const isAvailable = useMemo(() => available && stock > 0, [available, stock]);
-
-  const hasDiscount = useMemo(() => {
-    return originalPrice && discountAmount && Number(discountAmount) > 0;
-  }, [originalPrice, discountAmount]);
-
-  const discountPercent = useMemo(() => {
-    if (!hasDiscount) return 0;
-    const original = Number(originalPrice);
-    const final = Number(finalPrice);
-    if (original <= 0) return 0; // Evita división por cero
-    return Math.round(((original - final) / original) * 100);
-  }, [hasDiscount, originalPrice, finalPrice]);
+  // ⬅️ Lógica simplificada
+  const isAvailable = available && stock > 0;
+  const hasDiscount = !!originalPrice && !!discountAmount && Number(discountAmount) > 0;
+  
+  const discountPercent = hasDiscount
+    ? Math.round(((Number(originalPrice) - Number(finalPrice)) / Number(originalPrice)) * 100)
+    : 0;
 
   return (
     <li
@@ -46,15 +44,17 @@ export default function CatalogProduct({ product, onClick }: Props) {
         ${isAvailable ? 'hover:shadow-md cursor-pointer' : 'opacity-60 cursor-not-allowed'}
       `}
       role="listitem"
-      aria-label={`Producto: ${name}`}
+      aria-label={`Producto: ${name}. ${isAvailable ? 'Clic para ver detalles.' : 'Agotado.'}`} // ⬅️ Mejoramos el aria-label
     >
       {/* Imagen */}
       {imageUrl && (
-        <div className="w-full md:w-32 h-32 rounded-lg overflow-hidden border border-gray-100 flex-shrink-0">
-          <img
+        <div className="w-full md:w-32 h-32 rounded-lg overflow-hidden border border-gray-100 flex-shrink-0 relative">
+          <Image // ⬅️ Usamos el componente Image
             src={imageUrl}
             alt={name}
+            fill // ⬅️ Usamos fill para que la imagen ocupe el contenedor
             className="w-full h-full object-cover"
+            sizes="(max-width: 768px) 100vw, 128px"
             loading="lazy"
           />
         </div>
@@ -62,7 +62,6 @@ export default function CatalogProduct({ product, onClick }: Props) {
 
       {/* Contenido */}
       <div className="flex flex-col flex-grow">
-        {/* Header con Título y Badges */}
         <div className="flex items-start justify-between mb-2">
           <h4 className="text-lg font-semibold text-gray-900 line-clamp-2">
             {name}
@@ -81,14 +80,11 @@ export default function CatalogProduct({ product, onClick }: Props) {
           </div>
         </div>
 
-        {/* Descripción */}
         <p className="text-gray-600 text-sm line-clamp-2 mb-3">
           {description}
         </p>
 
-        {/* Precios y Rating */}
         <div className="flex items-end justify-between mt-auto">
-          {/* Rating */}
           <div className="flex items-center gap-1 text-sm text-gray-500">
             <Star className="text-yellow-400" size={14} />
             <span>
@@ -96,15 +92,14 @@ export default function CatalogProduct({ product, onClick }: Props) {
             </span>
           </div>
 
-          {/* Precios */}
           <div className="flex flex-col items-end">
             {hasDiscount && (
               <span className="text-xs line-through text-gray-400 leading-none">
-                {currencyMask} {(Number(originalPrice) || 0).toLocaleString("es-AR")}
+                {formatPrice(originalPrice, currencyMask)}
               </span>
             )}
             <span className="text-lg font-bold text-gray-900 leading-none">
-              {currencyMask} {(Number(finalPrice) || 0).toLocaleString("es-AR")}
+              {formatPrice(finalPrice, currencyMask)}
             </span>
           </div>
         </div>

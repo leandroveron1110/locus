@@ -1,3 +1,4 @@
+// src/features/business/components/BusinessProfile.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -14,6 +15,7 @@ import BusinessContactInfo from "./components/BusinessContactInfo";
 import BusinessHeader from "./components/BusinessHeader";
 
 import ProfileNav from "./components/ProfileNav";
+import { BusinessProfileSkeleton } from "./components/Skeleton/BusinessProfileSkeleton";
 
 interface Props {
   businessId: string;
@@ -38,12 +40,10 @@ export default function BusinessProfile({ businessId }: Props) {
 
   const [activeSection, setActiveSection] = useState<string>("gallery");
 
-  if (isLoading)
-    return (
-      <p className="text-center text-gray-500 mt-12 text-lg font-medium">
-        Cargando perfil...
-      </p>
-    );
+  if (isLoading) {
+    // ⬅️ Usamos el componente de esqueleto en lugar del texto
+    return <BusinessProfileSkeleton />; 
+  }
 
   if (isError)
     return (
@@ -64,9 +64,9 @@ export default function BusinessProfile({ businessId }: Props) {
   };
 
   return (
-    <main className="pb-25" >
-      {/* Header */}
-      <div className="mx-auto px-0 pt-0 sm:px-4 sm:pt-4">
+    <main className="pb-25">
+      {/* Header que ocupa todo el ancho en móvil */}
+      <div className="mb-8"> {/* Agrega un margen inferior para separar del contenido */}
         <BusinessHeader
           fullDescription={`${data.fullDescription ?? data.shortDescription}`}
           logoUrl={data.logoUrl}
@@ -75,6 +75,7 @@ export default function BusinessProfile({ businessId }: Props) {
         />
       </div>
 
+      {/* Contenido principal con márgenes */}
       <section className="px-4 max-w-6xl mx-auto space-y-10">
         {/* Botón de catálogo */}
         {hasMenu && (

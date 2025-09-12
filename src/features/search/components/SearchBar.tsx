@@ -29,35 +29,21 @@ export default function SearchBar({ onSearch }: Props) {
   return (
     <form
       onSubmit={handleSubmit(onSearch)}
-      className="bg-white shadow-lg rounded-2xl p-4 border border-gray-100 space-y-4"
+      className="relative w-full"
     >
-      {/* Input principal */}
-      <div className="flex items-center gap-2">
+      <div className="relative">
+        {/* Icono de búsqueda dentro del input */}
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <Search className="w-5 h-5 text-gray-400" />
+        </div>
+        {/* Input principal */}
         <input
           {...register("q")}
           placeholder="Buscar negocios, servicios, etc..."
-          className="flex-grow border border-gray-200 p-3 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 placeholder-gray-400"
+          className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 placeholder-gray-400 transition-colors"
         />
-        <button
-          type="submit"
-          className="bg-blue-600 text-white p-3 rounded-xl hover:bg-blue-700 transition-colors shadow-sm"
-        >
-          <Search className="w-5 h-5" />
-        </button>
       </div>
-      {errors.q && <p className="text-red-500 text-sm">{errors.q.message}</p>}
-
-      {/* Checkbox “Abiertos ahora” */}
-      {/* <div className="flex items-center gap-2 text-sm text-gray-700">
-        <label className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors">
-          <input
-            type="checkbox"
-            {...register("openNow")}
-            className="accent-blue-600"
-          />
-          Abiertos ahora
-        </label>
-      </div> */}
+      {errors.q && <p className="text-red-500 text-sm mt-2">{errors.q.message}</p>}
     </form>
   );
 }

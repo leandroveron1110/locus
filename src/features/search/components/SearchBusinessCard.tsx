@@ -1,9 +1,10 @@
-// features/search/components/SearchBusinessCard.tsx
+// src/features/search/components/SearchBusinessCard.tsx
 "use client";
 
-import { Star, MapPin, Users, Clock, Tag } from "lucide-react";
+import { Star, MapPin, Tag } from "lucide-react";
 import { SearchResultBusiness } from "../types/search";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface BusinessCardProps {
   business: SearchResultBusiness;
@@ -19,98 +20,85 @@ export const SearchBusinessCard = ({ business }: BusinessCardProps) => {
   return (
     <div
       onClick={handleClick}
-      className="flex flex-col bg-white rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer w-full h-full overflow-hidden border border-gray-100"
+      className="flex flex-col bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer w-full h-full overflow-hidden border border-gray-200"
     >
-      {/* Imagen */}
-      <div className="w-full h-48 flex-shrink-0 relative">
+      {/* Imagen del Negocio */}
+      <div className="w-full h-36 sm:h-40 flex-shrink-0 relative">
         {business.logoUrl ? (
-          <img
+          <Image
             src={business.logoUrl}
             alt={business.name}
-            className="w-full h-full object-cover rounded-t-3xl rounded-b-none"
-            loading="lazy"
+            fill
+            className="object-cover rounded-t-2xl"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 rounded-t-3xl rounded-b-none">
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 rounded-t-2xl">
             <Tag size={48} />
           </div>
         )}
       </div>
 
-      {/* Contenido */}
-      <div className="p-6 flex flex-col justify-between flex-grow min-w-0">
-        <div className="flex flex-col gap-4 flex-grow">
-          {/* Encabezado: Nombre, Rating y Estado */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <h3 className="text-xl font-extrabold text-gray-900 leading-tight line-clamp-2 min-w-0">
+      {/* Contenido de la Tarjeta */}
+      <div className="p-4 flex flex-col justify-between flex-grow min-w-0">
+        <div className="flex flex-col gap-2 flex-grow">
+          {/* Nombre y Estado */}
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight line-clamp-2 min-w-0">
               {business.name}
             </h3>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {/* Rating */}
-              {typeof business.averageRating === "number" && (
-                <div className="flex items-center gap-1 text-yellow-500 font-bold text-lg">
-                  <Star size={18} fill="currentColor" strokeWidth={0} />
-                  <span>{business.averageRating.toFixed(1)}</span>
-                  {business.reviewCount ? (
-                    <span className="text-gray-400 text-sm font-normal">
-                      ({business.reviewCount})
-                    </span>
-                  ) : null}
-                </div>
-              )}
-              {/* Estado de Apertura */}
-              {business.isOpenNow !== undefined && (
-                <div className="flex items-center gap-1.5 ml-2">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      business.isOpenNow
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {business.isOpenNow ? "Abierto" : "Cerrado"}
-                  </span>
-                </div>
+            {business.isOpenNow !== undefined && (
+              <span
+                className={`flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-bold whitespace-nowrap ${
+                  business.isOpenNow
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
+              >
+                {business.isOpenNow ? "Abierto" : "Cerrado"}
+              </span>
+            )}
+          </div>
+          
+          {/* Rating */}
+          {typeof business.averageRating === "number" && (
+            <div className="flex items-center gap-1.5 text-yellow-500 font-bold text-base">
+              <Star size={16} fill="currentColor" strokeWidth={0} />
+              <span>{business.averageRating.toFixed(1)}</span>
+              {business.reviewCount && (
+                <span className="text-gray-400 text-xs font-normal ml-1">
+                  ({business.reviewCount})
+                </span>
               )}
             </div>
-          </div>
+          )}
 
           {/* Descripción */}
           {business.description && (
-            <p className="text-gray-600 text-sm leading-snug line-clamp-3">
+            <p className="text-sm text-gray-600 leading-snug line-clamp-2 mt-2">
               {business.description}
             </p>
           )}
 
-          {/* Detalles (Dirección y Seguidores) */}
-          <div className="flex flex-col gap-2 text-gray-500 text-sm">
-            {business.address && (
-              <div className="flex items-center gap-1.5 min-w-0">
-                <MapPin size={16} className="flex-shrink-0 text-gray-400" />
-                <span className="truncate">
-                  {business.address}, {business.city}
-                </span>
-              </div>
-            )}
-            {typeof business.followersCount === "number" && (
-              <div className="flex items-center gap-1.5 flex-shrink-0">
-                <Users size={16} className="text-blue-500" />
-                <span className="font-medium">
-                  {business.followersCount.toLocaleString()}{" "}
-                  {business.followersCount === 1 ? "seguidor" : "seguidores"}
-                </span>
-              </div>
-            )}
-          </div>
+          {/* Dirección */}
+          {business.address && (
+            <div className="flex items-center gap-1.5 min-w-0 mt-2 text-sm text-gray-500">
+              <MapPin size={16} className="flex-shrink-0 text-gray-400" />
+              <span className="truncate">
+                {business.address}, {business.city}
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* Categorías (al final para un diseño limpio) */}
+        {/* Categorías */}
         {business.categoryNames && business.categoryNames.length > 0 && (
-          <div className="mt-4 flex overflow-x-auto gap-2 py-1 scrollbar-hide flex-shrink-0">
+          <div className="mt-4 flex flex-wrap gap-2 flex-shrink-0">
             {business.categoryNames.map((tag) => (
               <span
                 key={tag}
-                className="flex-shrink-0 bg-gray-100 text-gray-700 text-xs font-semibold px-3 py-1 rounded-full select-none"
+                className="bg-gray-100 text-gray-700 text-xs font-semibold px-3 py-1 rounded-full select-none"
               >
                 {tag}
               </span>

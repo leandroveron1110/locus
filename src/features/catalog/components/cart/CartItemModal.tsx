@@ -16,21 +16,21 @@ export default function CartItemModal({ item, onClose }: Props) {
       aria-modal="true"
       aria-labelledby="cart-item-modal-title"
     >
-      <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative transform transition-all duration-300">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-xl max-h-[80vh] overflow-y-auto relative transform transition-all duration-300">
         {/* Botón de cerrar */}
         <button
           onClick={onClose}
           aria-label="Cerrar"
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl font-bold transition-colors"
+          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 p-1 rounded-full transition-colors"
         >
           ✕
         </button>
 
         {/* Contenido */}
-        <div className="p-6">
+        <div className="p-5 sm:p-6">
           <h2
             id="cart-item-modal-title"
-            className="text-xl font-semibold text-gray-900 mb-4"
+            className="text-lg sm:text-xl font-semibold text-gray-900 mb-4"
           >
             Editar producto
           </h2>

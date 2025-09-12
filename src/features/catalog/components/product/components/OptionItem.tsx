@@ -32,48 +32,56 @@ export default function OptionItem({
   const reachedMax = !isSelected && selected.length >= max;
   const price = Number(option.priceFinal) || 0;
 
+  const handleToggle = () => {
+    if (!reachedMax) {
+      toggleOption(groupId, option, max, multiple);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleToggle();
+    }
+  };
+
+  const formattedPrice = price > 0
+    ? `+${currencyMask} ${price.toLocaleString("es-AR")}`
+    : "Incluido";
+
   return (
     <li
-      role="checkbox"
+      role={multiple ? "option" : "radio"} // ⬅️ Mejoramos el rol de accesibilidad
       aria-checked={isSelected}
       tabIndex={0}
-      onClick={() => !reachedMax && toggleOption(groupId, option, max, multiple)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          if (!reachedMax) toggleOption(groupId, option, max, multiple);
-        }
-      }}
-      className={`relative border rounded-xl p-4 cursor-pointer transition-all select-none shadow-sm
+      onClick={handleToggle}
+      onKeyDown={handleKeyDown}
+      className={`
+        relative border rounded-xl p-4 cursor-pointer transition-all select-none shadow-sm
         ${isSelected ? "border-blue-600 bg-blue-50" : "border-gray-300 hover:border-blue-400"}
         ${reachedMax ? "opacity-50 cursor-not-allowed" : ""}
       `}
     >
-      <div className="flex flex-col gap-2 pr-7"> 
-        {/* Nombre de la opción */}
-        <span className="font-medium text-gray-800 break-words leading-snug">
-          {option.name}
-        </span>
+      <div className="flex items-start justify-between"> {/* ⬅️ Usamos flexbox para alinear */}
+        <div className="flex flex-col gap-2 pr-2 overflow-hidden">
+          {/* Nombre de la opción */}
+          <span className="font-medium text-gray-800 break-words leading-snug">
+            {option.name}
+          </span>
+          {/* Precio */}
+          <span className={`text-sm font-semibold ${price > 0 ? "text-green-600" : "text-gray-500"}`}>
+            {formattedPrice}
+          </span>
+        </div>
 
-        {/* Precio alineado abajo */}
-        <span
-          className={`text-sm font-semibold ${
-            price > 0 ? "text-green-600" : "text-gray-500"
-          }`}
-        >
-          {price > 0
-            ? `+${currencyMask} ${price.toLocaleString("es-AR")}`
-            : "Incluido"}
-        </span>
+        {/* Check de selección */}
+        {isSelected && (
+          <CheckCircle
+            size={20}
+            className="text-blue-600 flex-shrink-0"
+          />
+        )}
       </div>
-
-      {/* Check de selección (sin romper layout) */}
-      {isSelected && (
-        <CheckCircle
-          size={20}
-          className="absolute top-3 right-3 text-blue-600 shrink-0"
-        />
-      )}
     </li>
   );
 }
