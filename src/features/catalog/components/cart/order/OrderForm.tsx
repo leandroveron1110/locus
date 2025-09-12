@@ -34,8 +34,8 @@ interface Props {
   businessName: string;
   businessPhone: string;
   businessAddress: string;
-  businessAddresslatitude: number,
-  businessAddresslongitude: number,
+  businessAddresslatitude: number;
+  businessAddresslongitude: number;
 }
 
 export default function OrderForm({
@@ -45,7 +45,7 @@ export default function OrderForm({
   businessPhone,
   businessAddress,
   businessAddresslatitude,
-  businessAddresslongitude
+  businessAddresslongitude,
 }: Props) {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
@@ -74,7 +74,11 @@ export default function OrderForm({
   const [showAddressModal, setShowAddressModal] = useState(false);
 
   // Hook para precio del envío
-  const { data: priceZone, isLoading: isPriceLoading, refetch } = usePriceZone(
+  const {
+    data: priceZone,
+    isLoading: isPriceLoading,
+    refetch,
+  } = usePriceZone(
     selectedCompanyDelivery && selectedAddress
       ? {
           companyId: selectedCompanyDelivery.id,
@@ -154,80 +158,99 @@ export default function OrderForm({
     return true;
   }, [user, selectedDeliveryOption, selectedAddress, selectedCompanyDelivery]);
 
-  const isSelectedDeliveryOption = ()=> {
-    return selectedDeliveryOption === "DELIVERY"
-  }
+  const isSelectedDeliveryOption = () => {
+    return selectedDeliveryOption === "DELIVERY";
+  };
 
+  const orderPayload: CreateOrderFull | null = useMemo(() => {
+    if (!user) return null;
 
-const orderPayload: CreateOrderFull | null = useMemo(() => {
-  if (!user) return null;
+    const subtotal = getTotal();
+    const deliveryPrice =
+      isSelectedDeliveryOption() && priceZone?.price ? priceZone.price : 0;
+    const total = subtotal + deliveryPrice;
 
-  const subtotal = getTotal();
-  const deliveryPrice =
-    isSelectedDeliveryOption() && priceZone?.price ? priceZone.price : 0;
-  const total = subtotal + deliveryPrice;
+    return {
+      userId: userId ?? "",
+      businessId,
+      deliveryAddressId: undefined, // donde busca el pedido el cadete
+      pickupAddressId: isSelectedDeliveryOption()
+        ? selectedAddress?.id
+        : undefined, // donde tiene que llevarlo
+      deliveryCompanyId: isSelectedDeliveryOption()
+        ? selectedCompanyDelivery?.id
+        : undefined,
 
-  return {
-    userId: userId ?? "",
+      // --- Snapshot del cliente ---
+      customerName: `${user.firstName} ${user.lastName}`,
+      customerPhone: user.email,
+      customerAddress: isSelectedDeliveryOption()
+        ? selectedAddress?.text
+        : undefined,
+      customerObservations: undefined,
+      customerAddresslatitude: isSelectedDeliveryOption()
+        ? selectedAddress?.lat
+        : undefined,
+      customerAddresslongitude: isSelectedDeliveryOption()
+        ? selectedAddress?.lng
+        : undefined,
+
+      // --- Snapshot del negocio ---
+      businessName,
+      businessPhone,
+      businessAddress,
+      businessAddresslatitude: businessAddresslatitude,
+      businessAddresslongitude: businessAddresslongitude,
+
+      // --- Snapshot de delivery ---
+      deliveryCompanyName: selectedCompanyDelivery?.name,
+      deliveryCompanyPhone: selectedCompanyDelivery?.phone,
+      totalDelivery: isSelectedDeliveryOption() ? deliveryPrice : undefined,
+
+      // --- Pagos ---
+      paymentType: selectedPaymentOption,
+      paymentStatus: "PENDING", // 🔹 obligatorio
+
+      deliveryType: selectedDeliveryOption,
+      total,
+      notes: orderNote,
+
+      items: [], // se rellenan en SubmitOrderButton
+    };
+  }, [
+    user,
+    userId,
     businessId,
-    deliveryAddressId: undefined, // donde busca el pedido el cadete
-    pickupAddressId: isSelectedDeliveryOption() ? selectedAddress?.id : undefined, // donde tiene que llevarlo
-    deliveryCompanyId: isSelectedDeliveryOption()
-      ? selectedCompanyDelivery?.id
-      : undefined,
-
-    // --- Snapshot del cliente ---
-    customerName: `${user.firstName} ${user.lastName}`,
-    customerPhone: user.email,
-    customerAddress: isSelectedDeliveryOption()
-      ? selectedAddress?.text
-      : undefined,
-    customerObservations: undefined,
-    customerAddresslatitude: isSelectedDeliveryOption()
-      ? selectedAddress?.lat
-      : undefined,
-    customerAddresslongitude: isSelectedDeliveryOption()
-      ? selectedAddress?.lng
-      : undefined,
-
-    // --- Snapshot del negocio ---
     businessName,
     businessPhone,
     businessAddress,
-    businessAddresslatitude: businessAddresslatitude,
-    businessAddresslongitude: businessAddresslongitude,
+    orderNote,
+    selectedDeliveryOption,
+    selectedAddress,
+    selectedPaymentOption,
+    selectedCompanyDelivery,
+    getTotal,
+    priceZone,
+  ]);
 
-    // --- Snapshot de delivery ---
-    deliveryCompanyName: selectedCompanyDelivery?.name,
-    deliveryCompanyPhone: selectedCompanyDelivery?.phone,
-    totalDelivery: isSelectedDeliveryOption() ? deliveryPrice : undefined,
+  // ✅ Determina si el usuario puede crear la orden
+  const canCreateOrder = useMemo(() => {
+    if (!user) return false;
 
-    // --- Pagos ---
-    paymentType: selectedPaymentOption,
-    paymentStatus: "PENDING", // 🔹 obligatorio
+    // Si es retiro, siempre puede crear
+    if (selectedDeliveryOption === "PICKUP") return true;
 
-    deliveryType: selectedDeliveryOption,
-    total,
-    notes: orderNote,
-
-    items: [], // se rellenan en SubmitOrderButton
-  };
-}, [
-  user,
-  userId,
-  businessId,
-  businessName,
-  businessPhone,
-  businessAddress,
-  orderNote,
-  selectedDeliveryOption,
-  selectedAddress,
-  selectedPaymentOption,
-  selectedCompanyDelivery,
-  getTotal,
-  priceZone,
-]);
-
+    // Si es delivery, solo si hay cadetería que cubre la zona y no está cargando
+    return (
+      !!selectedCompanyDelivery && priceZone?.price != null && !isPriceLoading
+    );
+  }, [
+    user,
+    selectedDeliveryOption,
+    selectedCompanyDelivery,
+    priceZone,
+    isPriceLoading,
+  ]);
 
   // Pasos
   const steps: { key: Step; title: string; content: React.ReactNode }[] = [
@@ -239,7 +262,15 @@ const orderPayload: CreateOrderFull | null = useMemo(() => {
           selectedOption={selectedDeliveryOption}
           onChange={(option) => {
             setSelectedDeliveryOption(option);
-            setActiveStep(option === "DELIVERY" ? "address" : "payment");
+
+            if (option === "DELIVERY") {
+              setActiveStep("address");
+            } else {
+              // Si cambia a PICKUP, resetear cadetería y dirección
+              setSelectedAddress(undefined);
+              setSelectedCompanyDelivery(null);
+              setActiveStep("payment");
+            }
           }}
         />
       ),
@@ -293,6 +324,7 @@ const orderPayload: CreateOrderFull | null = useMemo(() => {
               <span>Subtotal:</span>
               <span className="font-medium">{formatPrice(getTotal())}</span>
             </div>
+
             {selectedDeliveryOption === "DELIVERY" && (
               <>
                 <div className="flex justify-between text-gray-700">
@@ -305,6 +337,12 @@ const orderPayload: CreateOrderFull | null = useMemo(() => {
                       : "N/A"}
                   </span>
                 </div>
+                {priceZone?.price === undefined ||
+                  (priceZone?.price === null && !isPriceLoading && (
+                    <p className="mt-2 text-sm text-red-600 font-semibold">
+                      {priceZone.message}
+                    </p>
+                  ))}
                 <p className="mt-2 text-sm text-gray-500 italic">
                   El costo de envío mostrado es un{" "}
                   <strong className="font-semibold">precio base</strong>, puede
@@ -333,7 +371,7 @@ const orderPayload: CreateOrderFull | null = useMemo(() => {
             />
           </div>
 
-          {isCheckoutEnabled && orderPayload && (
+          {canCreateOrder && orderPayload && (
             <div className="mt-6">
               <SubmitOrderButton orderPayload={orderPayload} />
             </div>
@@ -346,11 +384,10 @@ const orderPayload: CreateOrderFull | null = useMemo(() => {
   return (
     <div className="space-y-6 md:space-y-8 relative">
       {steps
-        .filter(
-          (s) =>
-            selectedDeliveryOption === "PICKUP"
-              ? s.key !== "address" && s.key !== "deliveryCompany"
-              : true
+        .filter((s) =>
+          selectedDeliveryOption === "PICKUP"
+            ? s.key !== "address" && s.key !== "deliveryCompany"
+            : true
         )
         .map(({ key, title, content }) => {
           const isActive = activeStep === key;
@@ -366,11 +403,13 @@ const orderPayload: CreateOrderFull | null = useMemo(() => {
               }`}
             >
               <div
+              onClick={()=> setActiveStep(key as Step)}
                 className="flex items-center justify-between cursor-pointer"
-                onClick={() => setActiveStep(key)}
               >
                 <h2 className="text-xl font-bold flex items-center gap-2">
-                  {isDone && <CheckCircle2 className="text-green-500 w-6 h-6" />}
+                  {isDone && (
+                    <CheckCircle2 className="text-green-500 w-6 h-6" />
+                  )}
                   {title}
                 </h2>
               </div>
