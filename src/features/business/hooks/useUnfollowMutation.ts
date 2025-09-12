@@ -1,7 +1,7 @@
 // src/features/business/hooks/useUnfollowMutation.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "@/lib/api";
-import { Business, BusinessFollow } from "../types/business";
+import { BusinessFollow } from "../types/business";
 
 interface UnfollowParams {
   userId: string;

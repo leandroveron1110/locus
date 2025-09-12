@@ -1,6 +1,6 @@
 // src/components/PaymentModal.tsx
 import React from "react";
-import { Order, PaymentMethodType } from "@/features/orders/types/order";
+import { Order } from "@/features/orders/types/order";
 import { X } from "lucide-react";
 import TransferPaymentSection from "./TransferPaymentSection";
 

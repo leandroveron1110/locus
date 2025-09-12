@@ -12,7 +12,6 @@ interface Props {
 export default function PaymentOptionSelector({
   selectedOption,
   onChange,
-  isDelivery = false,
 }: Props) {
   const options = [
     {

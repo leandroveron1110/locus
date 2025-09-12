@@ -3,16 +3,12 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware"; // Para persistir el estado
 import {
   User,
-  LoginPayload,
   LoginResponse,
-  RegisterPayload,
   RegisterResponse,
   AuthState,
   AuthStore, // <-- Importa la nueva interfaz AuthStore
 } from "../types/auth";
 import {
-  login as apiLogin,
-  register as apiRegister,
   getMe as apiGetMe,
 } from "../api/authApi";
 
@@ -31,7 +27,7 @@ const initialState: AuthState = {
 export const useAuthStore = create<AuthStore>()(
   // <-- CAMBIO CLAVE AQUÍ: create<AuthStore>()
   persist(
-    (set, get) => ({
+    (set, _get) => ({
       ...initialState, // Carga el estado inicial
 
       /**
@@ -52,7 +48,6 @@ export const useAuthStore = create<AuthStore>()(
           });
           return response.user; // Devuelve el usuario para uso en el componente
         } catch (error: any) {
-          console.error("Login failed:", error);
           set({
             ...initialState, // Resetea el estado a no autenticado
             isLoading: false,

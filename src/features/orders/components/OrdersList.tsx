@@ -2,7 +2,7 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import { useOrders } from "../hooks/useOrders";
-import { Order, OrderStatus } from "../types/order";
+import { Order } from "../types/order";
 import OrderCard from "./OrderCard/OrderCard";
 import OrdersFilters from "./OrdersFilters";
 import EmptyState from "./EmptyState";

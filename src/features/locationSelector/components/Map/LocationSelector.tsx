@@ -8,7 +8,6 @@ import AddressInput from "../AddressInput";
 import LocationReview from "./components/LocationReview";
 import ConfirmationCard from "../ConfirmationCard";
 import { AddressData } from "../../types/address-data";
-import { useSaveAddress } from "../../hooks/useSaveAddress";
 
 const MapComponent = dynamic(() => import("./components/Map"), { ssr: false });
 interface LocationSelectorProps {
