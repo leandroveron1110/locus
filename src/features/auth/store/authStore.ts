@@ -120,7 +120,7 @@ export const useAuthStore = create<AuthStore>()(
               error: null,
             });
           }
-        } catch (_) {
+        } catch {
           localStorage.removeItem("authToken");
           set({
             ...initialState,
