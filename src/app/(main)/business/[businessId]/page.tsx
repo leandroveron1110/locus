@@ -1,7 +1,7 @@
 import BusinessProfile from "@/features/business/components/BusinessProfile";
 import AppHeader from "@/features/header/components/AppHeader";
 
-export async function BusinessPage({
+export default async function BusinessPage({
   params,
 }: {
   params: Promise<{ businessId: string }>;
