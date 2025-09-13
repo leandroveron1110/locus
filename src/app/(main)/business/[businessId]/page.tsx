@@ -1,7 +1,6 @@
 import BusinessProfile from "@/features/business/components/BusinessProfile";
 import AppHeader from "@/features/header/components/AppHeader";
 
-// Tipo para los params de la página
 interface BusinessPageProps {
   params: {
     businessId: string;
@@ -9,8 +8,7 @@ interface BusinessPageProps {
   searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-// Componente de página
-export default async function BusinessPage({ params }: BusinessPageProps) {
+export default function BusinessPage({ params }: BusinessPageProps) {
   return (
     <>
       <AppHeader />
