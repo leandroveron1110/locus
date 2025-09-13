@@ -1,14 +1,8 @@
 import BusinessProfile from "@/features/business/components/BusinessProfile";
 import AppHeader from "@/features/header/components/AppHeader";
 
-interface BusinessPageProps {
-  params: {
-    businessId: string;
-  };
-  searchParams?: { [key: string]: string | string[] | undefined };
-}
-
-export default function BusinessPage({ params }: BusinessPageProps) {
+// Page component
+export default function BusinessPage({ params }: { params: { businessId: string } }) {
   return (
     <>
       <AppHeader />
