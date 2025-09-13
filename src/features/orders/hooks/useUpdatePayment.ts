@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { PaymentMethodType, PaymentStatus } from "../types/order";
 import { fetchUpdatePayment } from "../api/order-api";
+import { Order } from "../types/order";
 
 interface UpdatePaymentPayload {
   paymentType: PaymentMethodType;
@@ -10,8 +11,10 @@ interface UpdatePaymentPayload {
   paymentInstructions?: string;
 }
 
+
 export const useUpdatePayment = () => {
-  return useMutation<any, Error, { orderId: string; payload: UpdatePaymentPayload }>({
+  return useMutation<Order, Error, { orderId: string; payload: UpdatePaymentPayload }>({
     mutationFn: ({ orderId, payload }) => fetchUpdatePayment(orderId, payload),
   });
 };
+

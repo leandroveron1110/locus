@@ -16,8 +16,6 @@ export const getSocket = (userId: string): Socket => {
       }
     });
 
-    socket.on("disconnect", (_reason) => {
-    });
   }
   if (!socket.connected) {
     socket.connect();

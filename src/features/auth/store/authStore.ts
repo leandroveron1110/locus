@@ -2,7 +2,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware"; // Para persistir el estado
 import {
-  User,
   LoginResponse,
   RegisterResponse,
   AuthState,
@@ -22,12 +21,17 @@ const initialState: AuthState = {
   error: null,
 };
 
-// Crea el store de Zustand para la autenticación.
-// Ahora tipamos 'create' con AuthStore, que incluye tanto el estado como las acciones.
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  return "Ocurrió un error desconocido.";
+}
+
 export const useAuthStore = create<AuthStore>()(
   // <-- CAMBIO CLAVE AQUÍ: create<AuthStore>()
   persist(
-    (set, _get) => ({
+    (set) => ({
       ...initialState, // Carga el estado inicial
 
       /**
@@ -47,15 +51,13 @@ export const useAuthStore = create<AuthStore>()(
             error: null,
           });
           return response.user; // Devuelve el usuario para uso en el componente
-        } catch (error: any) {
+        } catch (error: unknown) {
           set({
-            ...initialState, // Resetea el estado a no autenticado
+            ...initialState,
             isLoading: false,
-            error:
-              error.message ||
-              "Error al iniciar sesión. Por favor, inténtalo de nuevo.",
+            error: getErrorMessage(error) || "Error al iniciar sesión.",
           });
-          throw error; // Re-lanza el error para que el componente que llama lo maneje
+          throw error; // 👈 dejamos que el componente decida qué hacer
         }
       },
 
@@ -75,14 +77,12 @@ export const useAuthStore = create<AuthStore>()(
             error: null,
           });
           return response.user;
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error("Register failed:", error);
           set({
             ...initialState,
             isLoading: false,
-            error:
-              error.message ||
-              "Error al registrar usuario. Por favor, inténtalo de nuevo.",
+            error: getErrorMessage(error) || "Error al registrar usuario.",
           });
           throw error;
         }
@@ -120,9 +120,8 @@ export const useAuthStore = create<AuthStore>()(
               error: null,
             });
           }
-        } catch (error: any) {
-          console.error("Failed to retrieve user session:", error);
-          localStorage.removeItem("authToken"); // Token inválido o expirado, lo eliminamos
+        } catch (error: unknown) {
+          localStorage.removeItem("authToken");
           set({
             ...initialState,
             isLoading: false,

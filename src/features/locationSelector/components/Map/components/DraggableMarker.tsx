@@ -2,11 +2,11 @@
 "use client";
 
 import { useRef, useState, useMemo, useEffect } from "react";
-import { Marker, Popup, useMap } from "react-leaflet";
+import { Marker, Popup } from "react-leaflet"; // 🔹 Eliminamos useMap (no se usa)
 import * as L from "leaflet";
 
 // Fix de íconos de Leaflet
-// @ts-expect-error
+// @ts-expect-error - Leaflet type definitions don't include _getIconUrl, so we override it manually.
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:

@@ -16,8 +16,8 @@ const MapComponent = ({ initialPosition, onPositionChange }: MapComponentProps) 
       center={initialPosition}
       zoom={16}
       scrollWheelZoom={false}
-      zoomControl={false} // Oculta el control de zoom
-      attributionControl={false} // Oculta la atribución de Leaflet
+      zoomControl={false}
+      attributionControl={false}
       style={{ height: "100%", width: "100%" }}
     >
       <TileLayer

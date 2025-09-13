@@ -9,6 +9,7 @@ import {
   Banknote,
 } from "lucide-react";
 import TransferDetails from "./TransferDetails";
+import { BusinessPaymentMethod } from "@/features/orders/types/business-payment-methods";
 
 interface Props {
   orderId: string;
@@ -17,7 +18,7 @@ interface Props {
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onUpload: () => void;
   loading: boolean;
-  paymentMethods?: any[];
+  paymentMethods?: BusinessPaymentMethod[];
   showTransferInfo: boolean;
   setShowTransferInfo: React.Dispatch<React.SetStateAction<boolean>>;
 }

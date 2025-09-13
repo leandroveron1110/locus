@@ -24,6 +24,6 @@ export interface PaginationParams {
 export interface ApiErrorResponse {
   message: string; // Friendly error message
   code?: string; // Internal error code (optional)
-  details?: any; // Additional error details (optional)
+  details?: unknown; // Additional error details (optional)
   statusCode: number; // HTTP status code
 }

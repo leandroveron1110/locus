@@ -6,7 +6,7 @@ import { ISearchBusinessParams, ISearchBusiness } from '../types/search';
 export const useSearchBusinesses = (
   params?: ISearchBusinessParams
 ) => {
-  return useQuery<ISearchBusiness, Error>({
+  return useQuery<ISearchBusiness | undefined, Error>({
     queryKey: ['searchResults', params], // La clave de la query incluye todos los parámetros de búsqueda
     queryFn: () => fetcSearchBusiness(params), // La función que llama a la API de búsqueda
     // keepPreviousData: true, // Mantiene los datos anteriores mientras se carga la nueva query

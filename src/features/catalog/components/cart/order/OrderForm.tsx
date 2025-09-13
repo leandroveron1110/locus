@@ -74,19 +74,20 @@ export default function OrderForm({
   const [showAddressModal, setShowAddressModal] = useState(false);
 
   // Hook para precio del envío
-  const {
-    data: priceZone,
-    isLoading: isPriceLoading,
-    refetch,
-  } = usePriceZone(
+  const priceZoneParams =
     selectedCompanyDelivery && selectedAddress
       ? {
           companyId: selectedCompanyDelivery.id,
           lat: selectedAddress.lat,
           lng: selectedAddress.lng,
         }
-      : ({} as any)
-  );
+      : undefined;
+
+  const {
+    data: priceZone,
+    isLoading: isPriceLoading,
+    refetch,
+  } = usePriceZone(priceZoneParams);
 
   // Abrir modal si no hay direcciones guardadas
   useEffect(() => {
@@ -217,12 +218,15 @@ export default function OrderForm({
     businessPhone,
     businessAddress,
     orderNote,
+    businessAddresslatitude,
+    businessAddresslongitude,
     selectedDeliveryOption,
     selectedAddress,
     selectedPaymentOption,
     selectedCompanyDelivery,
     getTotal,
     priceZone,
+    isSelectedDeliveryOption
   ]);
 
   // ✅ Determina si el usuario puede crear la orden
@@ -395,7 +399,7 @@ export default function OrderForm({
               }`}
             >
               <div
-              onClick={()=> setActiveStep(key as Step)}
+                onClick={() => setActiveStep(key as Step)}
                 className="flex items-center justify-between cursor-pointer"
               >
                 <h2 className="text-xl font-bold flex items-center gap-2">

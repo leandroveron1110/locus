@@ -1,24 +1,17 @@
 // src/features/search/api/searchApi.ts
 import api from "../../../lib/api"; // Importa la instancia de Axios configurada
-import {
-  ISearchBusinessParams,
-  ISearchBusiness,
-} from "../types/search";
-import {  ApiErrorResponse } from "../../../types/api";
+import { ISearchBusinessParams, ISearchBusiness } from "../types/search";
+import { handleApiError } from "@/features/common/utils/handleApiError";
 
 export const fetcSearchBusiness = async (
   params?: ISearchBusinessParams
-): Promise<ISearchBusiness> => {
+): Promise<ISearchBusiness | undefined> => {
   try {
     const response = await api.get<ISearchBusiness>(`/search/businesses`, {
       params,
     });
     return response.data;
-  } catch (error: any) {
-    console.error("Error searching businesses:", error);
-    throw (
-      (error.response?.data as ApiErrorResponse) ||
-      new Error("Error desconocido al buscar negocios.")
-    );
+  } catch (error: unknown) {
+    handleApiError(error, "Unknown desconocido al buscar negocios");
   }
 };

@@ -1,6 +1,6 @@
 // src/stores/useOrdersStore.ts
 import { create } from "zustand";
-import { Order, PaymentStatus } from "../types/order";
+import { Order, OrderStatus, PaymentStatus } from "../types/order";
 
 interface OrdersState {
   orders: Order[];
@@ -23,7 +23,7 @@ export const useOrdersStore = create<OrdersState>((set) => ({
   updateOrderStatus: (orderId, newStatus) =>
     set((state) => ({
       orders: state.orders.map((order) =>
-        order.id === orderId ? { ...order, status: newStatus as any } : order
+        order.id === orderId ? { ...order, status: newStatus as OrderStatus } : order
       ),
     })),
 

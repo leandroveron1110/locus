@@ -10,7 +10,7 @@ export function useOrders(userId: string) {
 
     getUserOrders(userId).then(setOrders);
     initOrdersSocket(userId);
-  }, [userId]);
+  }, [userId, setOrders]);
 
   return orders;
 }

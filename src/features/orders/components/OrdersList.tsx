@@ -2,7 +2,6 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import { useOrders } from "../hooks/useOrders";
-import { Order } from "../types/order";
 import OrderCard from "./OrderCard/OrderCard";
 import OrdersFilters from "./OrdersFilters";
 import EmptyState from "./EmptyState";
@@ -16,31 +15,32 @@ export default function OrdersList({ userId }: OrdersListProps) {
   const orders = useOrders(userId);
   const [activeFilter, setActiveFilter] = useState<string>("Todos");
 
-  const filteredAndSortedOrders = useMemo(() => {
-    if (!orders) return [];
+const filteredAndSortedOrders = useMemo(() => {
+  if (!orders) return [];
 
-    const currentFilter = simplifiedFilters.find(f => f.label === activeFilter);
-    
-    let filtered = orders;
-    if (currentFilter && currentFilter.label !== "Todos") {
-      filtered = orders.filter(order => {
-        if (currentFilter.condition) {
-          return currentFilter.condition(order);
-        }
-        return currentFilter.statuses.includes(order.status);
-      });
-    }
+  const currentFilter = simplifiedFilters.find(f => f.label === activeFilter);
 
-    return [...filtered].sort((a, b) => {
-      const priorityA = statusPriority[a.status] ?? Infinity;
-      const priorityB = statusPriority[b.status] ?? Infinity;
-      
-      const priorityDiff = priorityA - priorityB;
-      if (priorityDiff !== 0) return priorityDiff;
-      
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  let filtered = orders;
+  if (currentFilter && currentFilter.label !== "Todos") {
+    filtered = orders.filter(order => {
+      if (currentFilter.condition) {
+        return currentFilter.condition(order);
+      }
+      return currentFilter.statuses.includes(order.status);
     });
-  }, [orders, activeFilter]);
+  }
+
+  return [...filtered].sort((a, b) => {
+    const priorityA = statusPriority[a.status] ?? Infinity;
+    const priorityB = statusPriority[b.status] ?? Infinity;
+
+    const priorityDiff = priorityA - priorityB;
+    if (priorityDiff !== 0) return priorityDiff;
+
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+}, [orders, activeFilter]);
+
 
   return (
     <div className="relative">
@@ -52,7 +52,7 @@ export default function OrdersList({ userId }: OrdersListProps) {
           quickFilters={simplifiedFilters}
           activeFilter={activeFilter}
           setActiveFilter={setActiveFilter}
-          orders={orders as Order[]}
+          orders={orders ?? []}
         />
       </div>
 

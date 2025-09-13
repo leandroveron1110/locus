@@ -22,7 +22,7 @@ export default function TransferPaymentSection({
   paymentStatus,
   paymentReceiptUrl,
 }: Props) {
-const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [showTransferInfo, setShowTransferInfo] = useState(false);
   // Se elimina el estado showOrderDetails
@@ -61,9 +61,8 @@ const [file, setFile] = useState<File | null>(null);
     },
     []
   );
-
   const uploadFile = async (file: File) => {
-    // Simulación de subida
+    console.log("Archivo recibido:", file.name); // 👈 usamos la variable para evitar el warning
     await new Promise((resolve) => setTimeout(resolve, 1500));
     return "https://via.placeholder.com/400x200.png?text=comprobante";
   };

@@ -6,7 +6,11 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { useCartStore } from "@/features/catalog/stores/useCartStore";
 import { useCreateOrder } from "@/features/catalog/hooks/useCreateOrder";
-import { CreateOrderFull, CreateOrderItem, CreateOrderOptionGroup } from "@/features/catalog/types/order";
+import {
+  CreateOrderFull,
+  CreateOrderItem,
+  CreateOrderOptionGroup,
+} from "@/features/catalog/types/order";
 
 interface Props {
   orderPayload: CreateOrderFull;
@@ -33,10 +37,10 @@ export default function SubmitOrderButton({ orderPayload }: Props) {
     try {
       // 1️⃣ Mapeo de ítems del carrito
       const mappedItems: CreateOrderItem[] = items.map((cartItem) => {
-        const mappedOptionGroups: CreateOrderOptionGroup[] = cartItem.selectedOptions
-          ? Object.values(
-              cartItem.selectedOptions.reduce(
-                (acc, selectedOpt) => {
+        const mappedOptionGroups: CreateOrderOptionGroup[] =
+          cartItem.selectedOptions
+            ? Object.values(
+                cartItem.selectedOptions.reduce((acc, selectedOpt) => {
                   let originalOption;
                   let originalGroup;
 
@@ -67,17 +71,17 @@ export default function SubmitOrderButton({ orderPayload }: Props) {
                       priceModifierType: originalOption.priceModifierType,
                       quantity: 1,
                       priceFinal: String(originalOption.priceFinal), // ✅ string
-                      priceWithoutTaxes: String(originalOption.priceWithoutTaxes), // ✅ string
+                      priceWithoutTaxes: String(
+                        originalOption.priceWithoutTaxes
+                      ), // ✅ string
                       taxesAmount: String(originalOption.taxesAmount), // ✅ string
                       opcionId: originalOption.id,
                     });
                   }
                   return acc;
-                },
-                {} as Record<string, MappedOptionGroup>
+                }, {} as Record<string, MappedOptionGroup>)
               )
-            )
-          : [];
+            : [];
 
         return {
           menuProductId: cartItem.product.id,
@@ -85,7 +89,9 @@ export default function SubmitOrderButton({ orderPayload }: Props) {
           productDescription: cartItem.product.description,
           productImageUrl: cartItem.product.imageUrl || undefined,
           quantity: cartItem.quantity,
-          priceAtPurchase: String(Number(cartItem.product.finalPrice).toFixed(2)), // ✅ string
+          priceAtPurchase: String(
+            Number(cartItem.product.finalPrice).toFixed(2)
+          ), // ✅ string
           notes: "",
           optionGroups: mappedOptionGroups,
         };
@@ -105,20 +111,24 @@ export default function SubmitOrderButton({ orderPayload }: Props) {
       clearCart();
       router.push(`/orders`);
     } catch (err: unknown) {
-      console.error("Error al enviar orden:", err);
+      let errorMessage = "Hubo un error al enviar la orden.";
 
-      const errorMessage =
-        typeof err === "object" &&
-        err !== null &&
-        "response" in err &&
-        typeof (err as any).response?.data?.message === "string"
-          ? (err as any).response.data.message
-          : typeof err === "object" &&
-            err !== null &&
-            "message" in err &&
-            typeof (err as { message?: string }).message === "string"
-          ? (err as { message?: string }).message
-          : "Hubo un error al enviar la orden.";
+      if (typeof err === "object" && err !== null) {
+        // Si es un error de axios
+        if ("response" in err) {
+          const e = err as { response?: { data?: { message?: string } } };
+          if (typeof e.response?.data?.message === "string") {
+            errorMessage = e.response.data.message;
+          }
+        }
+        // Si es un Error estándar
+        else if ("message" in err) {
+          const e = err as { message?: string };
+          if (typeof e.message === "string") {
+            errorMessage = e.message;
+          }
+        }
+      }
 
       setError(errorMessage);
     }
