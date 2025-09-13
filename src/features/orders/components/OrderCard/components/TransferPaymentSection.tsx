@@ -22,7 +22,7 @@ export default function TransferPaymentSection({
   paymentStatus,
   paymentReceiptUrl,
 }: Props) {
-  const [file, setFile] = useState<File | null>(null);
+const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [showTransferInfo, setShowTransferInfo] = useState(false);
   // Se elimina el estado showOrderDetails

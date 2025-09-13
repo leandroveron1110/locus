@@ -1,6 +1,7 @@
 // src/components/OrderDetailsSection.tsx
 import { OrderItem } from "@/features/orders/types/order";
 import React from "react";
+import Image from "next/image"; // ⬅️ Importamos el componente Image de Next.js
 
 interface Props {
   items: OrderItem[];
@@ -39,12 +40,14 @@ export default function OrderDetailsSection({ items }: Props) {
           className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-lg bg-gray-50 transition-colors"
         >
           {/* Contenedor de la imagen del producto */}
-          <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-white overflow-hidden border border-gray-200 shadow-sm">
+          <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-white overflow-hidden border border-gray-200 shadow-sm relative"> {/* ⬅️ Añadimos 'relative' */}
             {item.productImageUrl ? (
-              <img
+              <Image
                 src={item.productImageUrl}
                 alt={`Imagen de ${item.productName}`}
-                className="object-cover w-full h-full"
+                fill // ⬅️ Usamos fill para que la imagen ocupe todo el contenedor
+                className="object-cover"
+                sizes="100px" // ⬅️ Indicamos un tamaño aproximado para la optimización
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs text-center p-1">

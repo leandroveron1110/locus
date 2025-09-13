@@ -4,7 +4,7 @@ import { CreateOrderFull } from "../types/order";
 import { fetchCreateOrder } from "../api/catalog-api";
 
 export const useCreateOrder = () => {
-  return useMutation<any, Error, CreateOrderFull>({
+  return useMutation<void, Error, CreateOrderFull>({
     mutationFn: fetchCreateOrder,
   });
 };

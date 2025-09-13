@@ -11,7 +11,6 @@ export const BusinessComments = ({ businessId, currentUserId }: Props) => {
     data: comments = [],
     isLoading,
     isError,
-    refetch,
   } = useRatingComments(businessId);
 
   const yaComento = comments.some((c) => currentUserId && c.user.id === currentUserId);

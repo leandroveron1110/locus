@@ -1,6 +1,5 @@
 // src/app/page.tsx
 import AppHeader from "@/features/header/components/AppHeader";
-import MapClientWrapper from "@/features/locationSelector/components/MapClientWrapper";
 import SearchPage from "@/features/search/components/Search";
 
 export default function Home() {

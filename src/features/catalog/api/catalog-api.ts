@@ -16,9 +16,8 @@ export const fetchMenuProducDetaillByProductId = async (productId: string): Prom
 };
 
 // 🟢 Órdenes
-export const fetchCreateOrder = async (payload: CreateOrderFull): Promise<any> => {
-  const { data } = await axios.post("/orders/full", payload);
-  return data;
+export const fetchCreateOrder = async (payload: CreateOrderFull) => {
+  await axios.post("/orders/full", payload);
 };
 
 // 🟢 Direcciones

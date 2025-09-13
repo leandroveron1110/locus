@@ -2,7 +2,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   fetchCreateAddress,
-  fetchCreateOrder,
   fetchUserAddresses,
 } from "../api/catalog-api";
 import { Address, AddressCreateDto } from "../types/address";

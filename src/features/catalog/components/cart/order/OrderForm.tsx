@@ -150,14 +150,6 @@ export default function OrderForm({
     }
   };
 
-  const isCheckoutEnabled = useMemo(() => {
-    if (!user) return false;
-    if (selectedDeliveryOption === "DELIVERY") {
-      return !!selectedAddress && !!selectedCompanyDelivery;
-    }
-    return true;
-  }, [user, selectedDeliveryOption, selectedAddress, selectedCompanyDelivery]);
-
   const isSelectedDeliveryOption = () => {
     return selectedDeliveryOption === "DELIVERY";
   };

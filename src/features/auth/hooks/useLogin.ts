@@ -14,14 +14,14 @@ export const useLogin = () => {
   const authStoreLogin = useAuthStore((state) => state.login); // Obtiene la acción login de Zustand
   const router = useRouter();
 
-  return useMutation<LoginResponse, Error, LoginPayload>({
+  return useMutation<LoginResponse | undefined, Error, LoginPayload>({
     mutationFn: apiLogin, // La función que realiza la llamada a la API
     onSuccess: (data) => {
-      // Esta función se ejecuta si la mutación (login) es exitosa
-      authStoreLogin(data); // Actualiza el store de Zustand con los datos del usuario
-      // Redirige al usuario a la página principal o a la que intentaba acceder
-      const redirectPath = new URLSearchParams(window.location.search).get('redirect') || '/';
-      router.push(redirectPath);
+      if(data) {
+        authStoreLogin(data);
+        const redirectPath = new URLSearchParams(window.location.search).get('redirect') || '/';
+        router.push(redirectPath);
+      }
     },
     onError: (error) => {
       // Esta función se ejecuta si la mutación (login) falla

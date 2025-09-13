@@ -1,7 +1,9 @@
+// src/components/CartItemCard.tsx
 "use client";
 import React from "react";
 import { CartItem } from "../../stores/useCartStore";
 import { Trash2 } from "lucide-react";
+import Image from "next/image"; // ⬅️ Importamos el componente Image de Next.js
 
 interface Props {
   item: CartItem;
@@ -10,7 +12,6 @@ interface Props {
 }
 
 export default function CartItemCard({ item, onEdit, onRemove }: Props) {
-
   const hasOptions = item.selectedOptions && item.selectedOptions.length > 0;
 
   // 🔹 Calcular el precio total del ítem
@@ -28,14 +29,17 @@ export default function CartItemCard({ item, onEdit, onRemove }: Props) {
       className="flex items-center gap-4 border border-gray-200 rounded-xl p-4 shadow-sm bg-white hover:shadow-md transition cursor-pointer"
       onClick={() => onEdit(item)}
     >
-      {/* Imagen producto */}
+      {/* ➡️ Imagen del producto con next/image */}
       {item.product.imageUrl ? (
-        <img
-          src={item.product.imageUrl}
-          alt={item.product.name}
-          className="w-16 h-16 rounded-lg object-cover"
-          loading="lazy"
-        />
+        <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+          <Image
+            src={item.product.imageUrl}
+            alt={item.product.name}
+            fill
+            className="object-cover"
+            sizes="(max-width: 640px) 100vw, 16rem"
+          />
+        </div>
       ) : (
         <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
           📦

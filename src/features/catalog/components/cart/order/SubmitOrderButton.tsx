@@ -6,15 +6,17 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { useCartStore } from "@/features/catalog/stores/useCartStore";
 import { useCreateOrder } from "@/features/catalog/hooks/useCreateOrder";
-import { CreateOrderFull, CreateOrderItem } from "@/features/catalog/types/order";
+import { CreateOrderFull, CreateOrderItem, CreateOrderOptionGroup } from "@/features/catalog/types/order";
 
 interface Props {
   orderPayload: CreateOrderFull;
 }
 
+// 🔹 Usamos el mismo tipo que CreateOrderOptionGroup para evitar duplicación
+type MappedOptionGroup = CreateOrderOptionGroup;
+
 export default function SubmitOrderButton({ orderPayload }: Props) {
   const [error, setError] = useState("");
-  // Es mejor usar el hook de Zustand directamente para que el componente re-renderice
   const { items, getTotal, clearCart } = useCartStore();
   const createOrderMutation = useCreateOrder();
   const router = useRouter();
@@ -29,89 +31,96 @@ export default function SubmitOrderButton({ orderPayload }: Props) {
     }
 
     try {
-      // 1️⃣ Lógica de Mapeo Corregida
+      // 1️⃣ Mapeo de ítems del carrito
       const mappedItems: CreateOrderItem[] = items.map((cartItem) => {
-        // Encontrar los grupos de opciones seleccionados y sus opciones
-        const mappedOptionGroups = cartItem.selectedOptions
+        const mappedOptionGroups: CreateOrderOptionGroup[] = cartItem.selectedOptions
           ? Object.values(
-              cartItem.selectedOptions.reduce((acc, selectedOpt) => {
-                // Encontrar la opción original en la estructura del producto
-                let originalOption;
-                let originalGroup;
+              cartItem.selectedOptions.reduce(
+                (acc, selectedOpt) => {
+                  let originalOption;
+                  let originalGroup;
 
-                // Bucle para encontrar la opción original
-                for (const group of cartItem.product.optionGroups) {
-                  originalOption = group.options.find(
-                    (opt) => opt.id === selectedOpt.id
-                  );
-                  if (originalOption) {
-                    originalGroup = group;
-                    break;
+                  for (const group of cartItem.product.optionGroups) {
+                    originalOption = group.options.find(
+                      (opt) => opt.id === selectedOpt.id
+                    );
+                    if (originalOption) {
+                      originalGroup = group;
+                      break;
+                    }
                   }
-                }
 
-                // Si se encuentra la opción, mapearla a la estructura deseada
-                if (originalOption && originalGroup) {
-                  if (!acc[originalGroup.id]) {
-                    acc[originalGroup.id] = {
-                      groupName: originalGroup.name,
-                      minQuantity: originalGroup.minQuantity,
-                      maxQuantity: originalGroup.maxQuantity,
-                      quantityType: originalGroup.quantityType,
-                      opcionGrupoId: originalGroup.id,
-                      options: [],
-                    };
+                  if (originalOption && originalGroup) {
+                    if (!acc[originalGroup.id]) {
+                      acc[originalGroup.id] = {
+                        groupName: originalGroup.name,
+                        minQuantity: originalGroup.minQuantity,
+                        maxQuantity: originalGroup.maxQuantity,
+                        quantityType: originalGroup.quantityType,
+                        opcionGrupoId: originalGroup.id,
+                        options: [],
+                      };
+                    }
+
+                    acc[originalGroup.id].options.push({
+                      optionName: originalOption.name,
+                      priceModifierType: originalOption.priceModifierType,
+                      quantity: 1,
+                      priceFinal: String(originalOption.priceFinal), // ✅ string
+                      priceWithoutTaxes: String(originalOption.priceWithoutTaxes), // ✅ string
+                      taxesAmount: String(originalOption.taxesAmount), // ✅ string
+                      opcionId: originalOption.id,
+                    });
                   }
-                  
-                  // Añadir la opción seleccionada con todos los detalles
-                  acc[originalGroup.id].options.push({
-                    optionName: originalOption.name,
-                    priceModifierType: originalOption.priceModifierType,
-                    quantity: 1, // Por ahora 1, si permites múltiples de la misma opción, se ajusta aquí
-                    priceFinal: originalOption.priceFinal,
-                    priceWithoutTaxes: originalOption.priceWithoutTaxes,
-                    taxesAmount: originalOption.taxesAmount,
-                    opcionId: originalOption.id,
-                  });
-                }
-                return acc;
-              }, {} as Record<string, any>)
+                  return acc;
+                },
+                {} as Record<string, MappedOptionGroup>
+              )
             )
           : [];
 
-        // Retornar el objeto mapeado completo del ítem del carrito
         return {
           menuProductId: cartItem.product.id,
           productName: cartItem.product.name,
           productDescription: cartItem.product.description,
           productImageUrl: cartItem.product.imageUrl || undefined,
           quantity: cartItem.quantity,
-          priceAtPurchase: Number(cartItem.product.finalPrice).toFixed(2),
+          priceAtPurchase: String(Number(cartItem.product.finalPrice).toFixed(2)), // ✅ string
           notes: "",
           optionGroups: mappedOptionGroups,
         };
       });
 
-      // 2️⃣ Armar payload completo
+      // 2️⃣ Armado del payload
       const payload: CreateOrderFull = {
         ...orderPayload,
         items: mappedItems,
         total: Number(getTotal().toFixed(2)),
       };
 
-      // 3️⃣ Llamar API
+      // 3️⃣ Llamada a la API
       await createOrderMutation.mutateAsync(payload);
 
       // 4️⃣ Limpiar carrito y redirigir
       clearCart();
       router.push(`/orders`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error al enviar orden:", err);
-      setError(
-        err?.response?.data?.message ||
-        err?.message ||
-        "Hubo un error al enviar la orden."
-      );
+
+      const errorMessage =
+        typeof err === "object" &&
+        err !== null &&
+        "response" in err &&
+        typeof (err as any).response?.data?.message === "string"
+          ? (err as any).response.data.message
+          : typeof err === "object" &&
+            err !== null &&
+            "message" in err &&
+            typeof (err as { message?: string }).message === "string"
+          ? (err as { message?: string }).message
+          : "Hubo un error al enviar la orden.";
+
+      setError(errorMessage);
     }
   };
 

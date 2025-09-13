@@ -6,7 +6,7 @@ import { Marker, Popup, useMap } from "react-leaflet";
 import * as L from "leaflet";
 
 // Fix de íconos de Leaflet
-// @ts-ignore
+// @ts-expect-error
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -24,7 +24,6 @@ interface DraggableMarkerProps {
 
 const DraggableMarker = ({ initialPosition, onPositionChange }: DraggableMarkerProps) => {
   const [position, setPosition] = useState(initialPosition);
-  const map = useMap();
   const markerRef = useRef<L.Marker>(null);
 
   const eventHandlers = useMemo(

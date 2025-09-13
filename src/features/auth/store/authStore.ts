@@ -110,14 +110,16 @@ export const useAuthStore = create<AuthStore>()(
 
         // Si hay un token, intenta obtener los datos del usuario
         try {
-          const user: User = await apiGetMe(); // Usa la función de la API para obtener el perfil
-          set({
-            user: user,
-            token: token, // Mantiene el token que ya teníamos
-            isAuthenticated: true,
-            isLoading: false,
-            error: null,
-          });
+          const user = await apiGetMe(); // Usa la función de la API para obtener el perfil
+          if(user) {
+            set({
+              user: user,
+              token: token, // Mantiene el token que ya teníamos
+              isAuthenticated: true,
+              isLoading: false,
+              error: null,
+            });
+          }
         } catch (error: any) {
           console.error("Failed to retrieve user session:", error);
           localStorage.removeItem("authToken"); // Token inválido o expirado, lo eliminamos

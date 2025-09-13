@@ -49,7 +49,7 @@ export default function CartItemEditor({ item, onClose }: Props) {
       }
     }
     setSelected(grouped);
-  }, [product]);
+  }, [product, selectedOptions]);
 
   const basePrice = useMemo(() => Number(product?.finalPrice || 0), [product]);
 
