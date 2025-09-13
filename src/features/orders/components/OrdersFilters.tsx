@@ -1,4 +1,4 @@
-import { Order, OrderStatus, PaymentMethodType, PaymentStatus } from "../types/order";
+import { Order, OrderStatus, PaymentStatus } from "../types/order";
 
 type StatusFilter = OrderStatus | PaymentStatus;
 

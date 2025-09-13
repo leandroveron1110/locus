@@ -151,12 +151,11 @@ export default function OrderForm({
     }
   };
 
-  const isSelectedDeliveryOption = () => {
-    return selectedDeliveryOption === "DELIVERY";
-  };
-
   const orderPayload: CreateOrderFull | null = useMemo(() => {
     if (!user) return null;
+
+    const isSelectedDeliveryOption = () =>
+      selectedDeliveryOption === "DELIVERY";
 
     const subtotal = getTotal();
     const deliveryPrice =
@@ -166,15 +165,14 @@ export default function OrderForm({
     return {
       userId: userId ?? "",
       businessId,
-      deliveryAddressId: undefined, // donde busca el pedido el cadete
+      deliveryAddressId: undefined,
       pickupAddressId: isSelectedDeliveryOption()
         ? selectedAddress?.id
-        : undefined, // donde tiene que llevarlo
+        : undefined,
       deliveryCompanyId: isSelectedDeliveryOption()
         ? selectedCompanyDelivery?.id
         : undefined,
 
-      // --- Snapshot del cliente ---
       customerName: `${user.firstName} ${user.lastName}`,
       customerPhone: user.email,
       customerAddress: isSelectedDeliveryOption()
@@ -188,27 +186,24 @@ export default function OrderForm({
         ? selectedAddress?.lng
         : undefined,
 
-      // --- Snapshot del negocio ---
       businessName,
       businessPhone,
       businessAddress,
-      businessAddresslatitude: businessAddresslatitude,
-      businessAddresslongitude: businessAddresslongitude,
+      businessAddresslatitude,
+      businessAddresslongitude,
 
-      // --- Snapshot de delivery ---
       deliveryCompanyName: selectedCompanyDelivery?.name,
       deliveryCompanyPhone: selectedCompanyDelivery?.phone,
       totalDelivery: isSelectedDeliveryOption() ? deliveryPrice : undefined,
 
-      // --- Pagos ---
       paymentType: selectedPaymentOption,
-      paymentStatus: "PENDING", // 🔹 obligatorio
+      paymentStatus: "PENDING",
 
       deliveryType: selectedDeliveryOption,
       total,
       notes: orderNote,
 
-      items: [], // se rellenan en SubmitOrderButton
+      items: [],
     };
   }, [
     user,
@@ -226,7 +221,6 @@ export default function OrderForm({
     selectedCompanyDelivery,
     getTotal,
     priceZone,
-    isSelectedDeliveryOption
   ]);
 
   // ✅ Determina si el usuario puede crear la orden
