@@ -10,7 +10,7 @@ interface Props {
   businessId: string;
 }
 
-export default function Rating({ businessId }: Props) {
+export default function   Rating({ businessId }: Props) {
   const user = useAuthStore((state) => state.user);
   const userId = user?.id ?? null;
   const [showComments, setShowComments] = useState(false);

@@ -10,7 +10,7 @@ import {
   Review,
 } from "../types/business";
 
-const baseUrlBusiness = "/businesses/";
+const baseUrlBusiness = "/business/";
 
 /**
  * Obtenemos el negocio
@@ -61,7 +61,7 @@ export const fetchFollowers = async (
   userId: string | undefined
 ): Promise<BusinessFollow> => {
   if (!userId) {
-    const res = await axios.get(`/follow/business/${businessId}`); // endpoint de tu API
+    const res = await axios.get(`/follow/business/follow/${businessId}`); // endpoint de tu API
     return res.data;
   } else {
     const res = await axios.get(`/follow/business/${businessId}/${userId}`); // endpoint de tu API
@@ -95,13 +95,18 @@ export const fetchBusinessSchedule = async (
   return res.data;
 };
 
+export async function fetchWeeklySchedule(businessId: string) {
+  const { data } = await axios.get(`/weekly-schedules/${businessId}`);
+  return data as Record<string, string[]>;
+}
+
 /**
  * Feach Galery basic
  */
 export const fetchBusinessGaleryBasic = async (
   businessId: string
 ): Promise<BusinessGalery[]> => {
-  const res = await axios.get(`/businesses/${businessId}/gallery`);
+  const res = await axios.get(`/business/${businessId}/gallery`);
   return res.data;
 };
 

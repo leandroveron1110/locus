@@ -104,9 +104,9 @@ export default function BusinessProfile({ businessId }: Props) {
                 email={data.email}
                 phone={data.phone}
                 whatsapp={data.whatsapp}
-                facebookUrl={data.facebookUrl}
-                instagramUrl={data.instagramUrl}
-                websiteUrl={data.websiteUrl}
+                facebookUrl={data.facebookUrl || ""}
+                instagramUrl={data.instagramUrl || ""}
+                websiteUrl={data.websiteUrl || ""}
               />
             )}
             {activeSection === "schedule" && (
