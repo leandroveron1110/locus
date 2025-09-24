@@ -12,7 +12,7 @@ export default async function BusinessPage({
       <AppHeader />
       <div className="min-h-screen bg-gray-100 w-full">
         <main className="w-full">
-          <div className="bg-white w-full sm:p-8">
+          <div className="bg-white w-full">
             <BusinessProfile businessId={businessId} />
           </div>
         </main>

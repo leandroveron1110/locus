@@ -1,7 +1,7 @@
 // components/ProfileNav.tsx
 "use client";
 
-import { Phone, Clock, Tag, ImageIcon, Star } from "lucide-react";
+import { Phone, Clock, Tag, ImageIcon, Star, List } from "lucide-react";
 
 interface Section {
   id: string;
@@ -17,9 +17,10 @@ interface Props {
 const sections: Section[] = [
   { id: "categories", label: "Categorías", icon: <Tag className="h-6 w-6" /> },
   { id: "gallery", label: "Galería", icon: <ImageIcon className="h-6 w-6" /> },
+  { id: "menu", label: "Menú", icon: <List className="h-6 w-6" /> },
+  { id: "rating", label: "Calificación", icon: <Star className="h-6 w-6" /> },
   { id: "schedule", label: "Horarios", icon: <Clock className="h-6 w-6" /> },
   { id: "contact", label: "Contacto", icon: <Phone className="h-6 w-6" /> },
-  { id: "rating", label: "Calificacion", icon: <Star className="h-6 w-6" /> },
 ];
 
 

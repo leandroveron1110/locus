@@ -1,90 +1,73 @@
 // src/features/business/components/BusinessHeader.tsx
+import React from "react";
 import Image from "next/image";
-import { Globe } from "lucide-react";
+import { Star } from "lucide-react";
 import FollowButton from "./FollowButton";
+import { Business } from "../../types/business";
+import Title from "@/features/common/ui/Title";
+import Description from "@/features/common/ui/Description";
 
-interface BusinessHeaderProps {
+interface Props {
+  fullDescription: string;
   logoUrl: string | undefined;
   name: string;
-  fullDescription: string;
   businessId: string;
+  ratingsCount: number | undefined;
 }
 
 export default function BusinessHeader({
+  businessId,
+  fullDescription,
   logoUrl,
   name,
-  fullDescription,
-  businessId,
-}: BusinessHeaderProps) {
-  const commonClasses = "object-cover shadow-md";
+  ratingsCount,
+}: Props) {
+  const logoUrlBusiness = logoUrl || "/placeholder-logo.png";
 
   return (
-    <header className="w-full flex flex-col sm:flex-row sm:items-start">
-      {/* Contenedor para vista móvil (imagen grande) */}
-      <div className="w-full h-64 relative flex-shrink-0 sm:hidden">
-        {logoUrl ? (
+    <div className="bg-white p-3 md:p-6 mb-6">
+      <div className="flex flex-row items-start gap-6">
+        {/* Logo */}
+        <div className="relative w-24 h-24 md:w-28 md:h-28 flex-shrink-0 rounded-full overflow-hidden">
           <Image
-            src={logoUrl}
+            src={logoUrlBusiness}
             alt={`${name} logo`}
             fill
-            className={`${commonClasses} rounded-b-3xl`}
-            sizes="100vw"
+            className="object-cover"
+            sizes="112px"
             priority
           />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-b-3xl">
-            <Globe className="w-16 h-16 text-gray-400" />
-          </div>
-        )}
-        
-        {/* Overlay con texto y botón en móvil */}
-        <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/100 to-transparent p-4">
-          <h1 className="text-2xl font-extrabold text-white drop-shadow-lg">
-            {name}
-          </h1>
+        </div>
+
+        {/* Información del negocio */}
+        <div className="flex-1 text-left">
+          <Title size="medium">{name.toUpperCase()}</Title>
+
           {fullDescription && (
-            <p className="text-white text-sm mt-1 line-clamp-3 drop-shadow-sm">
-              {fullDescription}
-            </p>
+            <Description lines={2}>{fullDescription}</Description>
           )}
+
+          {/* Rating */}
+          <div className="flex gap-1 mt-2">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star
+                key={i}
+                size={14}
+                className={
+                  i < Math.round(Number(ratingsCount) || 0)
+                    ? "text-yellow-400 fill-yellow-400"
+                    : "text-gray-300"
+                }
+              />
+            ))}
+          </div>
+
+          {/* Botón de seguir */}
           <div className="mt-3">
             <FollowButton businessId={businessId} />
           </div>
         </div>
       </div>
-
-      {/* Contenedor para vista de escritorio (imagen pequeña) */}
-      <div className="hidden sm:block sm:w-40 sm:h-40 relative flex-shrink-0">
-        {logoUrl ? (
-          <Image
-            src={logoUrl}
-            alt={`${name} logo`}
-            fill
-            className={`${commonClasses} rounded-3xl`}
-            sizes="160px"
-            priority
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-3xl">
-            <Globe className="w-16 h-16 text-gray-400" />
-          </div>
-        )}
-      </div>
-
-      {/* Texto y botón en escritorio */}
-      <div className="flex-1 mt-4 px-4 hidden sm:flex flex-col justify-center">
-        <h1 className="text-3xl font-extrabold text-gray-900 break-words">
-          {name}
-        </h1>
-        {fullDescription && (
-          <p className="mt-2 text-gray-600 text-base sm:text-lg max-w-xl line-clamp-3">
-            {fullDescription}
-          </p>
-        )}
-        <div className="mt-4 w-max">
-          <FollowButton businessId={businessId} />
-        </div>
-      </div>
-    </header>
+    </div>
   );
 }

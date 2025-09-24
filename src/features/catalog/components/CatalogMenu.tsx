@@ -2,19 +2,21 @@
 import React from "react";
 import { Menu } from "../types/catlog";
 import CatalogSection from "./CatalogSection";
+import Title from "@/features/common/ui/Title";
 
 interface Props {
   menu: Menu;
 }
 
 export default function CatalogMenu({ menu }: Props) {
-  // ⬅️ La lógica de ordenamiento se mantiene aquí y es correcta
+  // La lógica de ordenamiento se mantiene aquí y es correcta
   const sortedSections = [...menu.sections].sort((a, b) => a.index - b.index);
 
   return (
-    <section> {/* ⬅️ Quitamos las clases de padding */}
+    <section>
       <header className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-800">{menu.name}</h2>
+        {/* Usamos text-xl para móvil y md:text-3xl para escritorio */}
+        <Title size="medium" >{menu.name}</Title>
       </header>
 
       <div className="space-y-12">
