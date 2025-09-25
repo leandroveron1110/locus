@@ -21,12 +21,8 @@ export default function AddressSelector({
   onCreateNew,
 }: Props) {
   return (
-    <div className="space-y-3">
-      <label className="block font-semibold text-gray-700 mb-2">
-        📍 Dirección de entrega
-      </label>
-
-      <div className="grid grid-cols-1 gap-2">
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-3">
         {addresses?.map((addr) => {
           const text = `${addr.street} ${addr.number}, ${addr.city}`;
           const isSelected = selectedId === addr.id;
@@ -41,17 +37,18 @@ export default function AddressSelector({
                   lng: addr.longitude || 0,
                 })
               }
-              className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition
-                ${
-                  isSelected
-                    ? "border-blue-600 bg-blue-50"
-                    : "border-gray-300 hover:border-blue-400"
+              className={`flex items-center justify-between w-full p-4 rounded-xl border transition
+                ${isSelected
+                  ? "border-blue-600 bg-blue-50 shadow-sm"
+                  : "border-gray-300 hover:border-blue-400 active:bg-gray-100"
                 }
               `}
             >
-              <span className="text-gray-800">{text}</span>
+              <span className="text-gray-800 text-sm sm:text-base truncate max-w-[80%]">
+                {text}
+              </span>
               {isSelected && (
-                <span className="text-blue-600 font-semibold">✔</span>
+                <span className="text-blue-600 font-bold text-lg">✔</span>
               )}
             </button>
           );
@@ -60,15 +57,16 @@ export default function AddressSelector({
         {/* Botón para crear nueva dirección */}
         <button
           onClick={() => onChange({ id: "new", text: "", lat: 0, lng: 0 })}
-          className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition
-            ${
-              selectedId === "new"
-                ? "border-blue-600 bg-blue-50"
-                : "border-gray-300 hover:border-blue-400"
+          className={`flex items-center justify-between w-full p-4 rounded-xl border transition
+            ${selectedId === "new"
+              ? "border-blue-600 bg-blue-50 shadow-sm"
+              : "border-gray-300 hover:border-blue-400 active:bg-gray-100"
             }
           `}
         >
-          <span className="text-gray-800">+ Agregar nueva dirección</span>
+          <span className="text-gray-800 text-sm sm:text-base">
+            ➕ Agregar nueva dirección
+          </span>
         </button>
       </div>
 
@@ -76,7 +74,7 @@ export default function AddressSelector({
       {selectedId === "new" && (
         <button
           onClick={onCreateNew}
-          className="mt-1 text-sm text-blue-600 hover:underline"
+          className="mt-1 text-sm text-blue-600 hover:underline self-start"
         >
           Abrir formulario de dirección
         </button>

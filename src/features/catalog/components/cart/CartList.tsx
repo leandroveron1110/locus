@@ -1,3 +1,4 @@
+// src/components/CartList.tsx
 "use client";
 import React, { useState } from "react";
 import { CartItem, useCartStore } from "../../stores/useCartStore";
@@ -8,6 +9,7 @@ import OrderForm from "./order/OrderForm";
 import { BusinessPaymentMethod } from "../../types/business";
 import BackButton from "@/features/common/ui/BackButton/BackButton";
 import { ShoppingCart } from "lucide-react";
+import OrderFormContainer from "./order/OrderFormContainer/OrderFormContainer";
 
 interface Props {
   userId?: string;
@@ -27,7 +29,7 @@ export default function CartList(props: Props) {
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-gray-500">
+      <div className="flex flex-col items-center justify-center h-full text-gray-500 p-8">
         <ShoppingCart size={48} className="mb-3 opacity-50" />
         <p className="text-lg font-medium">Tu carrito está vacío</p>
       </div>
@@ -38,11 +40,7 @@ export default function CartList(props: Props) {
     <div className="flex flex-col h-full">
       {/* Paso: Carrito */}
       {step === "cart" && (
-        <>
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">
-            Tu carrito
-          </h2>
-
+        <div className="flex-1 flex flex-col">
           <div className="flex-1 space-y-3 overflow-y-auto pr-1">
             {items.map((item) => (
               <CartItemCard
@@ -55,29 +53,29 @@ export default function CartList(props: Props) {
           </div>
 
           {/* Resumen y botón */}
-          <div className="border-t pt-3 mt-3">
+          <div className="flex-shrink-0 border-t pt-3 mt-3">
             <CartSummary total={getTotal()} onClear={clearCart} />
             <button
               onClick={() => setStep("order")}
-              className="w-full mt-3 bg-indigo-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
+              className="w-full mt-3 bg-blue-600 text-white py-3 rounded-xl text-lg font-semibold hover:bg-blue-700 active:bg-blue-800 transition-all duration-200"
             >
               Continuar
             </button>
           </div>
-        </>
+        </div>
       )}
 
       {/* Paso: Orden */}
       {step === "order" && (
-        <>
+        <div className="">
           <div className="flex items-center mb-4">
             <BackButton onClick={() => setStep("cart")} />
             <h2 className="text-lg font-semibold ml-3 text-gray-900">
               Finalizar compra
             </h2>
           </div>
-          <OrderForm {...props} />
-        </>
+          <OrderFormContainer {...props} />
+        </div>
       )}
 
       {/* Modal de edición */}

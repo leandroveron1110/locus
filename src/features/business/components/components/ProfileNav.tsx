@@ -12,8 +12,11 @@ interface Section {
 interface Props {
   activeSection: string;
   onChange: (section: string) => void;
+  // Agrega la nueva prop hasMenu
+  hasMenu: boolean;
 }
 
+// Actualiza la lista para incluir el menú como un elemento que se puede filtrar
 const sections: Section[] = [
   { id: "categories", label: "Categorías", icon: <Tag className="h-6 w-6" /> },
   { id: "gallery", label: "Galería", icon: <ImageIcon className="h-6 w-6" /> },
@@ -23,12 +26,18 @@ const sections: Section[] = [
   { id: "contact", label: "Contacto", icon: <Phone className="h-6 w-6" /> },
 ];
 
+export default function ProfileNav({ activeSection, onChange, hasMenu }: Props) {
+  // Filtra las secciones para mostrar u ocultar el menú
+  const visibleSections = sections.filter((section) => {
+    if (section.id === "menu") {
+      return hasMenu;
+    }
+    return true;
+  });
 
-
-export default function ProfileNav({ activeSection, onChange }: Props) {
   return (
     <div className="flex justify-around py-4 overflow-x-auto">
-      {sections.map((section) => (
+      {visibleSections.map((section) => (
         <button
           key={section.id}
           onClick={() => onChange(section.id)}

@@ -17,38 +17,41 @@ export default function PaymentOptionSelector({
     {
       value: PaymentMethodType.TRANSFER,
       label: "Transferencia Bancaria",
-      icon: <Wallet className="w-5 h-5 mr-3 text-gray-700" />,
+      icon: Wallet,
     },
     {
       value: PaymentMethodType.CASH,
       label: "Efectivo",
-      icon: <DollarSign className="w-5 h-5 mr-3 text-gray-700" />,
+      icon: DollarSign,
     },
   ];
 
   return (
-    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-      <h3 className="font-semibold text-gray-800 mb-3 text-lg">
+    <div className="bg-white pt-4 rounded-xl  border-gray-200">
+      <h3 className="font-semibold text-gray-800 mb-3 text-base sm:text-lg">
         Método de pago
       </h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {options.map((option) => {
-          const isSelected = selectedOption === option.value;
+        {options.map(({ value, label, icon: Icon }) => {
+          const isSelected = selectedOption === value;
           return (
             <button
-              key={option.value}
-              onClick={() => onChange(option.value)}
-              className={`
-                flex items-center p-3 border rounded-lg cursor-pointer transition-all duration-200
+              key={value}
+              onClick={() => onChange(value)}
+              className={`flex items-center p-3 rounded-xl border transition-all duration-200 gap-3
                 ${
                   isSelected
-                    ? "border-blue-600 bg-blue-50 shadow-md text-blue-700"
+                    ? "border-blue-600 bg-blue-50 text-blue-700 shadow-md"
                     : "border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-gray-100"
                 }
               `}
             >
-              {option.icon}
-              <span className="font-medium text-gray-800">{option.label}</span>
+              <Icon
+                className={`w-5 h-5 ${
+                  isSelected ? "text-blue-600" : "text-gray-600"
+                }`}
+              />
+              <span className="text-sm sm:text-base font-medium">{label}</span>
             </button>
           );
         })}

@@ -10,8 +10,6 @@ interface Props {
   onClick: () => void;
 }
 
-const MAX_DESC_LENGTH = 120; // Esto ya no se usará, pero lo mantenemos por referencia.
-
 export default function CatalogProduct({ product, onClick }: Props) {
   const {
     available,

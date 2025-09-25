@@ -12,6 +12,6 @@ export const fetcSearchBusiness = async (
     });
     return response.data;
   } catch (error: unknown) {
-    handleApiError(error, "Unknown desconocido al buscar negocios");
+    throw handleApiError(error, "Unknown desconocido al buscar negocios");
   }
 };

@@ -51,16 +51,19 @@ export default function CartItemCard({ item, onEdit, onRemove }: Props) {
         <h3 className="text-base font-semibold text-gray-900 truncate">
           {item.product.name}
         </h3>
-        <p className="text-sm text-gray-500">Cantidad: {item.quantity}</p>
+        <p className="text-sm text-gray-500 mb-1">Cantidad: {item.quantity}</p>
 
         {hasOptions && (
-          <ul className="mt-1 text-sm text-gray-600 space-y-0.5">
-            {item.selectedOptions!.map((opt) => (
+          <ul className="text-xs text-gray-600 space-y-0.5">
+            {item.selectedOptions!.map((opt, index) => (
               <li key={opt.id} className="flex items-center gap-1">
                 <span className="font-medium">{opt.name}:</span>
-                <span>
+                <span className="font-normal text-gray-500">
                   {opt.value !== 0
-                    ? `+ $${opt.value.toLocaleString("es-AR")}`
+                    ? `+ ${new Intl.NumberFormat("es-AR", {
+                        style: "currency",
+                        currency: "ARS",
+                      }).format(opt.value)}`
                     : "Incluido"}
                 </span>
               </li>

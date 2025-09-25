@@ -1,6 +1,6 @@
 // src/components/ProductOptions.tsx
 "use client";
-import React from "react";
+import React, { useCallback } from "react";
 import { Product, Option } from "@/features/catalog/types/catlog";
 import OptionGroup from "./OptionGroup";
 
@@ -14,6 +14,9 @@ interface Props {
     multiple: boolean
   ) => void;
 }
+
+// ✅ Se crea un componente memorizado para evitar re-renderizados innecesarios.
+const MemoizedOptionGroup = React.memo(OptionGroup);
 
 export default function ProductOptions({
   product,
@@ -32,14 +35,22 @@ export default function ProductOptions({
     );
   }
 
+  // ✅ Se envuelve la función en `useCallback` para que su referencia sea estable y no provoque re-renderizados de los componentes hijos.
+  const memoizedToggleOption = useCallback(
+    (groupId: string, option: Option, max: number, multiple: boolean) => {
+      toggleOption(groupId, option, max, multiple);
+    },
+    [toggleOption]
+  );
+
   return (
     <div className="space-y-8 mb-6">
       {product.optionGroups.map((group) => (
-        <OptionGroup
+        <MemoizedOptionGroup
           key={group.id}
           group={group}
           selected={selectedOptions[group.id] || []}
-          toggleOption={toggleOption}
+          toggleOption={memoizedToggleOption}
           currencyMask={product.currencyMask}
         />
       ))}

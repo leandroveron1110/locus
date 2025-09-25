@@ -1,26 +1,41 @@
-// features/search/components/SearchBusinessList.tsx
+"use client";
+
 import { SearchResultBusiness } from "../types/search";
 import { SearchBusinessCard } from "./SearchBusinessCard";
+import { Virtuoso } from "react-virtuoso";
 
 interface Props {
   businesses: SearchResultBusiness[];
 }
 
 export default function SearchBusinessList({ businesses }: Props) {
-  if (!businesses || businesses.length === 0) return null;
+  if (!businesses) return null;
 
   return (
-    <>
-      <h2 className="text-xl font-bold text-gray-800 mb-6">
-        {businesses.length} {businesses.length === 1 ? 'negocio' : 'negocios'} encontrados
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col h-[calc(100vh-80px)]">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">
+        {businesses.length > 0
+          ? `${businesses.length} ${businesses.length === 1 ? "negocio" : "negocios"} encontrados`
+          : "No se encontraron negocios"}
       </h2>
-      <div className="flex flex-wrap justify-center sm:justify-start gap-6">
-        {businesses.map((b) => (
-          <div key={b.id} className="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)]">
-            <SearchBusinessCard business={b} />
-          </div>
-        ))}
-      </div>
-    </>
+
+      {businesses.length > 0 ? (
+        <div className="flex-1">
+          <Virtuoso
+            data={businesses}
+            itemContent={(index, business) => (
+              <div className="mb-4">
+                <SearchBusinessCard key={business.id} business={business} />
+              </div>
+            )}
+            style={{ height: "100%", width: "100%" }}
+          />
+        </div>
+      ) : (
+        <p className="text-gray-500 text-center mt-12">
+          Prueba buscando otro término o verifica tu ubicación.
+        </p>
+      )}
+    </section>
   );
 }
