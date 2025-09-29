@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { Trash2 } from "lucide-react";
+import { formatPrice } from "@/features/common/utils/formatPrice";
 
 interface Props {
   total: number;
@@ -14,7 +15,7 @@ export default function CartSummary({ total, onClear }: Props) {
       <div className="flex flex-col">
         <span className="text-xs text-gray-500">Total de la compra</span>
         <span className="text-lg font-semibold text-gray-900">
-          ${total.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
+          {formatPrice(total)}
         </span>
       </div>
 

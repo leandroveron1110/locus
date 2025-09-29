@@ -1,3 +1,6 @@
+// Asumiendo la estructura de data es:
+// data: { categories?: { id: string; name: string }[] | null; tags?: { id: string; name: string }[] | null; }
+
 "use client";
 
 import { Tag } from "lucide-react";
@@ -10,6 +13,7 @@ interface Props {
 export default function CategoriesTags({ businessId }: Props) {
   const { data, isLoading, isError } = useCategoriesTags(businessId);
 
+  // 1. Estados de carga y error
   if (isLoading)
     return (
       <p className="text-sm text-gray-500 px-4 sm:px-0 text-center">
@@ -19,10 +23,20 @@ export default function CategoriesTags({ businessId }: Props) {
 
   if (isError || !data)
     return (
-      <p className="text-sm text-gray-500 px-4 sm:px-0 text-center">
-        No se pudieron cargar las categorías y tags.
+      <p className="text-sm text-red-500 px-4 sm:px-0 text-center">
+        🚨 No se pudieron cargar las categorías y tags.
       </p>
     );
+
+  // 2. Normalizar datos (usar arrays vacíos si son null/undefined)
+  const categories = data.categories || [];
+  const tags = data.tags || [];
+
+  const noCategories = categories.length === 0;
+  const noTags = tags.length === 0;
+
+  // ❌ Se eliminaron los early returns previos (Sin categorías / Sin tags)
+  // que impedían mostrar el otro conjunto de datos.
 
   const renderChips = (items: { id: string; name: string }[]) =>
     items.map((item) => (
@@ -35,41 +49,40 @@ export default function CategoriesTags({ businessId }: Props) {
       </div>
     ));
 
-  const noCategories = data.categories.length === 0;
-  const noTags = data.tags.length === 0;
-
+  // 3. Caso: No hay categorías NI tags
   if (noCategories && noTags) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-gray-400 space-y-2">
         <Tag size={40} className="text-gray-300" />
         <span className="text-sm font-medium">
-          Este negocio aún no tiene categorías ni tags disponibles
+          Este negocio aún no tiene categorías ni tags disponibles.
         </span>
       </div>
     );
   }
 
+  // 4. Renderizado: Se muestran ambos (o solo uno) si tienen elementos
   return (
     <section className="mt-6 px-4 sm:px-0 space-y-6">
-      {/* Categorías */}
-      {data.categories.length > 0 && (
+      {/* Categorías (Solo se renderiza si hay elementos) */}
+      {categories.length > 0 && (
         <div>
           <h3 className="text-gray-800 font-semibold mb-2">
-            Categorías ({data.categories.length})
+            Categorías ({categories.length})
           </h3>
           <div className="flex flex-wrap gap-2">
-            {renderChips(data.categories)}
+            {renderChips(categories)}
           </div>
         </div>
       )}
 
-      {/* Tags */}
-      {data.tags.length > 0 && (
+      {/* Tags (Solo se renderiza si hay elementos) */}
+      {tags.length > 0 && (
         <div>
           <h3 className="text-gray-800 font-semibold mb-2">
-            Tags ({data.tags.length})
+            Tags ({tags.length})
           </h3>
-          <div className="flex flex-wrap gap-2">{renderChips(data.tags)}</div>
+          <div className="flex flex-wrap gap-2">{renderChips(tags)}</div>
         </div>
       )}
     </section>

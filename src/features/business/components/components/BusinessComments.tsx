@@ -13,6 +13,10 @@ export const BusinessComments = ({ businessId, currentUserId }: Props) => {
     isError,
   } = useRatingComments(businessId);
 
+  if(!comments) {
+    return <p>Sin Comentarios</p>
+  }
+
   const yaComento = comments.some((c) => currentUserId && c.user.id === currentUserId);
 
   if (isLoading) return <p className="text-gray-500">Cargando comentarios...</p>;

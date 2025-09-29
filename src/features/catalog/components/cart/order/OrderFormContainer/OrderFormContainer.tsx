@@ -48,7 +48,6 @@ export default function OrderFormContainer({
   const user = useAuthStore((state) => state.user);
   const { getTotal } = useCartStore();
 
-  // 📦 API hooks
   const createAddress = useAddress();
   const { data: addresses, refetch: refetchAddresses } = useAddresses(userId);
   
@@ -111,16 +110,19 @@ export default function OrderFormContainer({
       userId,
     });
 
-    await refetchAddresses();
-
-    setSelectedAddress({
-      id: result.id,
-      text: `${address.street} ${address.number ?? ""}, ${address.city}`,
-      lat: address.latitude || 0,
-      lng: address.longitude || 0,
-    });
-    setShowAddressModal(false);
-    setActiveStep("deliveryCompany");
+    if(result) {
+      
+          await refetchAddresses();
+      
+          setSelectedAddress({
+            id: result.id,
+            text: `${address.street} ${address.number ?? ""}, ${address.city}`,
+            lat: address.latitude || 0,
+            lng: address.longitude || 0,
+          });
+          setShowAddressModal(false);
+          setActiveStep("deliveryCompany");
+    }
   };
 
   const handleAddressChange = (selection: { id: string; text: string; lat: number; lng: number; }) => {
@@ -216,7 +218,7 @@ export default function OrderFormContainer({
         orderPayload={orderPayload}
         canCreateOrder={canCreateOrder}
         isPriceLoading={isPriceLoading}
-        priceZone={priceZone}
+        priceZone={priceZone ? priceZone : undefined }
         orderNote={orderNote}
         setOrderNote={setOrderNote}
       />

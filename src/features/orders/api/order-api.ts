@@ -1,17 +1,35 @@
-import axios from "@/lib/api";
 import { Order, PaymentMethodType, PaymentStatus } from "../types/order";
 import { BusinessPaymentMethod } from "../types/business-payment-methods";
+import { handleApiError } from "@/features/common/utils/handleApiError";
+import { apiGet, apiPatch, apiPost, ApiResult } from "@/lib/apiFetch";
 
-export async function getUserOrders(userId: string): Promise<Order[]> {
-  const res = await axios.get(`/orders/user/${userId}`);
-  return res.data;
+// ===========================
+// 🟩 Obtener órdenes de un usuario
+// ===========================
+export async function getUserOrders(userId: string): Promise<ApiResult<Order[]>> {
+  try {
+    const res = await apiGet<Order[]>(`/orders/user/${userId}`);
+    return res;
+  } catch (error: unknown) {
+    throw handleApiError(error, "Error al buscar las órdenes del usuario");
+  }
 }
 
-export async function createOrder(payload: Partial<Order>): Promise<Order> {
-  const res = await axios.post(`orders`, payload);
-  return res.data;
+// ===========================
+// 🟩 Crear una orden
+// ===========================
+export async function createOrder(payload: Partial<Order>): Promise<ApiResult<Order>> {
+  try {
+    const res = await apiPost<Order>(`/orders`, payload);
+    return res;
+  } catch (error: unknown) {
+    throw handleApiError(error, "Error al crear la orden");
+  }
 }
 
+// ===========================
+// 🟩 Actualizar pago de la orden
+// ===========================
 interface UpdatePaymentPayload {
   paymentType: PaymentMethodType;
   paymentStatus: PaymentStatus;
@@ -20,22 +38,33 @@ interface UpdatePaymentPayload {
   paymentInstructions?: string;
 }
 
-export const fetchUpdatePayment = async (
+export async function fetchUpdatePayment(
   orderId: string,
   payload: UpdatePaymentPayload
-) => {
-  const { data } = await axios.patch(
-    `/orders/order/payment/stauts/${orderId}`,
-    { status: payload }
-  );
-  return data;
-};
+): Promise<ApiResult<Order>> {
+  try {
+    const res = await apiPatch<Order>(
+      `/orders/order/payment/status/${orderId}`,
+      {status: payload}
+    );
+    return res;
+  } catch (error: unknown) {
+    throw handleApiError(error, "Error al actualizar el pago de la orden");
+  }
+}
 
-
-export const fetchBusinessPaymentMethodByBusinessID = async (
+// ===========================
+// 🟩 Obtener métodos de pago de un negocio
+// ===========================
+export async function fetchBusinessPaymentMethodByBusinessID(
   businessId: string
-): Promise<BusinessPaymentMethod[]> => {
-  const res = await axios.get(`/business-payment-methods/business/${businessId}`); // endpoint de tu API
-  
-  return res.data;
-};
+): Promise<ApiResult<BusinessPaymentMethod[]>> {
+  try {
+    const res = await apiGet<BusinessPaymentMethod[]>(
+      `/business-payment-methods/business/${businessId}`
+    );
+    return res;
+  } catch (error: unknown) {
+    throw handleApiError(error, "Error al obtener los métodos de pago del negocio");
+  }
+}

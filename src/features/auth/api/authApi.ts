@@ -1,7 +1,7 @@
 // src/features/auth/api/authApi.ts
 import { handleApiError } from '@/features/common/utils/handleApiError';
-import api from '../../../lib/api'; // Import the configured Axios instance
 import { LoginPayload, LoginResponse, RegisterPayload, RegisterResponse, User } from '../types/auth';
+import { apiGet, apiPost, ApiResult } from '@/lib/apiFetch';
 
 /**
 
@@ -12,12 +12,12 @@ import { LoginPayload, LoginResponse, RegisterPayload, RegisterResponse, User } 
  * @returns A promise that resolves with the login response (user and token).
  * @throws ApiErrorResponse in case of error.
  */
-export const login = async (payload: LoginPayload): Promise<LoginResponse | undefined>  => {
+export const login = async (payload: LoginPayload): Promise<ApiResult<LoginResponse>>  => {
   try {
-    const response = await api.post<LoginResponse>('/auth/login/client', payload);
-    return response.data;
+    const response = await apiPost<LoginResponse>('/auth/login/client', payload);
+    return response;
   } catch (error: unknown) {
-    handleApiError(error, 'Unknown error during login');
+    throw handleApiError(error, 'Unknown error during login');
   }
 };
 
@@ -27,12 +27,12 @@ export const login = async (payload: LoginPayload): Promise<LoginResponse | unde
  * @returns A promise that resolves with the registration response (user and token).
  * @throws ApiErrorResponse in case of error.
  */
-export const register = async (payload: RegisterPayload): Promise<RegisterResponse | undefined> => {
+export const register = async (payload: RegisterPayload): Promise<ApiResult<RegisterResponse>> => {
   try {
-    const response = await api.post<RegisterResponse>('/auth/register', payload);
-    return response.data;
+    const response = await apiPost<RegisterResponse>('/auth/register', payload);
+    return response;
   } catch (error: unknown) {
-    handleApiError(error, 'Unknown error during registration');
+    throw handleApiError(error, 'Unknown error during registration');
   }
 };
 
@@ -41,16 +41,11 @@ export const register = async (payload: RegisterPayload): Promise<RegisterRespon
  * @returns A promise that resolves with the User object.
  * @throws ApiErrorResponse in case of error.
  */
-export const getMe = async (): Promise<User | undefined> => {
+export const getMe = async (): Promise<ApiResult<User>> => {
   try {
-    const response = await api.get<User>('/auth/me');
-    return response.data;
+    const response = await apiGet<User>('/auth/me');
+    return response;
   } catch (error: unknown) {
-    handleApiError(error, 'Unknown error getting user data');
+    throw handleApiError(error, 'Unknown error getting user data');
   }
 };
-
-// Future functions for:
-// - Password recovery
-// - User profile update
-// - Email verification, etc.

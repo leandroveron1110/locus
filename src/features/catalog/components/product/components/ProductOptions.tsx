@@ -24,7 +24,6 @@ export default function ProductOptions({
   toggleOption,
 }: Props) {
   if (
-    !product.hasOptions ||
     !product.optionGroups ||
     product.optionGroups.length === 0
   ) {

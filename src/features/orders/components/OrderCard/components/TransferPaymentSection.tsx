@@ -105,7 +105,7 @@ export default function TransferPaymentSection({
           onFileChange={handleFileChange}
           onUpload={handleUpload}
           loading={updatePaymentMutation.isPending}
-          paymentMethods={paymentMethods}
+          paymentMethods={paymentMethods ? paymentMethods : undefined }
           showTransferInfo={showTransferInfo}
           setShowTransferInfo={setShowTransferInfo}
         />

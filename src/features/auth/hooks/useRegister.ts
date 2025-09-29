@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/authStore'; // Importa tu store de Zustan
 import { register as apiRegister } from '../api/authApi'; // Importa la función de registro de la API
 import { RegisterPayload, RegisterResponse } from '../types/auth';
 import { useRouter } from 'next/navigation'; // Para la redirección después del registro
+import { ApiResult } from '@/lib/apiFetch';
 
 /**
  * Hook personalizado para manejar la lógica de registro de un nuevo usuario.
@@ -11,22 +12,17 @@ import { useRouter } from 'next/navigation'; // Para la redirección después de
  * y actualiza el store de Zustand con el estado de autenticación.
  */
 export const useRegister = () => {
-  const authStoreRegister = useAuthStore((state) => state.register); // Obtiene la acción register de Zustand
+  const authStoreRegister = useAuthStore((state) => state.register);
   const router = useRouter();
 
-  return useMutation<RegisterResponse | undefined, Error, RegisterPayload>({
-    mutationFn: apiRegister, // La función que realiza la llamada a la API
+  return useMutation<ApiResult<RegisterResponse> | undefined, Error, RegisterPayload>({
+    mutationFn: apiRegister,
     onSuccess: (user) => {
       if(user) {
         authStoreRegister(user);
         router.push('/');
 
       }
-    },
-    onError: (error) => {
-      // Esta función se ejecuta si la mutación (registro) falla
-      console.error('Error en el registro:', error);
-      // Puedes añadir lógica adicional aquí para mostrar mensajes de error.
-    },
+    }
   });
 };

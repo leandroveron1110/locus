@@ -2,9 +2,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchCompanyDelivery } from "../api/catalog-api";
 import { CompanyDelivery, } from "../types/zone";
+import { ApiResult } from "@/lib/apiFetch";
 
 export const useCompanyDelivery = () => {
-  return useQuery<CompanyDelivery[]>({
+  return useQuery<ApiResult<CompanyDelivery[]>>({
     queryKey: ["campany-delivery"],
     queryFn: () => fetchCompanyDelivery(),
     refetchOnWindowFocus: false, // ❌ no refetch al cambiar de pestaña

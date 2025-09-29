@@ -8,7 +8,11 @@ export function useOrders(userId: string) {
   useEffect(() => {
     if (!userId) return;
 
-    getUserOrders(userId).then(setOrders);
+    getUserOrders(userId).then((ordersFetch)=>{
+      if(ordersFetch){
+        setOrders(ordersFetch)
+      }
+    });
     initOrdersSocket(userId);
   }, [userId, setOrders]);
 

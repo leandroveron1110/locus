@@ -124,16 +124,19 @@ export default function OrderForm({
       userId,
     });
 
-    await refetchAddresses();
+    if(result) {
+      await refetchAddresses();
+  
+      setSelectedAddress({
+        id: result.id,
+        text: `${address.street} ${address.number ?? ""}, ${address.city}`,
+        lat: address.latitude || 0,
+        lng: address.longitude || 0,
+      });
+      setShowAddressModal(false);
+      setActiveStep("deliveryCompany");
+    }
 
-    setSelectedAddress({
-      id: result.id,
-      text: `${address.street} ${address.number ?? ""}, ${address.city}`,
-      lat: address.latitude || 0,
-      lng: address.longitude || 0,
-    });
-    setShowAddressModal(false);
-    setActiveStep("deliveryCompany");
   };
 
   const handleAddressChange = (selection: {

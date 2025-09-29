@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { CartItem, useCartStore } from "../../stores/useCartStore";
 import { Option, Product } from "../../types/catlog";
-import { fetchMenuProducDetaillByProductId } from "../../api/catalog-api";
+import { fetchMenuProductDetailByProductId } from "../../api/catalog-api";
 import OptionGroup from "../product/components/OptionGroup";
 import QuantitySelector from "../product/components/QuantitySelector";
 import ProductHeader from "../product/components/ProductHeader";
@@ -23,10 +23,12 @@ export default function CartItemEditor({ item, onClose }: Props) {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const freshProduct = await fetchMenuProducDetaillByProductId(
+        const freshProduct = await fetchMenuProductDetailByProductId(
           item.product.id
         );
-        setProduct(freshProduct);
+        if(freshProduct){
+          setProduct(freshProduct);
+        }
       } catch (err) {
         console.error("Error al obtener producto actualizado:", err);
       }

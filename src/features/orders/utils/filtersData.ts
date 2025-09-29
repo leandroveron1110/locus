@@ -44,9 +44,10 @@ export const simplifiedFilters = [
 
     ],
     condition: (order: Order) =>
-      order.paymentType === PaymentMethodType.TRANSFER &&
+      (order.paymentType === PaymentMethodType.TRANSFER &&
       (order.paymentStatus === PaymentStatus.PENDING ||
-        order.paymentStatus === PaymentStatus.IN_PROGRESS),
+        order.paymentStatus === PaymentStatus.IN_PROGRESS) || order.paymentType == PaymentMethodType.CASH && (order.paymentStatus === PaymentStatus.PENDING ||
+        order.paymentStatus === PaymentStatus.IN_PROGRESS)),
   },
   {
     label: "En curso",
