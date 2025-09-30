@@ -2,20 +2,13 @@
 import { OrderItem } from "@/features/orders/types/order";
 import React from "react";
 import Image from "next/image"; // ⬅️ Importamos el componente Image de Next.js
+import { formatPrice } from "@/features/common/utils/formatPrice";
 
 interface Props {
   items: OrderItem[];
 }
 
 export default function OrderDetailsSection({ items }: Props) {
-  // Función para formatear el precio a moneda local
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("es-AR", {
-      style: "currency",
-      currency: "ARS",
-      minimumFractionDigits: 2,
-    }).format(price);
-  };
 
   // Función corregida para calcular el precio total de un ítem
   const calculateItemTotal = (item: OrderItem) => {

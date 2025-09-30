@@ -11,6 +11,8 @@ import {
   CreateOrderItem,
   CreateOrderOptionGroup,
 } from "@/features/catalog/types/order";
+import { useAlert } from "@/features/common/ui/Alert/Alert";
+import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
 interface Props {
   orderPayload: CreateOrderFull;
@@ -26,6 +28,8 @@ export default function SubmitOrderButton({ orderPayload }: Props) {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
 
+  const { addAlert } = useAlert();
+
   const handleSubmitOrder = async () => {
     setError("");
 
@@ -35,7 +39,6 @@ export default function SubmitOrderButton({ orderPayload }: Props) {
     }
 
     try {
-      // 1️⃣ Mapeo de ítems del carrito
       const mappedItems: CreateOrderItem[] = items.map((cartItem) => {
         const mappedOptionGroups: CreateOrderOptionGroup[] =
           cartItem.selectedOptions
@@ -97,40 +100,21 @@ export default function SubmitOrderButton({ orderPayload }: Props) {
         };
       });
 
-      // 2️⃣ Armado del payload
       const payload: CreateOrderFull = {
         ...orderPayload,
         items: mappedItems,
         total: Number(getTotal().toFixed(2)),
       };
 
-      // 3️⃣ Llamada a la API
       await createOrderMutation.mutateAsync(payload);
 
-      // 4️⃣ Limpiar carrito y redirigir
       clearCart();
       router.push(`/orders`);
     } catch (err: unknown) {
-      let errorMessage = "Hubo un error al enviar la orden.";
-
-      if (typeof err === "object" && err !== null) {
-        // Si es un error de axios
-        if ("response" in err) {
-          const e = err as { response?: { data?: { message?: string } } };
-          if (typeof e.response?.data?.message === "string") {
-            errorMessage = e.response.data.message;
-          }
-        }
-        // Si es un Error estándar
-        else if ("message" in err) {
-          const e = err as { message?: string };
-          if (typeof e.message === "string") {
-            errorMessage = e.message;
-          }
-        }
-      }
-
-      setError(errorMessage);
+      addAlert({
+        message: getDisplayErrorMessage(err),
+        type: "error",
+      });
     }
   };
 

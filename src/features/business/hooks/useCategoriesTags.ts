@@ -9,7 +9,7 @@ export const useCategoriesTags = (businessId: string) => {
         fetchBusinessTags(businessId),
         fetchBusinessCategories(businessId),
       ]);
-      return { tags, categories }; // 👈 lo devolvés como objeto
+      return { tags, categories };
     },
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

@@ -1,4 +1,3 @@
-import { PaymentMethodType, PaymentStatus } from '@prisma/client';
 
 export interface CreateOrderOption {
   optionName: string;

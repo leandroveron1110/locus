@@ -12,7 +12,6 @@ interface Section {
 interface Props {
   activeSection: string;
   onChange: (section: string) => void;
-  // Agrega la nueva prop hasMenu
   hasMenu: boolean;
 }
 

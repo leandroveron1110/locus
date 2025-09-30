@@ -3,7 +3,6 @@ import React from "react";
 import Image from "next/image";
 import { Star } from "lucide-react";
 import FollowButton from "./FollowButton";
-import { Business } from "../../types/business";
 import Title from "@/features/common/ui/Title";
 import Description from "@/features/common/ui/Description";
 

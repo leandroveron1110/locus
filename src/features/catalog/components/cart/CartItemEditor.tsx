@@ -6,6 +6,8 @@ import { fetchMenuProductDetailByProductId } from "../../api/catalog-api";
 import OptionGroup from "../product/components/OptionGroup";
 import QuantitySelector from "../product/components/QuantitySelector";
 import ProductHeader from "../product/components/ProductHeader";
+import { useAlert } from "@/features/common/ui/Alert/Alert";
+import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
 interface Props {
   item: CartItem;
@@ -18,6 +20,7 @@ export default function CartItemEditor({ item, onClose }: Props) {
   const [count, setCount] = useState<number>(initialQuantity);
   const [selected, setSelected] = useState<Record<string, Option[]>>({});
   const editItem = useCartStore((state) => state.editItem);
+  const { addAlert } = useAlert()
 
   // Fetch producto actualizado
   useEffect(() => {
@@ -30,7 +33,10 @@ export default function CartItemEditor({ item, onClose }: Props) {
           setProduct(freshProduct);
         }
       } catch (err) {
-        console.error("Error al obtener producto actualizado:", err);
+        addAlert({
+          message: getDisplayErrorMessage(err),
+          type: 'error'
+        })
       }
     };
     fetchProduct();

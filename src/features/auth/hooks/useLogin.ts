@@ -5,6 +5,7 @@ import { login as apiLogin } from '../api/authApi'; // Importa la función de lo
 import { LoginPayload, LoginResponse } from '../types/auth';
 import { useRouter } from 'next/navigation'; // Para la redirección después del login
 import { ApiResult } from '@/lib/apiFetch';
+import { ApiError } from 'next/dist/server/api-utils';
 
 /**
  * Hook personalizado para manejar la lógica de inicio de sesión.
@@ -15,7 +16,7 @@ export const useLogin = () => {
   const authStoreLogin = useAuthStore((state) => state.login); // Obtiene la acción login de Zustand
   const router = useRouter();
 
-  return useMutation<ApiResult<LoginResponse> | undefined, Error, LoginPayload>({
+  return useMutation<ApiResult<LoginResponse>, ApiError, LoginPayload>({
     mutationFn: apiLogin, // La función que realiza la llamada a la API
     onSuccess: (data) => {
       if(data) {

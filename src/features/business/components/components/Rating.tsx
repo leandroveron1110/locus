@@ -1,23 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Star, MessageCircle } from "lucide-react";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { useRating, useSubmitRating } from "../../hooks/useRating";
 import { BusinessComments } from "./BusinessComments";
+import { useAlert } from "@/features/common/ui/Alert/Alert";
+import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
 interface Props {
   businessId: string;
 }
 
-export default function   Rating({ businessId }: Props) {
+export default function Rating({ businessId }: Props) {
   const user = useAuthStore((state) => state.user);
   const userId = user?.id ?? null;
   const [showComments, setShowComments] = useState(false);
   const [value, setValue] = useState<number>(0);
   const [comment, setComment] = useState("");
 
-  const { data: summary, isLoading, isError, refetch } = useRating(businessId);
+  const {
+    data: summary,
+    isLoading,
+    isError,
+    refetch,
+    error,
+  } = useRating(businessId);
+
+  const { addAlert } = useAlert();
+
+  useEffect(() => {
+    if (isError) {
+      addAlert({
+        message: getDisplayErrorMessage(error),
+        type: "error",
+      });
+    }
+  }, [isError, error]);
 
   const { submit, loading } = useSubmitRating({
     businessId,
@@ -38,19 +57,30 @@ export default function   Rating({ businessId }: Props) {
       <h2 className="text-xl font-semibold text-gray-800">Calificaciones</h2>
 
       {/* Estado de carga o error */}
-      {isLoading && <p className="text-sm text-gray-500">Cargando calificaciones...</p>}
-      {isError && <p className="text-sm text-red-500">Error al cargar las calificaciones.</p>}
+      {isLoading && (
+        <p className="text-sm text-gray-500">Cargando calificaciones...</p>
+      )}
+      {isError && (
+        <p className="text-sm text-red-500">
+          Error al cargar las calificaciones.
+        </p>
+      )}
 
       {/* Resumen de calificación */}
       {summary && summary.ratingsCount > 0 ? (
         <div className="flex items-center gap-3 text-yellow-500 font-semibold text-lg">
           <Star size={24} />
           <span>{summary.averageRating.toFixed(1)} / 5</span>
-          <span className="text-gray-500 text-base">({summary.ratingsCount} reseñas)</span>
+          <span className="text-gray-500 text-base">
+            ({summary.ratingsCount} reseñas)
+          </span>
         </div>
       ) : (
-        !isLoading && !isError && (
-          <p className="text-gray-400 text-sm">Este negocio aún no tiene calificaciones.</p>
+        !isLoading &&
+        !isError && (
+          <p className="text-gray-400 text-sm">
+            Este negocio aún no tiene calificaciones.
+          </p>
         )
       )}
 
@@ -64,7 +94,9 @@ export default function   Rating({ businessId }: Props) {
                 size={30}
                 onClick={() => setValue(n)}
                 className={`cursor-pointer transition ${
-                  n <= value ? "text-yellow-400" : "text-gray-300 hover:text-yellow-300"
+                  n <= value
+                    ? "text-yellow-400"
+                    : "text-gray-300 hover:text-yellow-300"
                 }`}
               />
             ))}
@@ -87,7 +119,9 @@ export default function   Rating({ businessId }: Props) {
           </button>
         </div>
       ) : (
-        <p className="text-sm text-gray-500">Iniciá sesión para dejar tu reseña.</p>
+        <p className="text-sm text-gray-500">
+          Iniciá sesión para dejar tu reseña.
+        </p>
       )}
 
       {/* Comentarios */}

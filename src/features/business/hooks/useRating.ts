@@ -1,9 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchCommentsByBusinessId, fetchSummary, fetchSummarySudmi } from "../api/businessApi";
+import {
+  fetchCommentsByBusinessId,
+  fetchSummary,
+  fetchSummarySudmi,
+} from "../api/businessApi";
 import { useState } from "react";
+import { ApiResult } from "@/lib/apiFetch";
+import { BusinessRating, Review } from "../types/business";
+import { ApiError } from "@/types/api";
+import { useAlert } from "@/features/common/ui/Alert/Alert";
+import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
 export const useRating = (businessId: string) => {
-  return useQuery({
+  return useQuery<ApiResult<BusinessRating>, ApiError>({
     queryKey: ["business-rating", businessId], // incluimos user?.id en la clave
     queryFn: () => fetchSummary(businessId),
     enabled: !!businessId, // solo si hay ambos
@@ -14,7 +23,7 @@ export const useRating = (businessId: string) => {
 };
 
 export const useRatingComments = (businessId: string) => {
-  return useQuery({
+  return useQuery<ApiResult<Review[]>, ApiError>({
     queryKey: ["business-rating-comments", businessId], // incluimos user?.id en la clave
     queryFn: () => fetchCommentsByBusinessId(businessId),
     enabled: !!businessId, // solo si hay ambos
@@ -36,6 +45,7 @@ export function useSubmitRating({
   onSuccess,
 }: UseSubmitRatingOptions) {
   const [loading, setLoading] = useState(false);
+  const { addAlert } = useAlert();
 
   const submit = async (value: number, comment: string) => {
     if (!value || !userId) return;
@@ -46,7 +56,10 @@ export function useSubmitRating({
 
       onSuccess?.();
     } catch (error) {
-      console.error("Error al enviar calificación:", error);
+      addAlert({
+        message: getDisplayErrorMessage(error),
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,6 @@
 // src/components/PriceSummary.tsx
 import { Product } from "@/features/catalog/types/catlog";
+import { formatPrice } from "@/features/common/utils/formatPrice";
 import React from "react";
 
 interface Props {
@@ -13,12 +14,6 @@ export default function PriceSummary({
   currencyMask,
   handleAddToCart,
 }: Props) {
-  // ✅ Usamos Intl.NumberFormat para un formato de moneda más robusto
-  const formattedTotal = new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS", // O la divisa correspondiente a tu currencyMask
-    minimumFractionDigits: 2,
-  }).format(total);
 
   return (
     <div className="w-full bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-4 shadow-sm">
@@ -26,7 +21,7 @@ export default function PriceSummary({
       <div className="flex justify-between items-center text-base md:text-lg font-semibold text-gray-900">
         <span>Total</span>
         <span>
-          {formattedTotal}
+          {formatPrice(total)}
         </span>
       </div>
 

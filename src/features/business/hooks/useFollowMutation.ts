@@ -2,12 +2,20 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BusinessFollow } from "../types/business";
 import { fetchFollowBusinessAddUser } from "../api/businessApi";
-
+import { ApiResult } from "@/lib/apiFetch";
+import { ApiError } from "@/types/api";
 
 export const useFollowMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<
+    ApiResult<BusinessFollow>,
+    ApiError,
+    {
+      userId: string;
+      businessId: string;
+    }
+  >({
     mutationFn: fetchFollowBusinessAddUser,
     onSuccess: (_, { businessId }) => {
       queryClient.setQueryData<BusinessFollow>(
@@ -17,13 +25,10 @@ export const useFollowMutation = () => {
           return {
             ...oldData,
             count: oldData.count + 1,
-            isFollowing: true
+            isFollowing: true,
           };
         }
       );
-    },
-    onError: (error) => {
-      console.error("Error al seguir el negocio:", error);
-    },
+    }
   });
 };

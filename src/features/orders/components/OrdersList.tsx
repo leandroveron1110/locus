@@ -15,39 +15,38 @@ export default function OrdersList({ userId }: OrdersListProps) {
   const orders = useOrders(userId);
   const [activeFilter, setActiveFilter] = useState<string>("Todos");
 
-const filteredAndSortedOrders = useMemo(() => {
-  if (!orders) return [];
+  const filteredAndSortedOrders = useMemo(() => {
+    if (!orders) return [];
 
-  const currentFilter = simplifiedFilters.find(f => f.label === activeFilter);
+    const currentFilter = simplifiedFilters.find(
+      (f) => f.label === activeFilter
+    );
 
-  let filtered = orders;
-  if (currentFilter && currentFilter.label !== "Todos") {
-    filtered = orders.filter(order => {
-      if (currentFilter.condition) {
-        return currentFilter.condition(order);
-      }
-      return currentFilter.statuses.includes(order.status);
+    let filtered = orders;
+    if (currentFilter && currentFilter.label !== "Todos") {
+      filtered = orders.filter((order) => {
+        if (currentFilter.condition) {
+          return currentFilter.condition(order);
+        }
+        return currentFilter.statuses.includes(order.status);
+      });
+    }
+
+    return [...filtered].sort((a, b) => {
+      const priorityA = statusPriority[a.status] ?? Infinity;
+      const priorityB = statusPriority[b.status] ?? Infinity;
+
+      const priorityDiff = priorityA - priorityB;
+      if (priorityDiff !== 0) return priorityDiff;
+
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
-  }
-
-  return [...filtered].sort((a, b) => {
-    const priorityA = statusPriority[a.status] ?? Infinity;
-    const priorityB = statusPriority[b.status] ?? Infinity;
-
-    const priorityDiff = priorityA - priorityB;
-    if (priorityDiff !== 0) return priorityDiff;
-
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-  });
-}, [orders, activeFilter]);
-
+  }, [orders, activeFilter]);
 
   return (
     <div className="relative">
       {/* Contenedor de filtros con `sticky` */}
-      <div 
-        className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm pt-4 pb-2"
-      >
+      <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm pt-4 pb-2">
         <OrdersFilters
           quickFilters={simplifiedFilters}
           activeFilter={activeFilter}

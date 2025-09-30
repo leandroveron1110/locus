@@ -7,12 +7,13 @@ import { SkeletonGallery } from "./Skeleton/SkeletonGallery";
 import { ImageOff, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import { useAlert } from "@/features/common/ui/Alert/Alert";
+import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
 interface Props {
   businessId: string;
 }
 
-// ➡️ Lightbox
 interface LightboxProps {
   images: { id: string; url: string; alt?: string }[];
   selectedIndex: number;
@@ -108,8 +109,19 @@ const Lightbox = ({
 
 // ➡️ Componente principal Gallery
 export default function Gallery({ businessId }: Props) {
-  const { data, isLoading, isError } = useGallery(businessId);
+  const { data, isLoading, isError, error } = useGallery(businessId);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+  const { addAlert } = useAlert();
+
+  useEffect(() => {
+    if (isError) {
+      addAlert({
+        message: getDisplayErrorMessage(error),
+        type: "error",
+      });
+    }
+  }, [isError, error]);
 
   if (isLoading) return <SkeletonGallery />;
 

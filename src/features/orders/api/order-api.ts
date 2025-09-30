@@ -27,9 +27,6 @@ export async function createOrder(payload: Partial<Order>): Promise<ApiResult<Or
   }
 }
 
-// ===========================
-// 🟩 Actualizar pago de la orden
-// ===========================
 interface UpdatePaymentPayload {
   paymentType: PaymentMethodType;
   paymentStatus: PaymentStatus;

@@ -7,6 +7,9 @@ import { useUnfollowMutation } from "../../hooks/useUnfollowMutation";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { useFollowInfo } from "../../hooks/useFollowInfo";
 import { SkeletonFollowButton } from "./Skeleton/SkeletonFollowButton";
+import { useAlert } from "@/features/common/ui/Alert/Alert";
+import { useEffect } from "react";
+import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
 interface Props {
   businessId: string;
@@ -15,18 +18,35 @@ interface Props {
 export default function FollowButton({ businessId }: Props) {
   const user = useAuthStore((state) => state.user);
   const userId = user?.id ?? null;
+  const { addAlert } = useAlert();
+  const { data, isLoading, isError, error } = useFollowInfo(businessId);
 
-  const { data, isLoading, isError } = useFollowInfo(businessId);
+  useEffect(() => {
+    if (isError) {
+      addAlert({
+        message: getDisplayErrorMessage(error),
+        type: "error",
+      });
+    }
+  }, [isError, error]);
+
   const followMutation = useFollowMutation();
   const unfollowMutation = useUnfollowMutation();
   const isMutating = followMutation.isPending || unfollowMutation.isPending;
 
   const handleFollowToggle = () => {
-    if (!userId || !data) return;
-    if (data.isFollowing) {
-      unfollowMutation.mutate({ userId, businessId });
-    } else {
-      followMutation.mutate({ userId, businessId });
+    try {
+      if (!userId || !data) return;
+      if (data.isFollowing) {
+        unfollowMutation.mutate({ userId, businessId });
+      } else {
+        followMutation.mutate({ userId, businessId });
+      }
+    } catch (error) {
+      addAlert({
+        message: getDisplayErrorMessage(error),
+        type: "error",
+      });
     }
   };
 

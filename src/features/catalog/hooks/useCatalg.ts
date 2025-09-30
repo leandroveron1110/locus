@@ -1,11 +1,12 @@
 // src/features/business/hooks/useBusinessProfile.ts
 import { useQuery } from "@tanstack/react-query";
 import { fetchCatalogByBusinessID } from "../api/catalog-api";
+import { Menu } from "../types/catlog";
+import { ApiResult } from "@/lib/apiFetch";
+import { ApiError } from "@/types/api";
 
 export const useCatalg = (businessId: string) => {
-//   const user = useAuthStore((state) => state.user);
-
-  return useQuery({
+  return useQuery<ApiResult<Menu[]>, ApiError>({
     queryKey: ["menu-catalog", businessId],
     queryFn: () => fetchCatalogByBusinessID(businessId),
     enabled: !!businessId, // solo si hay ambos

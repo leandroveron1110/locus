@@ -4,6 +4,9 @@ import { Clock, CheckCircle, CircleSlash } from "lucide-react";
 import { useSchedule } from "../../hooks/useSchedule";
 import { SkeletonSchedule } from "./Skeleton/SkeletonSchedule";
 import dayjs from "dayjs";
+import { useAlert } from "@/features/common/ui/Alert/Alert";
+import { useEffect } from "react";
+import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
 interface Props {
   businessId: string;
@@ -29,11 +32,26 @@ type Weekday =
   | "SUNDAY";
 
 export default function Schedule({ businessId }: Props) {
-  const { data, isLoading, isError } = useSchedule(businessId);
+  const { data, isLoading, isError, error } = useSchedule(businessId);
+
+  const { addAlert } = useAlert();
+
+  useEffect(() => {
+    if (isError) {
+      addAlert({
+        message: getDisplayErrorMessage(error),
+        type: "error",
+      });
+    }
+  }, [isError, error]);
 
   if (isLoading) return <SkeletonSchedule />;
 
-  if (isError || !data || Object.values(data).every((intervals) => intervals.length === 0)) {
+  if (
+    isError ||
+    !data ||
+    Object.values(data).every((intervals) => intervals.length === 0)
+  ) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-gray-400 space-y-2">
         <Clock size={40} className="text-gray-300" />
@@ -57,7 +75,10 @@ export default function Schedule({ businessId }: Props) {
             <span className="flex items-center gap-1 text-green-600">
               <CheckCircle size={16} /> Abierto hoy (
               {todayIntervals.map((i, idx) => (
-                <span key={idx} className="inline-block px-2 py-0.5 bg-green-50 rounded text-green-700 text-xs font-medium mr-1">
+                <span
+                  key={idx}
+                  className="inline-block px-2 py-0.5 bg-green-50 rounded text-green-700 text-xs font-medium mr-1"
+                >
                   {i}
                 </span>
               ))}
@@ -77,7 +98,11 @@ export default function Schedule({ businessId }: Props) {
           <li
             key={day}
             className={`flex flex-col sm:flex-row sm:justify-between px-5 py-3 rounded-xl shadow-sm transition-colors
-              ${day === today ? "bg-blue-50 font-semibold border border-blue-100" : "bg-white"}
+              ${
+                day === today
+                  ? "bg-blue-50 font-semibold border border-blue-100"
+                  : "bg-white"
+              }
             `}
           >
             <span className="text-gray-700 mb-1 sm:mb-0">{daysES[day]}</span>

@@ -1,7 +1,7 @@
 // src/features/catalog/components/Catalog.tsx
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useCatalg } from "../hooks/useCatalg";
 import CatalogMenu from "./CatalogMenu";
 import { useAuthStore } from "@/features/auth/store/authStore";
@@ -9,10 +9,11 @@ import { ShoppingCart, Search } from "lucide-react";
 import { useCartStore } from "../stores/useCartStore";
 import { CatalogSkeleton } from "./skeleton/CatalogSkeleton";
 import { Business } from "@/features/business/types/business";
-import { Menu } from "../types/catlog";
 import { debounce } from "lodash";
 import dynamic from "next/dynamic";
 import { Virtuoso } from "react-virtuoso";
+import { useAlert } from "@/features/common/ui/Alert/Alert";
+import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
 interface Props {
   businessId: string;
@@ -27,13 +28,24 @@ const CartModal = dynamic(() => import("./cart/CartModal"), {
 const MemoizedCatalogMenu = React.memo(CatalogMenu);
 
 export default function Catalog({ businessId, business }: Props) {
-  const { data, isLoading, isError } = useCatalg(businessId);
+  const { data, isLoading, isError, error } = useCatalg(businessId);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   const user = useAuthStore((state) => state.user);
   const cartItems = useCartStore((state) => state.items);
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+  const { addAlert } = useAlert();
+
+  useEffect(() => {
+    if (isError) {
+      addAlert({
+        message: getDisplayErrorMessage(error),
+        type: "error",
+      });
+    }
+  }, [isError, error]);
 
   const normalizedData = useMemo(() => {
     if (!data) return [];
@@ -77,15 +89,7 @@ export default function Catalog({ businessId, business }: Props) {
   );
 
   if (isLoading) return <CatalogSkeleton />;
-  if (isError) {
-    return (
-      <div className="flex flex-col justify-center items-center py-16">
-        <p className="text-red-600 text-base font-medium">
-          Error al cargar la información
-        </p>
-      </div>
-    );
-  }
+
   if (!data || data.length === 0 || !business) {
     return (
       <div className="text-center py-20 text-gray-500">

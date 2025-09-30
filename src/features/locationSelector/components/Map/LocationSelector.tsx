@@ -8,6 +8,8 @@ import AddressInput from "../AddressInput";
 import LocationReview from "./components/LocationReview";
 import ConfirmationCard from "../ConfirmationCard";
 import { AddressData } from "../../types/address-data";
+import { useAlert } from "@/features/common/ui/Alert/Alert";
+import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
 const MapComponent = dynamic(() => import("./components/Map"), { ssr: false });
 interface LocationSelectorProps {
@@ -27,6 +29,7 @@ const LocationSelector = ({ saveAddress }: LocationSelectorProps) => {
   const [rawStreetAndNumber, setRawStreetAndNumber] = useState("");
   const [lastSearchAddress, setLastSearchAddress] = useState("");
   const [step, setStep] = useState<"input" | "map" | "review">("input");
+  const { addAlert } = useAlert()
 
   const DEFAULT_CITY = "Concepción del Uruguay";
   const DEFAULT_PROVINCE = "Entre Ríos";
@@ -38,7 +41,6 @@ const LocationSelector = ({ saveAddress }: LocationSelectorProps) => {
   ) => {
     setLoading(true);
     setError(null);
-    // Cambiamos el proveedor de búsqueda a EsriProvider
     const provider = new EsriProvider();
 
     try {
@@ -57,8 +59,12 @@ const LocationSelector = ({ saveAddress }: LocationSelectorProps) => {
         resetSearch();
       }
     } catch (err) {
+      addAlert({
+        message: getDisplayErrorMessage(err),
+        type: 'error'
+      })
       setError("Error al buscar la dirección. Inténtalo de nuevo.");
-      console.error(err);
+
     } finally {
       setLoading(false);
     }
@@ -83,7 +89,10 @@ const LocationSelector = ({ saveAddress }: LocationSelectorProps) => {
 
   const handleConfirmLocation = async (apartment: string, notes: string) => {
     if (!finalCoordinates) {
-      alert("Por favor, selecciona una ubicación antes de confirmar.");
+      addAlert({
+        message: `Por favor, selecciona una ubicación antes de confirmar.`,
+        type: 'error'
+      })
       return;
     }
 

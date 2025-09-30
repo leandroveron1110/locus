@@ -1,5 +1,11 @@
+"use client"
+
+import { useEffect } from "react";
 import { useRatingComments } from "../../hooks/useRating";
 import { Star } from "lucide-react";
+import { error } from "console";
+import { useAlert } from "@/features/common/ui/Alert/Alert";
+import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
 interface Props {
   businessId: string;
@@ -11,7 +17,18 @@ export const BusinessComments = ({ businessId, currentUserId }: Props) => {
     data: comments = [],
     isLoading,
     isError,
+    error
   } = useRatingComments(businessId);
+  const { addAlert } = useAlert()
+
+  useEffect(()=>{
+    if(isError) {
+      addAlert({
+        message: getDisplayErrorMessage(error),
+        type: 'error'
+      })
+    }
+  }, [isError, error])
 
   if(!comments) {
     return <p>Sin Comentarios</p>

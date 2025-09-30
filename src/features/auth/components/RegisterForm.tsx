@@ -8,11 +8,13 @@ import { registerSchema } from "../../../lib/zodSchemas"; // Importa el esquema 
 import { useRegister } from "../hooks/useRegister"; // Importa el hook de registro
 import { Loader2 } from "lucide-react"; // Icono de carga
 import z from "zod";
+import { getDisplayErrorMessage } from "@/lib/uiErrors";
+import { useAlert } from "@/features/common/ui/Alert/Alert";
 
 enum UserRole {
-  CLIENT = 'CLIENT',
-  OWNER = 'OWNER',
-  ADMIN = 'ADMIN',
+  CLIENT = "CLIENT",
+  OWNER = "OWNER",
+  ADMIN = "ADMIN",
 }
 
 /**
@@ -32,6 +34,8 @@ export const RegisterForm = () => {
     resolver: zodResolver(registerSchema), // Usa zodResolver para la validación
   });
 
+  const { addAlert } = useAlert();
+
   // Usa el hook de registro de React Query
   const { mutate: registerUser, isPending, error, isError } = useRegister();
 
@@ -44,8 +48,13 @@ export const RegisterForm = () => {
       },
       {
         onSuccess: () => {
-          reset(); // Limpia el formulario al éxito
-          // La redirección se maneja dentro del hook useRegister
+          reset();
+        },
+        onError: (e) => {
+          addAlert({
+            message: getDisplayErrorMessage(e),
+            type: "error",
+          });
         },
       }
     );

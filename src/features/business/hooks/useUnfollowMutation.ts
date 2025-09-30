@@ -2,21 +2,29 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "@/lib/api";
 import { BusinessFollow } from "../types/business";
+import { apiDelete, ApiResult } from "@/lib/apiFetch";
+import { handleApiError } from "@/features/common/utils/handleApiError";
+import { ApiError } from "@/types/api";
 
 interface UnfollowParams {
   userId: string;
   businessId: string;
 }
 
-const unfollowBusiness = async ({ userId, businessId }: UnfollowParams) => {
-  const res = await axios.delete(`/follow/unfollow/${userId}/${businessId}`);
-  return res.data;
+const unfollowBusiness = async ({ userId, businessId }: UnfollowParams): Promise<ApiResult<void>> => {
+  try {
+    const res = await apiDelete<void>(`/follow/unfollow/${userId}/${businessId}`);
+    return res;
+    
+  } catch (error: unknown) {
+    throw handleApiError(error, "Error al desuscribirte")
+  }
 };
 
 export const useUnfollowMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<ApiResult<void>, ApiError, UnfollowParams>({
     mutationFn: unfollowBusiness,
     onSuccess: (_, { businessId }) => {
       queryClient.setQueryData<BusinessFollow>(
@@ -30,9 +38,6 @@ export const useUnfollowMutation = () => {
           };
         }
       );
-    },
-    onError: (error) => {
-      console.error("Error al dejar de seguir el negocio:", error);
-    },
+    }
   });
 };

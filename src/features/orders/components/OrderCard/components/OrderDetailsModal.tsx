@@ -3,6 +3,7 @@ import React from "react";
 import OrderDetailsSection from "./OrderDetailsSection";
 import { X } from "lucide-react";
 import { Order } from "@/features/orders/types/order";
+import { formatPrice } from "@/features/common/utils/formatPrice";
 
 interface Props {
   order: Order;
@@ -16,13 +17,6 @@ export default function OrderDetailsModal({
   onClose,
 }: Props) {
   if (!isOpen) return null;
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("es-AR", {
-      style: "currency",
-      currency: "ARS",
-    }).format(price);
-  };
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">

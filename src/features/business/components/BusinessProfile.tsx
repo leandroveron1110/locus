@@ -1,7 +1,7 @@
 // src/features/business/components/BusinessProfile.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useBusinessProfile } from "../hooks/useBusinessProfile";
 import { withSkeleton } from "@/features/common/utils/withSkeleton";
@@ -16,7 +16,8 @@ import { SkeletonGallery } from "./components/Skeleton/SkeletonGallery";
 import { SkeletonContactInfo } from "./components/Skeleton/SkeletonContactInfo";
 import { SkeletonRating } from "./components/Skeleton/SkeletonRating";
 import { SkeletonCatalog } from "./components/Skeleton/SkeletonCatalog";
-
+import { useAlert } from "@/features/common/ui/Alert/Alert";
+import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
 interface Props {
   businessId: string;
@@ -58,19 +59,19 @@ export default function BusinessProfile({ businessId }: Props) {
   const { data, isLoading, error, isError } = useBusinessProfile(businessId);
   const [activeSection, setActiveSection] = useState<string>("gallery");
 
+  const { addAlert } = useAlert();
+
+  useEffect(() => {
+    if (isError) {
+      addAlert({
+        message: getDisplayErrorMessage(error),
+        type: "error",
+      });
+    }
+  }, [isError, error]);
+
   if (isLoading) {
     return <BusinessProfileSkeleton />;
-  }
-
-  if (isError) {
-    return (
-      <p
-        role="alert"
-        className="text-center text-red-600 mt-12 text-lg font-semibold"
-      >
-        Error: {(error as Error).message}
-      </p>
-    );
   }
 
   if (!data) return null;
@@ -121,16 +122,19 @@ export default function BusinessProfile({ businessId }: Props) {
             {activeSection === "rating" && (
               <LazyRating businessId={businessId} />
             )}
-            {activeSection === "menu" && (
-              hasMenu ? (
+            {activeSection === "menu" &&
+              (hasMenu ? (
                 <LazyCatalog businessId={businessId} business={data} />
               ) : (
                 <div className="text-center text-gray-500 py-12">
-                  <p className="text-lg font-medium">El menú aún no está disponible para este negocio.</p>
-                  <p className="text-sm mt-2">Te invitamos a explorar otras secciones o volver más tarde.</p>
+                  <p className="text-lg font-medium">
+                    El menú aún no está disponible para este negocio.
+                  </p>
+                  <p className="text-sm mt-2">
+                    Te invitamos a explorar otras secciones o volver más tarde.
+                  </p>
                 </div>
-              )
-            )}
+              ))}
           </div>
         </div>
       </section>

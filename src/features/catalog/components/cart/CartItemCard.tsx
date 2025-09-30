@@ -3,7 +3,7 @@
 import React from "react";
 import { CartItem } from "../../stores/useCartStore";
 import { Trash2 } from "lucide-react";
-import Image from "next/image"; // ⬅️ Importamos el componente Image de Next.js
+import Image from "next/image";
 
 interface Props {
   item: CartItem;

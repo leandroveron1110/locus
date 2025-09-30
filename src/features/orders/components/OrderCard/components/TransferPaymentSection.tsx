@@ -1,12 +1,14 @@
 // src/components/TransferPaymentSection.tsx
 "use client";
 
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { PaymentStatus, PaymentMethodType } from "../../../types/order";
 import { useUpdatePayment } from "../../../hooks/useUpdatePayment";
 import { useBusinessPaymentMethods } from "../../../hooks/useBusinessPaymentMethods";
 import PaymentStatusSection from "./PaymentStatusSection";
 import UploadReceiptSection from "./UploadReceiptSection";
+import { useAlert } from "@/features/common/ui/Alert/Alert";
+import { getDisplayErrorMessage } from "@/lib/uiErrors";
 // Se eliminan los íconos de Chevron
 
 interface Props {
@@ -25,10 +27,19 @@ export default function TransferPaymentSection({
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [showTransferInfo, setShowTransferInfo] = useState(false);
-  // Se elimina el estado showOrderDetails
-
   const updatePaymentMutation = useUpdatePayment();
-  const { data: paymentMethods } = useBusinessPaymentMethods(businessId);
+  const { data: paymentMethods, isError, error } = useBusinessPaymentMethods(businessId);
+
+  const { addAlert } = useAlert()
+
+  useEffect(()=>{
+    if(isError) {
+      addAlert({
+        message: getDisplayErrorMessage(error),
+        type: 'error'
+      })
+    }
+  }, [isError, error])
 
   const { canUpload, isPaymentRejected } = useMemo(
     () => ({
@@ -83,7 +94,10 @@ export default function TransferPaymentSection({
       setFile(null);
       setFileError(null);
     } catch (err) {
-      console.error(err);
+      addAlert({
+        message: getDisplayErrorMessage(err),
+        type: 'error'
+      })
       setFileError("Error al procesar el comprobante. Intenta de nuevo.");
     }
   }, [file, orderId, updatePaymentMutation]);

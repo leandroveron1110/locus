@@ -1,10 +1,13 @@
 // src/features/business/hooks/useBusinessProfile.ts
 import { useQuery } from "@tanstack/react-query";
 import { fetchBusinessPaymentMethodByBusinessID } from "../api/order-api";
+import { ApiResult } from "@/lib/apiFetch";
+import { BusinessPaymentMethod } from "../types/business-payment-methods";
+import { ApiError } from "@/types/api";
 
 export const useBusinessPaymentMethods = (businessId: string) => {
 
-  return useQuery({
+  return useQuery<ApiResult<BusinessPaymentMethod[]>, ApiError>({
     queryKey: ["business-payment-methods", businessId], // incluimos user?.id en la clave
     queryFn: () => fetchBusinessPaymentMethodByBusinessID(businessId),
     enabled: !!businessId, // solo si hay ambos

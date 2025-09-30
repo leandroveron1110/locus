@@ -5,6 +5,7 @@ import { register as apiRegister } from '../api/authApi'; // Importa la función
 import { RegisterPayload, RegisterResponse } from '../types/auth';
 import { useRouter } from 'next/navigation'; // Para la redirección después del registro
 import { ApiResult } from '@/lib/apiFetch';
+import { ApiError } from '@/types/api';
 
 /**
  * Hook personalizado para manejar la lógica de registro de un nuevo usuario.
@@ -15,7 +16,7 @@ export const useRegister = () => {
   const authStoreRegister = useAuthStore((state) => state.register);
   const router = useRouter();
 
-  return useMutation<ApiResult<RegisterResponse> | undefined, Error, RegisterPayload>({
+  return useMutation<ApiResult<RegisterResponse>, ApiError, RegisterPayload>({
     mutationFn: apiRegister,
     onSuccess: (user) => {
       if(user) {

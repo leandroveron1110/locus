@@ -5,13 +5,27 @@
 
 import { Tag } from "lucide-react";
 import { useCategoriesTags } from "../../hooks/useCategoriesTags";
+import { useEffect } from "react";
+import { useAlert } from "@/features/common/ui/Alert/Alert";
+import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
 interface Props {
   businessId: string;
 }
 
 export default function CategoriesTags({ businessId }: Props) {
-  const { data, isLoading, isError } = useCategoriesTags(businessId);
+  const { data, isLoading, isError, error } = useCategoriesTags(businessId);
+
+  const { addAlert } = useAlert();
+
+  useEffect(() => {
+    if (isError) {
+      addAlert({
+        message: getDisplayErrorMessage(error),
+        type: "error",
+      });
+    }
+  }, [isError, error]);
 
   // 1. Estados de carga y error
   if (isLoading)
@@ -70,9 +84,7 @@ export default function CategoriesTags({ businessId }: Props) {
           <h3 className="text-gray-800 font-semibold mb-2">
             Categorías ({categories.length})
           </h3>
-          <div className="flex flex-wrap gap-2">
-            {renderChips(categories)}
-          </div>
+          <div className="flex flex-wrap gap-2">{renderChips(categories)}</div>
         </div>
       )}
 
