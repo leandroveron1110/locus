@@ -40,7 +40,7 @@ export default function CartItemEditor({ item, onClose }: Props) {
       }
     };
     fetchProduct();
-  }, [item.product.id]);
+  }, [item.product.id, addAlert]);
 
   // Agrupar opciones seleccionadas
   useEffect(() => {

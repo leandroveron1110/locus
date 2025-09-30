@@ -35,7 +35,7 @@ api.interceptors.request.use(
 
     return config;
   },
-  (error: any) => Promise.reject(error)
+  (error: unknown) => Promise.reject(error)
 );
 
 api.interceptors.response.use(

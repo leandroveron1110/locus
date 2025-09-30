@@ -22,7 +22,7 @@ export function useOrders(userId: string) {
       })
     })
     initOrdersSocket(userId);
-  }, [userId, setOrders]);
+  }, [userId, setOrders, addAlert]);
 
   return orders;
 }

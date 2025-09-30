@@ -23,24 +23,22 @@ export default function ProductOptions({
   selectedOptions,
   toggleOption,
 }: Props) {
-  if (
-    !product.optionGroups ||
-    product.optionGroups.length === 0
-  ) {
-    return (
-      <p className="text-gray-500 italic mb-6">
-        Este producto no tiene opciones para seleccionar.
-      </p>
-    );
-  }
-
-  // ✅ Se envuelve la función en `useCallback` para que su referencia sea estable y no provoque re-renderizados de los componentes hijos.
+  // ✅ useCallback siempre se llama
   const memoizedToggleOption = useCallback(
     (groupId: string, option: Option, max: number, multiple: boolean) => {
       toggleOption(groupId, option, max, multiple);
     },
     [toggleOption]
   );
+
+  // ahora sí la condición para render
+  if (!product.optionGroups || product.optionGroups.length === 0) {
+    return (
+      <p className="text-gray-500 italic mb-6">
+        Este producto no tiene opciones para seleccionar.
+      </p>
+    );
+  }
 
   return (
     <div className="space-y-8 mb-6">

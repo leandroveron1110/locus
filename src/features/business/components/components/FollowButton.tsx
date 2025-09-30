@@ -28,7 +28,7 @@ export default function FollowButton({ businessId }: Props) {
         type: "error",
       });
     }
-  }, [isError, error]);
+  }, [isError, error, useAlert]);
 
   const followMutation = useFollowMutation();
   const unfollowMutation = useUnfollowMutation();

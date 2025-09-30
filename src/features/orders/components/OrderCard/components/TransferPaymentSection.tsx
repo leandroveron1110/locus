@@ -39,7 +39,7 @@ export default function TransferPaymentSection({
         type: 'error'
       })
     }
-  }, [isError, error])
+  }, [isError, error, addAlert])
 
   const { canUpload, isPaymentRejected } = useMemo(
     () => ({
@@ -100,7 +100,7 @@ export default function TransferPaymentSection({
       })
       setFileError("Error al procesar el comprobante. Intenta de nuevo.");
     }
-  }, [file, orderId, updatePaymentMutation]);
+  }, [file, orderId, updatePaymentMutation, addAlert]);
 
   return (
     <div className="mt-4 rounded-xl">

@@ -1,4 +1,3 @@
-import axios from "@/lib/api";
 import {
   Business,
   BusinessCategory,

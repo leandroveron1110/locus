@@ -1,6 +1,5 @@
 // src/features/business/hooks/useUnfollowMutation.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "@/lib/api";
 import { BusinessFollow } from "../types/business";
 import { apiDelete, ApiResult } from "@/lib/apiFetch";
 import { handleApiError } from "@/features/common/utils/handleApiError";

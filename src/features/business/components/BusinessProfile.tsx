@@ -2,7 +2,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useBusinessProfile } from "../hooks/useBusinessProfile";
 import { withSkeleton } from "@/features/common/utils/withSkeleton";
 
@@ -55,7 +54,6 @@ const LazyCatalog = withSkeleton(
 );
 
 export default function BusinessProfile({ businessId }: Props) {
-  const router = useRouter();
   const { data, isLoading, error, isError } = useBusinessProfile(businessId);
   const [activeSection, setActiveSection] = useState<string>("gallery");
 
@@ -68,7 +66,7 @@ export default function BusinessProfile({ businessId }: Props) {
         type: "error",
       });
     }
-  }, [isError, error]);
+  }, [isError, error, addAlert]);
 
   if (isLoading) {
     return <BusinessProfileSkeleton />;

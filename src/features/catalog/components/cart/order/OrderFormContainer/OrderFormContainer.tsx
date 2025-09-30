@@ -101,7 +101,7 @@ export default function OrderFormContainer({
         type: "error",
       });
     }
-  }, [isError, error]);
+  }, [isError, error, addAlert]);
 
   useEffect(() => {
     if (isErrorPriceZone) {
@@ -110,7 +110,7 @@ export default function OrderFormContainer({
         type: "error",
       });
     }
-  }, [isErrorPriceZone, errorPriceZone]);
+  }, [isErrorPriceZone, errorPriceZone, addAlert]);
 
   // Lógica para abrir el modal si no hay direcciones
   useEffect(() => {

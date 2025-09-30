@@ -22,7 +22,7 @@ const ProductDetails = ({ product, onClose }: Props) => {
   const [count, setCount] = useState<number>(1);
   const addToCart = useCartStore((state) => state.addToCart);
 
-  const { finalPrice, currencyMask } = product;
+  const { finalPrice } = product;
   const basePrice = useMemo(() => Number(finalPrice) || 0, [finalPrice]);
 
   const optionsTotal = useMemo(() => {
@@ -99,7 +99,6 @@ const ProductDetails = ({ product, onClose }: Props) => {
       />
       <PriceSummary
         total={total}
-        currencyMask={currencyMask}
         handleAddToCart={handleAddToCart}
       />
     </div>

@@ -1,17 +1,14 @@
 // src/components/PriceSummary.tsx
-import { Product } from "@/features/catalog/types/catlog";
 import { formatPrice } from "@/features/common/utils/formatPrice";
 import React from "react";
 
 interface Props {
   total: number;
-  currencyMask: Product["currencyMask"];
   handleAddToCart: () => void;
 }
 
 export default function PriceSummary({
   total,
-  currencyMask,
   handleAddToCart,
 }: Props) {
 

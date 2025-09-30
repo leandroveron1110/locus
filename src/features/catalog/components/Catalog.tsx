@@ -1,7 +1,7 @@
 // src/features/catalog/components/Catalog.tsx
 "use client";
 
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useCatalg } from "../hooks/useCatalg";
 import CatalogMenu from "./CatalogMenu";
 import { useAuthStore } from "@/features/auth/store/authStore";
@@ -45,7 +45,7 @@ export default function Catalog({ businessId, business }: Props) {
         type: "error",
       });
     }
-  }, [isError, error]);
+  }, [isError, error, addAlert]);
 
   const normalizedData = useMemo(() => {
     if (!data) return [];

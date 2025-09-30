@@ -43,7 +43,7 @@ export default function Schedule({ businessId }: Props) {
         type: "error",
       });
     }
-  }, [isError, error]);
+  }, [isError, error, useAlert]);
 
   if (isLoading) return <SkeletonSchedule />;
 

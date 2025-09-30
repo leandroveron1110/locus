@@ -28,7 +28,7 @@ export const BusinessComments = ({ businessId, currentUserId }: Props) => {
         type: 'error'
       })
     }
-  }, [isError, error])
+  }, [isError, error, useAlert])
 
   if(!comments) {
     return <p>Sin Comentarios</p>

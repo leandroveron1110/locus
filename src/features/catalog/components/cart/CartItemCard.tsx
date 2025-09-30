@@ -55,7 +55,7 @@ export default function CartItemCard({ item, onEdit, onRemove }: Props) {
 
         {hasOptions && (
           <ul className="text-xs text-gray-600 space-y-0.5">
-            {item.selectedOptions!.map((opt, index) => (
+            {item.selectedOptions!.map((opt) => (
               <li key={opt.id} className="flex items-center gap-1">
                 <span className="font-medium">{opt.name}:</span>
                 <span className="font-normal text-gray-500">

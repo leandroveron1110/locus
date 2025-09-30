@@ -25,7 +25,7 @@ export default function CategoriesTags({ businessId }: Props) {
         type: "error",
       });
     }
-  }, [isError, error]);
+  }, [isError, error, useAlert]);
 
   // 1. Estados de carga y error
   if (isLoading)

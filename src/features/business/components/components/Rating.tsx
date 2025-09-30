@@ -36,7 +36,7 @@ export default function Rating({ businessId }: Props) {
         type: "error",
       });
     }
-  }, [isError, error]);
+  }, [isError, error, useAlert]);
 
   const { submit, loading } = useSubmitRating({
     businessId,
