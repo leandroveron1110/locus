@@ -121,7 +121,7 @@ export default function Gallery({ businessId }: Props) {
         type: "error",
       });
     }
-  }, [isError, error, useAlert]);
+  }, [isError, error, addAlert]);
 
   if (isLoading) return <SkeletonGallery />;
 

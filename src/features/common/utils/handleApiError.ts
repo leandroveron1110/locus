@@ -1,5 +1,5 @@
 // src/utils/handleApiError.ts
-import { ApiError, ApiResponse } from "@/types/api"; 
+import { ApiError } from "@/types/api"; 
 import { AxiosError } from "axios";
 
 // Helper para validar si un objeto es tu ApiError de frontend

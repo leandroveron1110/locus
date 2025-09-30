@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useRatingComments } from "../../hooks/useRating";
 import { Star } from "lucide-react";
-import { error } from "console";
 import { useAlert } from "@/features/common/ui/Alert/Alert";
 import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
@@ -28,7 +27,7 @@ export const BusinessComments = ({ businessId, currentUserId }: Props) => {
         type: 'error'
       })
     }
-  }, [isError, error, useAlert])
+  }, [isError, error, addAlert])
 
   if(!comments) {
     return <p>Sin Comentarios</p>
