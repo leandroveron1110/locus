@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { SearchFormValues } from "@/features/search/components/SearchBar";
 import { useSearchBusinesses } from "@/features/search/hooks/useSearchBusinesses";
 import { List, MapPin } from "lucide-react";
-
 import { withSkeleton } from "@/features/common/utils/withSkeleton";
 import SearchBarSkeleton from "./skeleton/SearchBarSkeleton";
 import SearchBusinessListSkeleton from "./skeleton/SearchBusinessListSkeleton";
@@ -49,7 +48,7 @@ export default function SearchPage() {
     setParams({ query: values.q });
   };
 
-  const hasResults =  data ?  data?.data?.length > 0 : false;
+  const hasResults = data ? data?.data?.length > 0 : false;
 
   const renderContent = () => {
     if (isLoading) {
@@ -81,16 +80,18 @@ export default function SearchPage() {
         Encontrá lo que buscás
       </h1>
 
-      <div className="flex flex-col sm:flex-row gap-4 mb-2 items-center">
-        <div className="flex-grow w-full px-4 py-8 lg:p-8">
+      <div className="flex flex-row items-center gap-3 mb-4 w-full px-2 sm:px-4">
+        {/* Buscador: ocupa todo el espacio disponible */}
+        <div className="flex-grow">
           <DynamicSearchBar onSearch={handleSearch} />
         </div>
 
+        {/* Botones de vista */}
         {(hasResults || isLoading) && (
-          <div className="flex gap-2 p-1 rounded-full bg-gray-100">
+          <div className="flex gap-2 p-1 rounded-full bg-gray-100 flex-shrink-0">
             <button
               onClick={() => setViewMode("map")}
-              className={`p-2 rounded-full transition-colors flex items-center gap-2 ${
+              className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-colors ${
                 viewMode === "map"
                   ? "bg-white text-gray-900 shadow"
                   : "text-gray-500 hover:bg-gray-200"
@@ -100,7 +101,7 @@ export default function SearchPage() {
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`p-2 rounded-full transition-colors flex items-center gap-2 ${
+              className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-colors ${
                 viewMode === "list"
                   ? "bg-white text-gray-900 shadow"
                   : "text-gray-500 hover:bg-gray-200"

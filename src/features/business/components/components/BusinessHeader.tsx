@@ -1,10 +1,13 @@
+"use client";
 // src/features/business/components/BusinessHeader.tsx
+
 import React from "react";
 import Image from "next/image";
 import { Star } from "lucide-react";
 import FollowButton from "./FollowButton";
 import Title from "@/features/common/ui/Title";
 import Description from "@/features/common/ui/Description";
+import { useAuthStore } from "@/features/auth/store/authStore";
 
 interface Props {
   fullDescription: string;
@@ -21,6 +24,8 @@ export default function BusinessHeader({
   name,
   ratingsCount,
 }: Props) {
+  const user = useAuthStore((state) => state.user);
+
   const logoUrlBusiness = logoUrl || "/placeholder-logo.png";
 
   return (
@@ -61,10 +66,14 @@ export default function BusinessHeader({
             ))}
           </div>
 
+          {user ? (
+            <div className="mt-3">
+              <FollowButton businessId={businessId} />
+            </div>
+          ) : (
+            <></>
+          )}
           {/* Botón de seguir */}
-          <div className="mt-3">
-            <FollowButton businessId={businessId} />
-          </div>
         </div>
       </div>
     </div>
