@@ -84,7 +84,7 @@ export default function BusinessProfile({ businessId }: Props) {
           logoUrl={data.logoUrl}
           name={data.name}
           businessId={data.id}
-          ratingsCount={data.ratingsCount}
+          ratingsCount={Number(data.averageRating)}
         />
       </div>
 
