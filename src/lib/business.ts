@@ -1,21 +1,29 @@
 // src/lib/business.ts
 
-import { Business } from '@/features/business/types/business';
-import { cache } from 'react';
+import { Business } from "@/features/business/types/business";
+import { handleApiError } from "@/features/common/utils/handleApiError";
+import { cache } from "react";
+import { ApiResult } from "./apiFetch";
+import { ApiResponse } from "@/types/api";
 
-// Esta función se llamará UNA SOLA VEZ, incluso si se invoca
-// en generateMetadata y en el componente BusinessPage,
-// siempre que reciba el mismo businessId.
-export const getBusinessData = cache(async (businessId: string):Promise<Business> => {
-  // Lógica real de obtención de datos, por ejemplo:
-  const res = await fetch(`https://tu-api.com/businesses/${businessId}`, {
-    cache: 'force-cache', // O la configuración de caché que prefieras
-  });
+export const getBusinessData = cache(
+  async (businessId: string): Promise<ApiResult<Business>> => {
+    try {
+      const res = await fetch(
+        `http://localhost:3001/business/business/og-data/${businessId}`,
+        {
+          cache: "force-cache", // O la configuración de caché que prefieras
+        }
+      );
 
-  if (!res.ok) {
-    throw new Error('Fallo al obtener los datos del negocio');
+      const data: ApiResponse<ApiResult<Business>> = await res.json();
+
+      return data.data;
+    } catch (error: unknown) {
+      throw handleApiError(
+        error,
+        "Error al obtener la información del negocio"
+      );
+    }
   }
-
-  const data = await res.json();
-  return data;
-});
+);

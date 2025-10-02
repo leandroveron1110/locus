@@ -10,25 +10,31 @@ export async function generateMetadata({
   params: Promise<{ businessId: string }>;
 }): Promise<Metadata> {
   const { businessId } = await params;
-  const businessData = await getBusinessData(businessId); // LLAMADA 1
+  const businessData = await getBusinessData(businessId);
 
-  const businessTitle = `${businessData.name} | Locus`;
-  const businessDescription = businessData.shortDescription;
-  const businessImage = businessData.logoUrl ?? DEFAULT_OG_IMAGE;
+  let title = "Locus";
+  let description = "Locus es la plataforma que centraliza todos los negocios de tu ciudad. Encontrá todo lo que buscás y hacé tus pedidos online desde un solo lugar.";
+  let image = DEFAULT_OG_IMAGE;
+
+  if (businessData) {
+    title = `${businessData.name} | Locus`;
+    description = businessData.shortDescription ? businessData.shortDescription : "";
+    image = businessData.logoUrl ?? DEFAULT_OG_IMAGE;
+  }
 
   return {
-    title: businessTitle,
-    description: businessDescription,
+    title: title,
+    description: description,
     openGraph: {
-      title: businessTitle,
-      description: businessDescription,
+      title: title,
+      description: description,
       url: `https://locus-drab.vercel.app/business/${businessId}`,
       images: [
         {
-          url: businessImage, // 👈 Imagen dinámica del negocio
+          url: image, // 👈 Imagen dinámica del negocio
           width: 1200,
           height: 630,
-          alt: businessTitle,
+          alt: title,
         },
       ],
     },
