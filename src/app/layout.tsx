@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     siteName: "Locus",
     images: [
       {
-        url: "/LOCUS-300.png", // ✅ PNG o JPG, no SVG
+        url: "/locu-g.png", // ✅ PNG o JPG, no SVG
         width: 1200,
         height: 630,
         alt: "Locus - La plataforma de tu ciudad",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     title: "Locus | La plataforma de tu ciudad",
     description:
       "Descubrí y pedí online en todos los negocios de tu ciudad con Locus.",
-    images: ["/LOCUS-300.png"], // ✅ PNG también para Twitter
+    images: ["/locu-g.png"], // ✅ PNG también para Twitter
     creator: "@locus",
   },
 };
