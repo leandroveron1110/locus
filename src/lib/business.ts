@@ -6,8 +6,14 @@ import { cache } from "react";
 import { ApiResult } from "./apiFetch";
 import { ApiResponse } from "@/types/api";
 
+interface IBusinessOgData {
+    name: string;
+    description: string;
+    imageUrl: string;
+}
+
 export const getBusinessData = cache(
-  async (businessId: string): Promise<ApiResult<Business>> => {
+  async (businessId: string): Promise<ApiResult<IBusinessOgData>> => {
     try {
       const res = await fetch(
         `https://locus-back.onrender.com/business/business/og-data/${businessId}`,
@@ -16,7 +22,7 @@ export const getBusinessData = cache(
         }
       );
 
-      const data: ApiResponse<ApiResult<Business>> = await res.json();
+      const data: ApiResponse<ApiResult<IBusinessOgData>> = await res.json();
 
       return data.data;
     } catch (error: unknown) {

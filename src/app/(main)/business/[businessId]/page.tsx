@@ -24,9 +24,9 @@ export async function generateMetadata({
     // Asegúrate de que shortDescription exista, si no, usa una descripción del negocio,
     // o usa la descripción base si es muy corta.
     description =
-      businessData.shortDescription ||
+      businessData.description ||
       `Descubrí el perfil de ${businessData.name} y hacé tu pedido online fácilmente en Locus.`;
-    image = businessData.logoUrl ?? DEFAULT_OG_IMAGE;
+    image = businessData.imageUrl ?? DEFAULT_OG_IMAGE;
   }
 
   return {
