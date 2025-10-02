@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
+import { Inter } from "next/font/google";
+
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -12,9 +14,22 @@ import { Providers } from "./providers";
 //   subsets: ["latin"],
 // });
 
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Logus",
+  title: "Locus",
   description: "la plataforma de tu ciudad",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" }, // ✅ correcto
+    ],
+    apple: [
+      { url: "/favicon.svg", sizes: "180x180", type: "image/svg+xml" }, // ✅ ruta absoluta y mime correcto
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -23,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es" className={inter.className}>
       <body
         // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
