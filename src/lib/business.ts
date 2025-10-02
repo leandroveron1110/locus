@@ -1,6 +1,4 @@
 // src/lib/business.ts
-
-import { Business } from "@/features/business/types/business";
 import { handleApiError } from "@/features/common/utils/handleApiError";
 import { cache } from "react";
 import { ApiResult } from "./apiFetch";
