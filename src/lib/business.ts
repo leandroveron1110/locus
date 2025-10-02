@@ -12,7 +12,7 @@ export const getBusinessData = cache(
       const res = await fetch(
         `https://locus-back.onrender.com/business/business/og-data/${businessId}`,
         {
-          cache: "force-cache", // O la configuración de caché que prefieras
+          cache: "no-store", // O la configuración de caché que prefieras
         }
       );
 
