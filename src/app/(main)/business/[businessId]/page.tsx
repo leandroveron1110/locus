@@ -12,34 +12,58 @@ export async function generateMetadata({
   const { businessId } = await params;
   const businessData = await getBusinessData(businessId);
 
-  let title = "Locus";
-  let description = "Locus es la plataforma que centraliza todos los negocios de tu ciudad. Encontrá todo lo que buscás y hacé tus pedidos online desde un solo lugar.";
+  let title = "Locus | La plataforma de tu ciudad"; // Usa el título base
+  let description =
+    "Locus es la plataforma que centraliza todos los negocios de tu ciudad. Encontrá todo lo que buscás y hacé tus pedidos online desde un solo lugar."; // Usa la descripción base
   let image = DEFAULT_OG_IMAGE;
 
-  if (businessData) {
-    title = `${businessData.name} | Locus`;
-    description = businessData.shortDescription ? businessData.shortDescription : "";
+  // Lógica para usar datos del negocio si están disponibles
+  if (businessData && businessData.name) {
+    // Asegúrate de que businessData no sea nulo y tenga nombre
+    title = `${businessData.name} | Pedí online en Locus`;
+    // Asegúrate de que shortDescription exista, si no, usa una descripción del negocio,
+    // o usa la descripción base si es muy corta.
+    description =
+      businessData.shortDescription ||
+      `Descubrí el perfil de ${businessData.name} y hacé tu pedido online fácilmente en Locus.`;
     image = businessData.logoUrl ?? DEFAULT_OG_IMAGE;
   }
 
   return {
+    // 1. Descripción general (para SEO/Google)
     title: title,
-    description: description,
+    description: description, // 👈 ¡Sobreescribe la descripción general!
+
+    // 2. OPEN GRAPH (para WhatsApp/Facebook)
     openGraph: {
       title: title,
-      description: description,
+      description: description, // 👈 ¡Sobreescribe la descripción de OG!
       url: `https://locus-drab.vercel.app/business/${businessId}`,
+      siteName: "Locus",
       images: [
         {
-          url: image, // 👈 Imagen dinámica del negocio
+          url: image,
           width: 1200,
           height: 630,
           alt: title,
         },
       ],
+      type: "website",
+      locale: "es_AR",
+    },
+
+    // 3. TWITTER CARD (para Twitter/X)
+    twitter: {
+      card: "summary_large_image",
+      title: title,
+      description: description, // 👈 ¡Sobreescribe la descripción de Twitter!
+      images: [image],
+      creator: "@locus",
     },
   };
 }
+
+// ... (resto del componente BusinessPage)
 
 export default async function BusinessPage({
   params,
