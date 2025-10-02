@@ -39,13 +39,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// ---
-// 2. Componente de la página: Obtiene los datos para el contenido
-// ---
+
 export default async function BusinessPage({ params }: Props) {
-  // LLAMADA 2: Usa la misma función. Gracias a la deduplicación, NO
-  // se hace una segunda petición de red. Se reusa el resultado de la Llamada 1.
-  const businessData = await getBusinessData(params.businessId);
 
   return (
     <>
