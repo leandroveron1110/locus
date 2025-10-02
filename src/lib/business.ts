@@ -10,7 +10,7 @@ export const getBusinessData = cache(
   async (businessId: string): Promise<ApiResult<Business>> => {
     try {
       const res = await fetch(
-        `http://localhost:3001/business/business/og-data/${businessId}`,
+        `https://locus-back.onrender.com/business/business/og-data/${businessId}`,
         {
           cache: "force-cache", // O la configuración de caché que prefieras
         }
