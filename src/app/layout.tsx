@@ -22,7 +22,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Locus | La plataforma de tu ciudad",
   description:
-    "Descubrí, reservá y disfrutá lo mejor de tu ciudad. Locus te conecta con bares, salas, clases, desayunos y mucho más, todo en un solo lugar.",
+    "Locus es la plataforma que centraliza todos los negocios de tu ciudad. Encontrá todo lo que buscás y hacé tus pedidos online desde un solo lugar.",
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
@@ -34,12 +34,12 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Locus | La plataforma de tu ciudad",
     description:
-      "Con Locus podés explorar y reservar salas, pedir en tu bar favorito, tomar clases o descubrir experiencias únicas en tu ciudad.",
+      "Locus centraliza todos los negocios de tu ciudad para que encuentres lo que buscás y hagas tus pedidos online fácilmente.",
     url: "https://locus-drab.vercel.app/",
     siteName: "Locus",
     images: [
       {
-        url: "/favicon.svg", // ✅ tenés que poner esta imagen en /public
+        url: "/LOCUS-300.png", // ✅ PNG o JPG, no SVG
         width: 1200,
         height: 630,
         alt: "Locus - La plataforma de tu ciudad",
@@ -52,11 +52,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Locus | La plataforma de tu ciudad",
     description:
-      "Descubrí y reservá lo mejor de tu ciudad en un solo lugar: bares, salas, desayunos, clases y más.",
-    images: ["/favicon.svgg"], // misma imagen que OpenGraph
-    creator: "@locus", // opcional
+      "Descubrí y pedí online en todos los negocios de tu ciudad con Locus.",
+    images: ["/LOCUS-300.png"], // ✅ PNG también para Twitter
+    creator: "@locus",
   },
 };
+
 
 
 export default function RootLayout({
