@@ -1,22 +1,20 @@
-// src\app\(main)\business\[businessId]\page.tsx
-
-import type { Metadata } from "next";
 import BusinessProfile from "@/features/business/components/BusinessProfile";
 import AppHeader from "@/features/header/components/AppHeader";
+import type { Metadata } from "next";
 import { getBusinessData } from "@/lib/business";
 
-type Props = {
-  params: { businessId: string };
-};
-
-
-const DEFAULT_OG_IMAGE = "/locu-g.png"; 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const businessData = await getBusinessData(params.businessId); // LLAMADA 1
+const DEFAULT_OG_IMAGE = "/locu-g.png";
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ businessId: string }>;
+}): Promise<Metadata> {
+  const { businessId } = await params;
+  const businessData = await getBusinessData(businessId); // LLAMADA 1
 
   const businessTitle = `${businessData.name} | Locus`;
   const businessDescription = businessData.shortDescription;
-  const businessImage = businessData.logoUrl ?? DEFAULT_OG_IMAGE; 
+  const businessImage = businessData.logoUrl ?? DEFAULT_OG_IMAGE;
 
   return {
     title: businessTitle,
@@ -24,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: businessTitle,
       description: businessDescription,
-      url: `https://locus-drab.vercel.app/business/${params.businessId}`,
+      url: `https://locus-drab.vercel.app/business/${businessId}`,
       images: [
         {
           url: businessImage, // 👈 Imagen dinámica del negocio
@@ -33,23 +31,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           alt: businessTitle,
         },
       ],
-      // ... otros campos
     },
-    // ... otros metadatos (twitter, icons, etc.)
   };
 }
 
-
-export default async function BusinessPage({ params }: Props) {
-
+export default async function BusinessPage({
+  params,
+}: {
+  params: Promise<{ businessId: string }>;
+}) {
+  const { businessId } = await params;
   return (
     <>
       <AppHeader />
       <div className="min-h-screen bg-gray-100 w-full">
         <main className="w-full">
           <div className="bg-white w-full">
-            {/* Ahora puedes pasar los datos completos a tu componente */}
-            <BusinessProfile businessId={params.businessId} /> 
+            <BusinessProfile businessId={businessId} />
           </div>
         </main>
       </div>
