@@ -118,7 +118,6 @@ export default function Catalog({ businessId, business }: Props) {
         </div>
 
         {/* Contenedor de la lista */}
-        <div className="flex-1 overflow-y-auto">
           {displayData.length > 0 ? (
             <Virtuoso
               data={displayData}
@@ -132,7 +131,7 @@ export default function Catalog({ businessId, business }: Props) {
               <p className="text-lg">No se encontraron productos.</p>
             </div>
           )}
-        </div>
+
       </div>
 
       {/* Botón flotante del carrito */}

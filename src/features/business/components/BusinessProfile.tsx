@@ -55,7 +55,7 @@ const LazyCatalog = withSkeleton(
 
 export default function BusinessProfile({ businessId }: Props) {
   const { data, isLoading, error, isError } = useBusinessProfile(businessId);
-  const [activeSection, setActiveSection] = useState<string>("gallery");
+  const [activeSection, setActiveSection] = useState<string>("categories");
 
   const { addAlert } = useAlert();
 
