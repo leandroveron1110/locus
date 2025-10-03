@@ -1,13 +1,13 @@
+// src/components/CatalogMenu.tsx
 import React from "react";
 import { Menu } from "../types/catlog";
 import Title from "@/features/common/ui/Title";
-import CatalogSection from "./CatalogSection";
-import { useIntersection } from "../hooks/useIntersection";
+// Importar el nuevo componente envoltorio
+import CatalogSectionWrapper from "./CatalogSectionWrapper"; 
 
 interface Props {
   menu: Menu;
 }
-
 
 export default function CatalogMenu({ menu }: Props) {
   const DEFAULT_PAGE_SIZE = 5;
@@ -20,23 +20,15 @@ export default function CatalogMenu({ menu }: Props) {
       </header>
 
       <div className="space-y-12">
-        {sortedSections.map((section) => {
-          const { ref, isIntersecting } = useIntersection<HTMLDivElement>({
-            rootMargin: "100px", // pre-carga antes de que aparezca
-          });
-
-          return (
-            <div key={section.id} ref={ref}>
-              <CatalogSection
-                section={section}
-                pageSize={DEFAULT_PAGE_SIZE}
-                autoLoad={isIntersecting}
-              />
-            </div>
-          );
-        })}
+        {sortedSections.map((section) => (
+          // ✅ Llamamos al componente envoltorio aquí
+          <CatalogSectionWrapper
+            key={section.id}
+            section={section}
+            pageSize={DEFAULT_PAGE_SIZE}
+          />
+        ))}
       </div>
     </section>
   );
 }
-

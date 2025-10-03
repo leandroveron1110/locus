@@ -2,7 +2,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchProductsBySection, ProductPaginationResponse } from "../api/products-api";
 import { ApiResult } from "@/lib/apiFetch";
-import { Product } from "../types/catlog";
 
 interface UseProductsBySectionOptions {
   sectionId: string;
