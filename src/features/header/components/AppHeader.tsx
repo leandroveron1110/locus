@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import Image from "next/image";
-import img from "../../../app/locus.svg";
+import img from "../../../app/favicon.svg";
 import { useAuthStore } from "@/features/auth/store/authStore";
 
 interface ILinks {
