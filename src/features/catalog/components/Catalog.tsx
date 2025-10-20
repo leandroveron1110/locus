@@ -1,17 +1,15 @@
 // src/features/catalog/components/Catalog.tsx
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { useCatalg } from "../hooks/useCatalg";
 import CatalogMenu from "./CatalogMenu";
 import { useAuthStore } from "@/features/auth/store/authStore";
-import { ShoppingCart, Search } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { useCartStore } from "../stores/useCartStore";
 import { CatalogSkeleton } from "./skeleton/CatalogSkeleton";
 import { Business } from "@/features/business/types/business";
-import { debounce } from "lodash";
 import dynamic from "next/dynamic";
-import { Virtuoso } from "react-virtuoso";
 import { useAlert } from "@/features/common/ui/Alert/Alert";
 import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
@@ -29,7 +27,6 @@ const MemoizedCatalogMenu = React.memo(CatalogMenu);
 
 export default function Catalog({ businessId, business }: Props) {
   const { data, isLoading, isError, error } = useCatalg(businessId);
-  const [searchTerm, setSearchTerm] = useState<string>("");
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   const user = useAuthStore((state) => state.user);
@@ -61,33 +58,6 @@ export default function Catalog({ businessId, business }: Props) {
     }));
   }, [data]);
 
-  const filteredData = useMemo(() => {
-    if (!searchTerm) return normalizedData;
-    const lowerSearch = searchTerm.toLowerCase();
-
-    return normalizedData
-      .map((menu) => {
-        const filteredSections = menu.sections
-          .map((section) => ({
-            ...section,
-            products: section.products.filter((product) =>
-              product.lowerName.includes(lowerSearch)
-            ),
-          }))
-          .filter((section) => section.products.length > 0);
-        return { ...menu, sections: filteredSections };
-      })
-      .filter((menu) => menu.sections.length > 0);
-  }, [normalizedData, searchTerm]);
-
-  const handleSearchChange = useMemo(
-    () =>
-      debounce((event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value);
-      }, 300),
-    []
-  );
-
   if (isLoading) return <CatalogSkeleton />;
 
   if (!data || data.length === 0 || !business) {
@@ -98,40 +68,19 @@ export default function Catalog({ businessId, business }: Props) {
     );
   }
 
-  const isSearching = searchTerm.trim() !== "";
-  const displayData = isSearching ? filteredData : normalizedData;
-
   return (
-    <div className="w-full h-screen pb-2">
+    <div className="w-full min-h-screen pb-2 bg-white">
       <div className="max-w-7xl h-full flex flex-col">
-        {/* Contenedor del buscador */}
-        <div className="relative my-8 flex-shrink-0">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <Search className="h-5 w-5 text-gray-400" />
-          </div>
-          <input
-            type="text"
-            placeholder="Buscar en el menú..."
-            onChange={handleSearchChange}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-          />
-        </div>
-
         {/* Contenedor de la lista */}
-          {displayData.length > 0 ? (
-            <Virtuoso
-              data={displayData}
-              itemContent={(index, menu) => (
-                <MemoizedCatalogMenu key={index} menu={menu} />
-              )}
-              style={{ height: "100%", width: "100%" }}
-            />
-          ) : (
-            <div className="text-center text-gray-500 py-10">
-              <p className="text-lg">No se encontraron productos.</p>
-            </div>
-          )}
-
+        {normalizedData.length > 0 ? (
+          normalizedData.map((menu, index) => (
+            <MemoizedCatalogMenu key={index} menu={menu} />
+          ))
+        ) : (
+          <div className="text-center text-gray-500 py-10">
+            <p className="text-lg">No se encontraron productos.</p>
+          </div>
+        )}
       </div>
 
       {/* Botón flotante del carrito */}

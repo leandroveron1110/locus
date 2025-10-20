@@ -10,6 +10,7 @@ interface Props {
     text: string;
     lat: number;
     lng: number;
+    notes: string;
   }) => void;
   onCreateNew: () => void;
 }
@@ -35,6 +36,7 @@ export default function AddressSelector({
                   text,
                   lat: addr.latitude || 0,
                   lng: addr.longitude || 0,
+                  notes: addr.notes || ""
                 })
               }
               className={`flex items-center justify-between w-full p-4 rounded-xl border transition
@@ -56,7 +58,7 @@ export default function AddressSelector({
 
         {/* Botón para crear nueva dirección */}
         <button
-          onClick={() => onChange({ id: "new", text: "", lat: 0, lng: 0 })}
+          onClick={() => onChange({ id: "new", text: "", lat: 0, lng: 0 , notes: ""})}
           className={`flex items-center justify-between w-full p-4 rounded-xl border transition
             ${selectedId === "new"
               ? "border-blue-600 bg-blue-50 shadow-sm"

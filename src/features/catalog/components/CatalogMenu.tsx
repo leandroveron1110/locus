@@ -14,9 +14,9 @@ export default function CatalogMenu({ menu }: Props) {
   const sortedSections = [...menu.sections].sort((a, b) => a.index - b.index);
 
   return (
-    <section>
+    <>
       <header className="mb-8">
-        <Title size="medium">{menu.name}</Title>
+        <Title size="medium">{menu.name.toLocaleUpperCase()}</Title>
       </header>
 
       <div className="space-y-12">
@@ -29,6 +29,6 @@ export default function CatalogMenu({ menu }: Props) {
           />
         ))}
       </div>
-    </section>
+    </>
   );
 }

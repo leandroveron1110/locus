@@ -17,12 +17,12 @@ interface Props {
 
 // Actualiza la lista para incluir el menú como un elemento que se puede filtrar
 const sections: Section[] = [
-  { id: "categories", label: "Categorías", icon: <Tag className="h-6 w-6" /> },
-  { id: "gallery", label: "Galería", icon: <ImageIcon className="h-6 w-6" /> },
-  { id: "menu", label: "Menú", icon: <List className="h-6 w-6" /> },
-  { id: "rating", label: "Calificación", icon: <Star className="h-6 w-6" /> },
   { id: "schedule", label: "Horarios", icon: <Clock className="h-6 w-6" /> },
   { id: "contact", label: "Contacto", icon: <Phone className="h-6 w-6" /> },
+  { id: "menu", label: "Menú", icon: <List className="h-6 w-6" /> },
+  { id: "categories", label: "Categorías", icon: <Tag className="h-6 w-6" /> },
+  { id: "rating", label: "Calificación", icon: <Star className="h-6 w-6" /> },
+  // { id: "gallery", label: "Galería", icon: <ImageIcon className="h-6 w-6" /> },
 ];
 
 export default function ProfileNav({ activeSection, onChange, hasMenu }: Props) {

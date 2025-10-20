@@ -68,6 +68,7 @@ export default function OrderFormContainer({
     text: string;
     lat: number;
     lng: number;
+    notes: string;
   }>();
   const [selectedCompanyDelivery, setSelectedCompanyDelivery] =
     useState<CompanyDelivery | null>(null);
@@ -155,6 +156,7 @@ export default function OrderFormContainer({
         text: `${address.street} ${address.number ?? ""}, ${address.city}`,
         lat: address.latitude || 0,
         lng: address.longitude || 0,
+        notes: result.notes || "",
       });
       setShowAddressModal(false);
       setActiveStep("deliveryCompany");
@@ -166,6 +168,7 @@ export default function OrderFormContainer({
     text: string;
     lat: number;
     lng: number;
+    notes: string;
   }) => {
     if (selection.id === "new") {
       setShowAddressModal(true);
@@ -195,18 +198,22 @@ export default function OrderFormContainer({
       deliveryCompanyId: isSelectedDeliveryOption()
         ? selectedCompanyDelivery?.id
         : undefined,
+        
       customerName: `${user.firstName} ${user.lastName}`,
       customerPhone: user.email,
       customerAddress: isSelectedDeliveryOption()
         ? selectedAddress?.text
         : undefined,
-      customerObservations: undefined,
+      customerObservations: isSelectedDeliveryOption()
+        ? selectedAddress?.notes
+        : undefined,
       customerAddresslatitude: isSelectedDeliveryOption()
         ? selectedAddress?.lat
         : undefined,
       customerAddresslongitude: isSelectedDeliveryOption()
         ? selectedAddress?.lng
         : undefined,
+
       businessName,
       businessPhone,
       businessAddress,
@@ -220,6 +227,7 @@ export default function OrderFormContainer({
       deliveryType: selectedDeliveryOption,
       total,
       notes: orderNote,
+
       items: [],
     };
   }, [

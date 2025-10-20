@@ -62,10 +62,7 @@ export default function OrderCard({ order }: Props) {
       <div className="h-full flex flex-col bg-white rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
         <div className="flex flex-col flex-grow p-4 sm:p-6">
           {/* Encabezado principal */}
-          <div
-            className="cursor-pointer"
-            onClick={() => setIsDetailsModalOpen(true)}
-          >
+          <div className="cursor-pointer">
             <OrderHeader
               business={order.business}
               createdAt={order.createdAt}
@@ -150,12 +147,11 @@ export default function OrderCard({ order }: Props) {
                 {formatPrice(order.total)}
               </span>
             </div>
-            {
-              order.deliveryCompany?.totalDelivery && (<p className="text-xs text-gray-400 italic mt-1">
-              * Envío no incluido, se abona al cadete.
-            </p>)
-            }
-            
+            {order.deliveryCompany?.totalDelivery && (
+              <p className="text-xs text-gray-400 italic mt-1">
+                * El precio del envío no está incluido, se abona al cadete.
+              </p>
+            )}
           </div>
 
           {/* Botón ver productos */}
@@ -172,7 +168,9 @@ export default function OrderCard({ order }: Props) {
           {/* Botón de pago minimalista */}
           {showPaymentButton && (
             <div className="mt-3 flex flex-col gap-2">
-              <p className="text-xs text-gray-500 leading-snug pl-1">{getPaymentButtonHint()}</p>
+              <p className="text-xs text-gray-500 leading-snug pl-1">
+                {getPaymentButtonHint()}
+              </p>
               <button
                 onClick={() => setIsPaymentModalOpen(true)}
                 className={`self-start px-4 py-1.5 rounded-full text-sm font-medium transition-colors

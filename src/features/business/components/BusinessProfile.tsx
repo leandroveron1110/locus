@@ -55,7 +55,7 @@ const LazyCatalog = withSkeleton(
 
 export default function BusinessProfile({ businessId }: Props) {
   const { data, isLoading, error, isError } = useBusinessProfile(businessId);
-  const [activeSection, setActiveSection] = useState<string>("categories");
+  const [activeSection, setActiveSection] = useState<string>("schedule");
 
   const { addAlert } = useAlert();
 
@@ -88,52 +88,48 @@ export default function BusinessProfile({ businessId }: Props) {
         />
       </div>
 
-      <section className=" space-y-10">
-        <div>
-          <ProfileNav
-            activeSection={activeSection}
-            onChange={setActiveSection}
-            hasMenu={hasMenu}
-          />
-          <div className="px-4 mt-6">
-            {/* Lógica de renderizado simple, sin Suspense */}
-            {activeSection === "contact" && (
-              <LazyBusinessContactInfo
-                address={data.address}
-                email={data.email}
-                phone={data.phone}
-                whatsapp={data.whatsapp}
-                facebookUrl={data.facebookUrl || ""}
-                instagramUrl={data.instagramUrl || ""}
-                websiteUrl={data.websiteUrl || ""}
-              />
-            )}
-            {activeSection === "schedule" && (
-              <LazySchedule businessId={businessId} />
-            )}
-            {activeSection === "categories" && (
-              <LazyCategoriesTags businessId={businessId} />
-            )}
-            {activeSection === "gallery" && (
-              <LazyGallery businessId={businessId} />
-            )}
-            {activeSection === "rating" && (
-              <LazyRating businessId={businessId} />
-            )}
-            {activeSection === "menu" &&
-              (hasMenu ? (
-                <LazyCatalog businessId={businessId} business={data} />
-              ) : (
-                <div className="text-center text-gray-500 py-12">
-                  <p className="text-lg font-medium">
-                    El menú aún no está disponible para este negocio.
-                  </p>
-                  <p className="text-sm mt-2">
-                    Te invitamos a explorar otras secciones o volver más tarde.
-                  </p>
-                </div>
-              ))}
-          </div>
+      <section className="h-full  bg-white">
+        <ProfileNav
+          activeSection={activeSection}
+          onChange={setActiveSection}
+          hasMenu={hasMenu}
+        />
+        <div className="px-4 mt-6 bg-white">
+          {/* Lógica de renderizado simple, sin Suspense */}
+          {activeSection === "contact" && (
+            <LazyBusinessContactInfo
+              address={data.address}
+              email={data.email}
+              phone={data.phone}
+              whatsapp={data.whatsapp}
+              facebookUrl={data.facebookUrl || ""}
+              instagramUrl={data.instagramUrl || ""}
+              websiteUrl={data.websiteUrl || ""}
+            />
+          )}
+          {activeSection === "schedule" && (
+            <LazySchedule businessId={businessId} />
+          )}
+          {activeSection === "categories" && (
+            <LazyCategoriesTags businessId={businessId} />
+          )}
+          {activeSection === "gallery" && (
+            <LazyGallery businessId={businessId} />
+          )}
+          {activeSection === "rating" && <LazyRating businessId={businessId} />}
+          {activeSection === "menu" &&
+            (hasMenu ? (
+              <LazyCatalog businessId={businessId} business={data} />
+            ) : (
+              <div className="text-center text-gray-500 py-12">
+                <p className="text-lg font-medium">
+                  El menú aún no está disponible para este negocio.
+                </p>
+                <p className="text-sm mt-2">
+                  Te invitamos a explorar otras secciones o volver más tarde.
+                </p>
+              </div>
+            ))}
         </div>
       </section>
     </main>

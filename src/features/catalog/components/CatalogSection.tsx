@@ -31,10 +31,6 @@ export default function CatalogSection({
 
   const loadProducts = useCallback(
     async (currentOffset: number) => {
-      if (isLoading || !hasMore) return;
-
-      setIsLoading(true);
-
       try {
         const response = await fetchProductsBySection(
           section.id,
@@ -56,19 +52,19 @@ export default function CatalogSection({
         setIsLoading(false);
       }
     },
-    [section.id, pageSize, isLoading, hasMore]
+    [section.id, pageSize]
   );
 
   useEffect(() => {
-    if (section.id && autoLoad && products.length === 0) {
-      setProducts([]);
-      setOffset(0);
-      setHasMore(true);
+    if (!section.id || !autoLoad || products.length > 0 || isLoading) return;
 
-      loadProducts(0);
-    }
-    // solo depende de section.id y autoLoad
-  }, [section.id, autoLoad, loadProducts]);
+    setProducts([]);
+    setOffset(0);
+    setHasMore(true);
+    setIsLoading(true);
+
+    loadProducts(0);
+  }, [section.id, autoLoad]);
 
   // 4. HANDLERS de Interacción
   const handleSelectProduct = useCallback((product: Product) => {
@@ -117,7 +113,7 @@ export default function CatalogSection({
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-baseline gap-2">
           <h3 className="font-bold text-gray-900 leading-tight text-gray-800">
-            {section.name}
+            {section.name.toUpperCase()}
           </h3>
         </div>
 
@@ -150,7 +146,7 @@ export default function CatalogSection({
 
           {/* CONDICIÓN 2: Mostrar productos si ya tenemos datos */}
           {products.length > 0 && (
-            <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+            <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sortedProducts.map((product) => (
                 <CatalogProduct
                   key={product.id}
@@ -159,7 +155,7 @@ export default function CatalogSection({
                 />
               ))}
 
-              {/* Indicador de carga para PAGINACIÓN (aparece debajo de los productos) */}
+              {/* Indicador de carga para paginación */}
               {isLoading && products.length > 0 && (
                 <li className="col-span-full flex justify-center py-4">
                   <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
@@ -178,9 +174,10 @@ export default function CatalogSection({
                 </li>
               )}
 
-              {/* Mensaje de Fin */}
+              {/* Mensaje de fin */}
               {!hasMore && (
                 <li className="col-span-full flex justify-center py-4 text-gray-500 text-sm">
+                  No hay más productos para mostrar.
                 </li>
               )}
             </ul>

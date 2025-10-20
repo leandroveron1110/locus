@@ -21,7 +21,6 @@ export default function OrderSummary({
   orderNote,
   setOrderNote,
 }: Props) {
-  const total = subtotal + (deliveryPrice ?? 0);
 
   return (
     <>
@@ -33,7 +32,7 @@ export default function OrderSummary({
         <div className="space-y-2 text-sm sm:text-base">
           <div className="flex justify-between text-gray-700">
             <span>Subtotal</span>
-            <span className="font-medium">{formatPrice(subtotal)}</span>
+            <span className="font-medium">{formatPrice(subtotal -(deliveryPrice ?? 0))}</span>
           </div>
 
           {isDelivery && (
@@ -63,7 +62,7 @@ export default function OrderSummary({
 
           <div className="flex justify-between font-bold text-lg sm:text-xl mt-3 pt-3 border-t border-gray-200">
             <span>Total</span>
-            <span>{formatPrice(total)}</span>
+            <span>{formatPrice(subtotal)}</span>
           </div>
         </div>
       </div>

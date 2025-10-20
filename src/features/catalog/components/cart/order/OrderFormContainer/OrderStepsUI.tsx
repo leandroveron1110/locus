@@ -21,9 +21,9 @@ interface Props {
   selectedDeliveryOption: DeliveryOption;
   setSelectedDeliveryOption: (option: DeliveryOption) => void;
   addresses: AddressCreateDto[];
-  selectedAddress: { id: string; text: string; lat: number; lng: number } | undefined;
-  setSelectedAddress: (address: { id: string; text: string; lat: number; lng: number } | undefined) => void;
-  handleAddressChange: (selection: { id: string; text: string; lat: number; lng: number }) => void;
+  selectedAddress: { id: string; text: string; lat: number; lng: number, notes: string } | undefined;
+  setSelectedAddress: (address: { id: string; text: string; lat: number; lng: number; notes: string } | undefined) => void;
+  handleAddressChange: (selection: { id: string; text: string; lat: number; lng: number, notes: string }) => void;
   selectedCompanyDelivery: CompanyDelivery | null;
   setSelectedCompanyDelivery: (company: CompanyDelivery | null) => void;
   selectedPaymentOption: PaymentMethodType;
