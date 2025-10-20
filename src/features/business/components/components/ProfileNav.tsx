@@ -1,7 +1,7 @@
 // components/ProfileNav.tsx
 "use client";
 
-import { Phone, Clock, Tag, ImageIcon, Star, List } from "lucide-react";
+import { Phone, Clock, Tag, Star, List } from "lucide-react";
 
 interface Section {
   id: string;
