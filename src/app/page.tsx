@@ -8,11 +8,9 @@ export default function Home() {
       <AppHeader />
       <div className="bg-white min-h-screen bg-gray-100">
         <main className="p-3">
-            <div className="mb-6">
-              
-              <SearchPage />
-            </div>
-
+          <div className="mb-6">
+            <SearchPage />
+          </div>
         </main>
       </div>
     </>

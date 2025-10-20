@@ -31,7 +31,8 @@ export default function OrdersPage() {
             <div className="mb-8">
               <h1 className="text-2xl font-bold text-gray-900">Mis Órdenes</h1>
               <p className="text-gray-500 mt-1">
-                Aquí puedes revisar el estado de tus órdenes y realizar pagos pendientes.
+                Aquí puedes revisar el estado de tus órdenes y realizar pagos
+                pendientes.
               </p>
             </div>
 

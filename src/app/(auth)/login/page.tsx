@@ -1,11 +1,11 @@
 // src/app/(auth)/login/page.tsx
-'use client'; // Necesario para usar hooks de React
+"use client"; // Necesario para usar hooks de React
 
-import React, { useEffect } from 'react';
-import { LoginForm } from '../../../features/auth/components/LoginForm'; // Importa el componente del formulario
-import { useRouter } from 'next/navigation'; // Para la redirección
-import { useAuthStore } from '@/features/auth/store/authStore';
-import Link from 'next/link';
+import React, { useEffect } from "react";
+import { LoginForm } from "../../../features/auth/components/LoginForm"; // Importa el componente del formulario
+import { useRouter } from "next/navigation"; // Para la redirección
+import { useAuthStore } from "@/features/auth/store/authStore";
+import Link from "next/link";
 
 /**
  * Página de inicio de sesión.
@@ -13,7 +13,7 @@ import Link from 'next/link';
  */
 export default function LoginPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading, checkAuth   } = useAuthStore(); // Obtiene el estado de autenticación
+  const { isAuthenticated, isLoading, checkAuth } = useAuthStore(); // Obtiene el estado de autenticación
 
   useEffect(() => {
     // Al montar la página, verifica el estado de autenticación.
@@ -24,7 +24,8 @@ export default function LoginPage() {
   useEffect(() => {
     // Si ya está autenticado y no está cargando la verificación inicial, redirige.
     if (!isLoading && isAuthenticated) {
-      const redirectPath = new URLSearchParams(window.location.search).get('redirect') || '/';
+      const redirectPath =
+        new URLSearchParams(window.location.search).get("redirect") || "/";
       router.push(redirectPath);
     }
   }, [isAuthenticated, isLoading, router]); // Se ejecuta cuando cambian isAuthenticated o isLoading
@@ -47,8 +48,11 @@ export default function LoginPage() {
         </h1>
         <LoginForm />
         <p className="mt-6 text-center text-gray-600">
-          ¿No tienes una cuenta?{' '}
-          <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
+          ¿No tienes una cuenta?{" "}
+          <Link
+            href="/register"
+            className="font-medium text-blue-600 hover:text-blue-500"
+          >
             Regístrate aquí
           </Link>
         </p>

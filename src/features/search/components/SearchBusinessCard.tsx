@@ -23,10 +23,7 @@ export const SearchBusinessCard = ({ business }: BusinessCardProps) => {
     <li
       onClick={handleClick}
       role="listitem"
-      className={`
-    rounded-2xl border border-gray-200 p-3 h-auto transition
-    cursor-pointer hover:shadow-md
-  `}
+      className={`rounded-2xl border border-gray-200 p-3 h-auto transition cursor-pointer hover:shadow-md`}
     >
       <div className="flex flex-col">
         {/* Contenido principal */}

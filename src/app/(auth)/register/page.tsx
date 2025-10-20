@@ -1,10 +1,10 @@
 // src/app/(auth)/register/page.tsx
-'use client'; // Necesario para usar hooks de React
+"use client"; // Necesario para usar hooks de React
 
-import React, { useEffect } from 'react';
-import { RegisterForm } from '../../../features/auth/components/RegisterForm'; // Importa el componente del formulario de registro
-import { useAuthStore } from '../../../features/auth/store/authStore'; // Importa el store de Zustand
-import { useRouter } from 'next/navigation'; // Para la redirección
+import React, { useEffect } from "react";
+import { RegisterForm } from "../../../features/auth/components/RegisterForm"; // Importa el componente del formulario de registro
+import { useAuthStore } from "../../../features/auth/store/authStore"; // Importa el store de Zustand
+import { useRouter } from "next/navigation"; // Para la redirección
 
 /**
  * Página de registro de usuario.
@@ -22,7 +22,7 @@ export default function RegisterPage() {
   useEffect(() => {
     // Si ya está autenticado y no está cargando la verificación inicial, redirige.
     if (!isLoading && isAuthenticated) {
-      router.push('/'); // Redirige a la página principal
+      router.push("/"); // Redirige a la página principal
     }
   }, [isAuthenticated, isLoading, router]); // Se ejecuta cuando cambian isAuthenticated o isLoading
 
@@ -44,8 +44,11 @@ export default function RegisterPage() {
         </h1>
         <RegisterForm />
         <p className="mt-6 text-center text-gray-600">
-          ¿Ya tienes una cuenta?{' '}
-          <a href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+          ¿Ya tienes una cuenta?{" "}
+          <a
+            href="/login"
+            className="font-medium text-blue-600 hover:text-blue-500"
+          >
             Inicia sesión aquí
           </a>
         </p>

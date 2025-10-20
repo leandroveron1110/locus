@@ -17,7 +17,9 @@ export default function Home() {
             {/* Este contenedor podrías usarlo para mostrar los negocios */}
             <div className="mt-8">
               {/* Aquí irían tus componentes de lista de negocios, por ejemplo */}
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Negocios cerca de ti</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                Negocios cerca de ti
+              </h2>
               {/* <BusinessesList /> */}
               {/* <MapClientWrapper /> */}
             </div>

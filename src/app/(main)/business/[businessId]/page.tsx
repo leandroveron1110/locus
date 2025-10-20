@@ -47,7 +47,6 @@ export async function generateMetadata({
   };
 }
 
-
 // ... (resto del componente BusinessPage)
 
 export default async function BusinessPage({

@@ -3,7 +3,6 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { Inter } from "next/font/google";
 
-
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
 //   subsets: ["latin"],
@@ -24,12 +23,8 @@ export const metadata: Metadata = {
   description:
     "Locus es la plataforma que centraliza todos los negocios de tu ciudad. Encontrá todo lo que buscás y hacé tus pedidos online desde un solo lugar.",
   icons: {
-    icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-    ],
-    apple: [
-      { url: "/favicon.svg", sizes: "180x180", type: "image/svg+xml" },
-    ],
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/favicon.svg", sizes: "180x180", type: "image/svg+xml" }],
   },
   openGraph: {
     title: "Locus | La plataforma de tu ciudad",
@@ -58,8 +53,6 @@ export const metadata: Metadata = {
   },
 };
 
-
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -68,11 +61,9 @@ export default function RootLayout({
   return (
     <html lang="es" className={inter.className}>
       <body
-        // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
