@@ -27,10 +27,7 @@ export default function SearchBar({ onSearch }: Props) {
   });
 
   return (
-    <form
-      onSubmit={handleSubmit(onSearch)}
-      className="relative w-full"
-    >
+    <form onSubmit={handleSubmit(onSearch)} className="relative w-full">
       <div className="relative">
         {/* Icono de búsqueda dentro del input */}
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -43,7 +40,9 @@ export default function SearchBar({ onSearch }: Props) {
           className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 placeholder-gray-400 transition-colors"
         />
       </div>
-      {errors.q && <p className="text-red-500 text-sm mt-2">{errors.q.message}</p>}
+      {errors.q && (
+        <p className="text-red-500 text-sm mt-2">{errors.q.message}</p>
+      )}
     </form>
   );
 }

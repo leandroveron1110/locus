@@ -42,7 +42,7 @@ export default function AppHeader() {
     return pathname.startsWith(linkHref);
   };
 
-  const logo = svg.src
+  const logo = svg.src;
 
   return (
     <header className="bg-white shadow sticky top-0 z-30">

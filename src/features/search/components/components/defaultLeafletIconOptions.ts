@@ -2,7 +2,7 @@
 import L from "leaflet";
 
 export function defaultLeafletIconOptions() {
-// @ts-expect-error Leaflet internal property, safe to delete
+  // @ts-expect-error Leaflet internal property, safe to delete
   delete L.Icon.Default.prototype._getIconUrl;
 
   L.Icon.Default.mergeOptions({
