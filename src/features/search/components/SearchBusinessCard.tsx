@@ -1,7 +1,7 @@
 // src/features/search/components/SearchBusinessCard.tsx
 "use client";
 
-import { Star, Tag } from "lucide-react";
+import { Star } from "lucide-react";
 import { SearchResultBusiness } from "../types/search";
 import { useRouter } from "next/navigation";
 import logo from "../../../../public/locu-g.png";

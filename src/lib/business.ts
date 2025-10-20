@@ -45,7 +45,7 @@ export const getBusinessData = cache(
 
       // Si no vino nada útil del backend, usar valores por defecto
       return DEFAULT_BUSINESS_DATA;
-    } catch (error) {
+    } catch {
       return DEFAULT_BUSINESS_DATA;
     }
   }
