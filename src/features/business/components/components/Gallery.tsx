@@ -6,7 +6,6 @@ import { useGallery } from "../../hooks/useGallery";
 import { SkeletonGallery } from "./Skeleton/SkeletonGallery";
 import { ImageOff, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
 import { useAlert } from "@/features/common/ui/Alert/Alert";
 import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
@@ -79,12 +78,11 @@ const Lightbox = ({
           className="relative w-full max-w-[90vw] max-h-[80vh] animate-scale-in"
           style={{ height: "80vh" }}
         >
-          <Image
+          <img
             src={images[selectedIndex].url}
             alt={`Imagen negocio ${selectedIndex + 1}`}
-            fill
-            className="rounded-lg shadow-lg object-contain"
-            sizes="(max-width: 768px) 100vw, 75vw"
+            className="rounded-lg shadow-lg object-contain w-full h-full"
+            loading="lazy"
           />
         </div>
 
@@ -160,14 +158,13 @@ export default function Gallery({ businessId }: Props) {
             className="relative overflow-hidden rounded-2xl shadow-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label={`Abrir imagen ${idx + 1} de la galería`}
           >
-            <Image
+            <img
               src={img.url}
               alt={`Imagen negocio ${idx + 1}`}
-              fill
-              className="object-cover transform transition-transform duration-300 hover:scale-105"
-              sizes="(max-width: 640px) 50vw, 25vw"
+              className="object-cover w-full h-full transform transition-transform duration-300 hover:scale-105 rounded-lg"
               loading="lazy"
             />
+
             <div className="absolute inset-0 bg-black bg-opacity-10 opacity-0 hover:opacity-100 transition-opacity rounded-2xl" />
           </button>
         ))}

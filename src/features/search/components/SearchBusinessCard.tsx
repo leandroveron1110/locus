@@ -4,7 +4,7 @@
 import { Star, Tag } from "lucide-react";
 import { SearchResultBusiness } from "../types/search";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import logo from "../../../../public/locu-g.png";
 
 interface BusinessCardProps {
   business: SearchResultBusiness;
@@ -16,6 +16,8 @@ export const SearchBusinessCard = ({ business }: BusinessCardProps) => {
   const handleClick = () => {
     router.push(`/business/${business.id}`, { scroll: false });
   };
+
+  const logoUrlBusiness = business.logoUrl || logo.src;
 
   return (
     <li
@@ -31,18 +33,12 @@ export const SearchBusinessCard = ({ business }: BusinessCardProps) => {
         <div className="flex gap-3 items-start">
           {/* Imagen */}
           <div className="relative w-24 h-24 rounded-full overflow-hidden border border-gray-200 flex-shrink-0 flex items-center justify-center bg-gray-50">
-            {business.logoUrl ? (
-              <Image
-                src={business.logoUrl}
-                alt={business.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 96px"
-                loading="lazy"
-              />
-            ) : (
-              <Tag className="w-12 h-12 text-gray-400" />
-            )}
+            <img
+              src={logoUrlBusiness}
+              alt={business.name}
+              className="object-cover w-full h-full"
+              loading="lazy"
+            />
           </div>
 
           {/* Texto */}

@@ -1,7 +1,6 @@
 "use client";
 import React, { useMemo } from "react";
 import { Star, Package } from "lucide-react";
-import Image from "next/image";
 import { formatPrice } from "@/features/common/utils/formatPrice";
 import { Product } from "../types/catlog";
 
@@ -33,7 +32,14 @@ export default function CatalogProduct({ product, onClick }: Props) {
         )
       : 0;
     return { isAvailable, hasDiscount, discountPercent };
-  }, [available, stock, originalPrice, discountPercentage, finalPrice, product.originalPrice]);
+  }, [
+    available,
+    stock,
+    originalPrice,
+    discountPercentage,
+    finalPrice,
+    product.originalPrice,
+  ]);
 
   return (
     <li
@@ -67,12 +73,10 @@ export default function CatalogProduct({ product, onClick }: Props) {
         <div className="flex gap-3 items-start ">
           <div className="relative w-24 h-24 rounded-full overflow-hidden border border-gray-200 flex-shrink-0 flex items-center justify-center bg-gray-50">
             {product.imageUrl ? (
-              <Image
+              <img
                 src={product.imageUrl}
                 alt={product.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 96px"
+                className="object-cover w-full h-full"
                 loading="lazy"
               />
             ) : (

@@ -11,8 +11,7 @@ import {
   User,
 } from "lucide-react";
 import React, { useState } from "react";
-import Image from "next/image";
-import img from "../../../app/favicon.svg";
+import svg from "../../../../public/favicon.svg";
 import { useAuthStore } from "@/features/auth/store/authStore";
 
 interface ILinks {
@@ -43,6 +42,8 @@ export default function AppHeader() {
     return pathname.startsWith(linkHref);
   };
 
+  const logo = svg.src
+
   return (
     <header className="bg-white shadow sticky top-0 z-30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between relative">
@@ -57,13 +58,7 @@ export default function AppHeader() {
           </button>
 
           <Link href="/" className="flex-shrink-0">
-            <Image
-              src={img}
-              alt="Locus Logo"
-              width={100}
-              height={32}
-              className="h-8 w-auto"
-            />
+            <img src={logo} alt="Locus Logo" className="h-8 w-auto" />
           </Link>
         </div>
 

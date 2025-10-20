@@ -2,11 +2,11 @@
 // src/features/business/components/BusinessHeader.tsx
 
 import React from "react";
-import Image from "next/image";
 import { Star } from "lucide-react";
 import FollowButton from "./FollowButton";
 import Title from "@/features/common/ui/Title";
 import Description from "@/features/common/ui/Description";
+import logo from "../../../../../public/locu-g.png";
 import { useAuthStore } from "@/features/auth/store/authStore";
 
 interface Props {
@@ -26,20 +26,18 @@ export default function BusinessHeader({
 }: Props) {
   const user = useAuthStore((state) => state.user);
 
-  const logoUrlBusiness = logoUrl || "/placeholder-logo.png";
+  const logoUrlBusiness = logoUrl || logo.src;
 
   return (
     <div className="bg-white p-3 md:p-6 mb-6">
       <div className="flex flex-row items-start gap-6">
         {/* Logo */}
         <div className="relative w-24 h-24 md:w-28 md:h-28 flex-shrink-0 rounded-full overflow-hidden">
-          <Image
+          <img
             src={logoUrlBusiness}
             alt={`${name} logo`}
-            fill
-            className="object-cover"
-            sizes="112px"
-            priority
+            className="object-cover w-full h-full"
+            loading="eager"
           />
         </div>
 

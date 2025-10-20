@@ -1,5 +1,4 @@
 // src/features/search/components/BusinessMapPopup.tsx
-import Image from "next/image";
 import { Star } from "lucide-react";
 import { SearchResultBusiness } from "@/features/search/types/search";
 
@@ -13,16 +12,14 @@ export function BusinessMapPopup({ business }: BusinessMapPopupProps) {
       {/* Logo + nombre */}
       <div className="flex items-center gap-2">
         {business.logoUrl ? (
-          <Image
+          <img
             src={business.logoUrl}
             alt={business.name}
-            width={40}
-            height={40}
-            className="rounded-full object-cover"
+            className="w-10 h-10 rounded-full object-cover"
           />
         ) : (
           <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
-            {business.name.charAt(0)}
+            {business.name.charAt(0).toUpperCase()}
           </div>
         )}
         <div className="flex flex-col">
@@ -41,7 +38,9 @@ export function BusinessMapPopup({ business }: BusinessMapPopupProps) {
 
       {/* Descripción */}
       {business.description && (
-        <p className="text-xs text-gray-600 line-clamp-2">{business.description}</p>
+        <p className="text-xs text-gray-600 line-clamp-2">
+          {business.description}
+        </p>
       )}
 
       {/* Categorías */}

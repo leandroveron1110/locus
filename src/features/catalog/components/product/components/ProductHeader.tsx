@@ -1,7 +1,6 @@
 // src/components/ProductHeader.tsx
 "use client";
 import React from "react";
-import Image from "next/image";
 import { Star } from "lucide-react";
 import { Product } from "@/features/catalog/types/catlog";
 
@@ -18,14 +17,13 @@ export default function ProductHeader({ product }: Props) {
     <div className="space-y-5">
       {imageUrl && (
         <div className="relative w-full h-56 rounded-2xl overflow-hidden shadow-md border border-gray-200">
-          <Image
+          <img
             src={imageUrl}
             alt={name}
-            fill
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-            priority
-            sizes="(max-width: 768px) 100vw, 50vw"
+            loading="eager"
           />
+
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
         </div>
       )}

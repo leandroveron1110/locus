@@ -3,7 +3,6 @@
 import React from "react";
 import { CartItem } from "../../stores/useCartStore";
 import { Trash2 } from "lucide-react";
-import Image from "next/image";
 
 interface Props {
   item: CartItem;
@@ -32,12 +31,11 @@ export default function CartItemCard({ item, onEdit, onRemove }: Props) {
       {/* ➡️ Imagen del producto con next/image */}
       {item.product.imageUrl ? (
         <div className="relative w-16 h-16 rounded-lg overflow-hidden">
-          <Image
+          <img
             src={item.product.imageUrl}
             alt={item.product.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 640px) 100vw, 16rem"
+            className="object-cover w-full h-full"
+            loading="lazy"
           />
         </div>
       ) : (
