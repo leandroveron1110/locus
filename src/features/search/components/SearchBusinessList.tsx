@@ -2,7 +2,6 @@
 
 import { SearchResultBusiness } from "../types/search";
 import { SearchBusinessCard } from "./SearchBusinessCard";
-import { Virtuoso } from "react-virtuoso";
 
 interface Props {
   businesses: SearchResultBusiness[];
@@ -12,24 +11,29 @@ export default function SearchBusinessList({ businesses }: Props) {
   if (!businesses) return null;
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col h-[calc(100vh-80px)]">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        {businesses.length > 0
-          ? `${businesses.length} ${businesses.length === 1 ? "negocio" : "negocios"} encontrados`
-          : "No se encontraron negocios"}
-      </h2>
+    <section className="max-w-7xl mx-auto  flex flex-col h-[calc(100vh-80px)]">
+      <p className="text-sm sm:text-base text-gray-500 mb-4">
+        {businesses.length > 0 ? (
+          <>
+            <span className="font-medium text-gray-700">
+              {businesses.length}
+            </span>{" "}
+            {businesses.length === 1
+              ? "negocio encontrado"
+              : "negocios encontrados"}
+          </>
+        ) : (
+          "No se encontraron negocios"
+        )}
+      </p>
 
       {businesses.length > 0 ? (
-        <div className="flex-1">
-          <Virtuoso
-            data={businesses}
-            itemContent={(index, business) => (
-              <div className="mb-4">
-                <SearchBusinessCard key={business.id} business={business} />
-              </div>
-            )}
-            style={{ height: "100%", width: "100%" }}
-          />
+        <div className="flex-1 overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
+            {businesses.map((business) => (
+              <SearchBusinessCard key={business.id} business={business} />
+            ))}
+          </div>
         </div>
       ) : (
         <p className="text-gray-500 text-center mt-12">

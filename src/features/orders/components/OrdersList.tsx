@@ -1,18 +1,22 @@
 // OrdersList.tsx
 "use client";
 import React, { useState, useMemo } from "react";
-import { useOrders } from "../hooks/useOrders";
 import OrderCard from "./OrderCard/OrderCard";
 import OrdersFilters from "./OrdersFilters";
 import EmptyState from "./EmptyState";
 import { simplifiedFilters, statusPriority } from "../utils/filtersData";
+import { useUserOrdersSocket } from "../sockets/useUserOrdersSocket";
+import { useUserOrdersStore } from "@/lib/hooks/useOrdersStore";
+import { useFetchUserOrders } from "@/lib/hooks/useFetchUserOrders";
 
 interface OrdersListProps {
   userId: string;
 }
 
 export default function OrdersList({ userId }: OrdersListProps) {
-  const orders = useOrders(userId);
+  const orders = useUserOrdersStore((s)=> s.orders);
+  useUserOrdersSocket(userId);
+  useFetchUserOrders(userId);
   const [activeFilter, setActiveFilter] = useState<string>("Todos");
 
   const filteredAndSortedOrders = useMemo(() => {

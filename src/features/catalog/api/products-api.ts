@@ -1,6 +1,7 @@
 import { Product } from "@/features/catalog/types/catlog";
 import { handleApiError } from "@/features/common/utils/handleApiError";
-import { apiGet, ApiResult } from "@/lib/apiFetch";
+import { apiGet } from "@/lib/apiFetch";
+import { ApiResult } from "@/types/api";
 
 export interface ProductPaginationResponse {
   products: Product[];
@@ -18,8 +19,8 @@ export const fetchProductsBySection = async (
     );
 
     return {
-        products: response ? response : [],
-        total: response ? response.length : 0
+        products: response.data ? response.data : [],
+        total: response.data ? response.data.length : 0
     }
   } catch (error: unknown) {
     throw handleApiError(error, `Error al traer los productos`);

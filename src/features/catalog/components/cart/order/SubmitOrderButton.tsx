@@ -109,7 +109,7 @@ export default function SubmitOrderButton({ orderPayload }: Props) {
       await createOrderMutation.mutateAsync(payload);
 
       clearCart();
-      router.push(`/orders`);
+      // router.push(`/orders`);
     } catch (err: unknown) {
       addAlert({
         message: getDisplayErrorMessage(err),

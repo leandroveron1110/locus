@@ -20,7 +20,7 @@ export const SearchBusinessCard = ({ business }: BusinessCardProps) => {
   const logoUrlBusiness = business.logoUrl || logo.src;
 
   return (
-    <li
+    <div
       onClick={handleClick}
       role="listitem"
       className={`rounded-2xl border border-gray-200 p-3 h-auto transition cursor-pointer hover:shadow-md`}
@@ -29,7 +29,18 @@ export const SearchBusinessCard = ({ business }: BusinessCardProps) => {
         {/* Contenido principal */}
         <div className="flex gap-3 items-start">
           {/* Imagen */}
-          <div className="relative w-24 h-24 rounded-full overflow-hidden border border-gray-200 flex-shrink-0 flex items-center justify-center bg-gray-50">
+          <div
+            className="
+              relative 
+              w-20 h-20 sm:w-20 sm:h-20 md:w-20 md:h-20 
+              rounded-full 
+              overflow-hidden 
+              border border-gray-200 
+              flex-shrink-0 
+              flex items-center justify-center 
+              bg-gray-50 
+            "
+          >
             <img
               src={logoUrlBusiness}
               alt={business.name}
@@ -98,6 +109,6 @@ export const SearchBusinessCard = ({ business }: BusinessCardProps) => {
           </div>
         </div>
       </div>
-    </li>
+    </div>
   );
 };

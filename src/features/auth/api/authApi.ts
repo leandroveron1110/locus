@@ -1,7 +1,8 @@
 // src/features/auth/api/authApi.ts
 import { handleApiError } from '@/features/common/utils/handleApiError';
 import { LoginPayload, LoginResponse, RegisterPayload, RegisterResponse, User } from '../types/auth';
-import { apiGet, apiPost, ApiResult } from '@/lib/apiFetch';
+import { apiGet, apiPost } from '@/lib/apiFetch';
+import { ApiResult } from '@/types/api';
 
 /**
 
@@ -15,7 +16,7 @@ import { apiGet, apiPost, ApiResult } from '@/lib/apiFetch';
 export const login = async (payload: LoginPayload): Promise<ApiResult<LoginResponse>>  => {
   try {
     const response = await apiPost<LoginResponse>('/auth/login/client', payload);
-    return response;
+    return response.data;
   } catch (error: unknown) {
     throw handleApiError(error, 'Unknown error during login');
   }
@@ -30,7 +31,7 @@ export const login = async (payload: LoginPayload): Promise<ApiResult<LoginRespo
 export const register = async (payload: RegisterPayload): Promise<ApiResult<RegisterResponse>> => {
   try {
     const response = await apiPost<RegisterResponse>('/auth/register', payload);
-    return response;
+    return response.data;
   } catch (error: unknown) {
     throw handleApiError(error, 'Unknown error during registration');
   }
@@ -44,7 +45,7 @@ export const register = async (payload: RegisterPayload): Promise<ApiResult<Regi
 export const getMe = async (): Promise<ApiResult<User>> => {
   try {
     const response = await apiGet<User>('/auth/me');
-    return response;
+    return response.data;
   } catch (error: unknown) {
     throw handleApiError(error, 'Unknown error getting user data');
   }

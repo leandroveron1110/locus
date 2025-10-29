@@ -8,8 +8,9 @@ import {
   BusinessWeeklySchedule,
   Review,
 } from "../types/business";
-import { apiDelete, apiGet, apiPost, ApiResult } from "@/lib/apiFetch";
+import { apiDelete, apiGet, apiPost } from "@/lib/apiFetch";
 import { handleApiError } from "@/features/common/utils/handleApiError";
+import { ApiResult } from "@/types/api";
 
 const baseUrlBusiness = "/business/";
 
@@ -21,7 +22,7 @@ export const fetchBusinessesByID = async (
 ): Promise<ApiResult<Business>> => {
   try {
     const res = await apiGet<Business>(`${baseUrlBusiness}${businessId}`);
-    return res;
+    return res.data;;
   } catch (error: unknown) {
     throw handleApiError(error, "Error al obtener la información del negocio");
   }
@@ -70,7 +71,7 @@ export const fetchFollowBusinessAddUser = async ({
     const res = await apiPost<BusinessFollow>(
       `/follow/${userId}/${businessId}`
     );
-    return res;
+    return res.data;;
   } catch (error: unknown) {
     throw handleApiError(
       error,
@@ -88,12 +89,12 @@ export const fetchFollowers = async (
       const res = await apiGet<BusinessFollow>(
         `/follow/business/follow/${businessId}`
       );
-      return res;
+      return res.data;;
     } else {
       const res = await apiGet<BusinessFollow>(
         `/follow/business/${businessId}/${userId}`
       );
-      return res;
+      return res.data;;
     }
   } catch (error: unknown) {
     throw handleApiError(error, "Error al obtener los seguidores del negocio");
@@ -108,7 +109,7 @@ export const fetchBusinessTags = async (
     const res = await apiGet<BusinessTag[]>(
       `${baseUrlBusiness}${businessId}/tags/tags`
     );
-    return res;
+    return res.data;;
   } catch (error: unknown) {
     throw handleApiError(error, "Error al obtener los tags del negocio");
   }
@@ -122,7 +123,7 @@ export const fetchBusinessCategories = async (
     const res = await apiGet<BusinessCategory[]>(
       `/business/${businessId}/categories/category`
     );
-    return res;
+    return res.data;;
   } catch (error: unknown) {
     throw handleApiError(error, "Error al obtener las categorías del negocio");
   }
@@ -138,7 +139,7 @@ export const fetchBusinessSchedule = async (
     const res = await apiGet<BusinessWeeklySchedule>(
       `/weekly-schedules/by-business/${businessId}`
     );
-    return res;
+    return res.data;;
   } catch (error: unknown) {
     throw handleApiError(error, "Error al obtener los horarios del negocio");
   }
@@ -151,7 +152,7 @@ export async function fetchWeeklySchedule(
     const data = await apiGet<Record<string, string[]>>(
       `/weekly-schedules/${businessId}`
     );
-    return data;
+    return data.data;
   } catch (error: unknown) {
     throw handleApiError(
       error,
@@ -170,7 +171,7 @@ export const fetchBusinessGaleryBasic = async (
     const res = await apiGet<BusinessGalery[]>(
       `/business/${businessId}/gallery`
     );
-    return res;
+    return res.data;;
   } catch (error: unknown) {
     throw handleApiError(error, "Error al obtener la galería del negocio");
   }
@@ -181,7 +182,7 @@ export const fetchSummary = async (
 ): Promise<ApiResult<BusinessRating>> => {
   try {
     const res = await apiGet<BusinessRating>(`/ratings/summary/${businessId}`);
-    return res;
+    return res.data;;
   } catch (error: unknown) {
     throw handleApiError(
       error,
@@ -203,7 +204,7 @@ export const fetchSummarySudmi = async (
       value,
       comment,
     });
-    return res;
+    return res.data;;
   } catch (error: unknown) {
     throw handleApiError(error, "Error al enviar la calificación del negocio");
   }
@@ -214,7 +215,7 @@ export const fetchCommentsByBusinessId = async (
 ): Promise<ApiResult<Review[]>> => {
   try {
     const res = await apiGet<Review[]>(`/ratings/comments/${businessId}`);
-    return res;
+    return res.data;;
   } catch (error: unknown) {
     throw handleApiError(error, "Error al obtener los comentarios del negocio");
   }

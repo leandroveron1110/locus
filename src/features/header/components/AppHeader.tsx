@@ -1,151 +1,192 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import {
-  ShoppingBag,
   Store,
+  ShoppingBag,
   Menu as MenuIconLucide,
   X,
-  LucideProps,
   User,
 } from "lucide-react";
-import React, { useState } from "react";
-import svg from "../../../../public/favicon.svg";
+import svg from "../../../../public/locus_isotipo.svg";
 import { useAuthStore } from "@/features/auth/store/authStore";
-
-interface ILinks {
-  href: (businessId: string) => string;
-  label: string;
-  icon: React.ForwardRefExoticComponent<
-    Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
-  >;
-}
+import { NotificationsBell } from "./Notification/NotificationsBell"; // Asume que NotificationsBell.tsx está actualizado
+import { useUserNotificationsSocket } from "@/lib/hooks/useUserNotificationsSocket";
+import { useFetchUserNotifications } from "../hooks/useFetchUserNotifications";
 
 export default function AppHeader() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
+  // Conexión del socket solo si hay un usuario
+  useUserNotificationsSocket(user?.id);
+  useFetchUserNotifications(user?.id)
 
-  // Solo "Negocios" siempre está, "Órdenes" solo si hay user
-  const links: ILinks[] = [
-    { href: () => `/`, label: "Negocios", icon: Store },
-    ...(user
-      ? [{ href: () => `/orders`, label: "Órdenes", icon: ShoppingBag }]
-      : []),
-  ];
-
-  const checkIsActive = (linkHref: string) => {
-    if (linkHref === "/") {
-      return pathname === "/";
-    }
-    return pathname.startsWith(linkHref);
-  };
-
+  // Asegúrate de que esta ruta sea correcta
   const logo = svg.src;
+
+  const checkIsActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
     <header className="bg-white shadow sticky top-0 z-30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between relative">
-        {/* Izquierda: Menú móvil + logo */}
-        <div className="flex items-center gap-2 md:gap-4">
+        {/* 🔹 IZQUIERDA: Logo */}
+        <Link href="/" className="flex-shrink-0 flex items-center gap-2">
+          <img src={logo} alt="Locus Logo" className="h-8 w-auto" />
+        </Link>
+
+        {/* 🔸 CENTRO: Navegación principal (solo escritorio) */}
+        <nav className="hidden md:flex gap-8">
+          <Link
+            href="/"
+            className={`flex flex-col items-center text-sm font-medium ${
+              checkIsActive("/")
+                ? "text-blue-600"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            <Store size={22} />
+            <span>Negocios</span>
+          </Link>
+
+          {user && (
+            <Link
+              href="/orders"
+              className={`flex flex-col items-center text-sm font-medium ${
+                checkIsActive("/orders")
+                  ? "text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <ShoppingBag size={22} />
+              <span>Órdenes</span>
+            </Link>
+          )}
+        </nav>
+
+        {/* 🔹 DERECHA: Componentes dinámicos */}
+        <div className="flex items-center gap-3">
+          {user && (
+            // Uso en ESCRITORIO: Permite el dropdown (visible solo en md:arriba)
+            <div className="hidden md:block">
+              <NotificationsBell userId={user.id || "default"} isMobileView={false} />
+            </div>
+          )}
+
+          {/* Perfil (solo escritorio) */}
+          {user ? (
+            <Link
+              href="/profile"
+              className="hidden md:flex items-center gap-2 text-gray-700 hover:text-gray-900"
+            >
+              <User size={26} />
+              <span className="font-medium text-sm">Perfil</span>
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="hidden md:flex items-center gap-2 text-gray-700 hover:text-gray-900"
+            >
+              <User size={26} />
+              <span className="font-medium text-sm">Iniciar sesión</span>
+            </Link>
+          )}
+
+          {/* 🍔 Menú móvil toggle */}
           <button
-            className="md:hidden p-2 rounded-md hover:bg-gray-100 transition"
+            className="md:hidden p-2 rounded-md hover:bg-gray-100 transition ml-2"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Abrir menú móvil"
           >
             {mobileMenuOpen ? <X size={28} /> : <MenuIconLucide size={28} />}
           </button>
-
-          <Link href="/" className="flex-shrink-0">
-            <img src={logo} alt="Locus Logo" className="h-8 w-auto" />
-          </Link>
         </div>
-
-        {/* Navegación escritorio */}
-        <nav className="hidden md:flex flex-1 justify-center">
-          <ul className="flex gap-10">
-            {links.map((link) => {
-              const linkHref = link.href("");
-              const isActive = checkIsActive(linkHref);
-
-              return (
-                <li key={linkHref}>
-                  <Link
-                    href={linkHref}
-                    className={`flex flex-col items-center justify-center gap-1
-                      text-sm font-medium transition-colors duration-200 group
-                      ${
-                        isActive
-                          ? "text-blue-600"
-                          : "text-gray-500 hover:text-gray-700"
-                      }`}
-                  >
-                    <link.icon
-                      size={24}
-                      strokeWidth={isActive ? 2 : 1.5}
-                      className="transition-transform duration-200 group-hover:scale-110"
-                    />
-                    <span>{link.label}</span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-
-        {/* Perfil o login */}
-        {user ? (
-          <Link
-            href="/profile"
-            className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
-          >
-            <User size={28} />
-            <span className="hidden sm:block font-medium text-sm">Perfil</span>
-          </Link>
-        ) : (
-          <Link
-            href="/login"
-            className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
-          >
-            <User size={28} />
-            <span className="hidden sm:block font-medium text-sm">
-              Iniciar sesión
-            </span>
-          </Link>
-        )}
       </div>
 
-      {/* Menú móvil */}
+      {/* 📱 Menú móvil desplegable */}
       {mobileMenuOpen && (
         <div
-          className="md:hidden absolute top-full left-0 right-0 
-            bg-white shadow-lg border-t border-gray-200 
-            z-40 max-h-[80vh] overflow-y-auto"
+          className="md:hidden absolute top-full left-0 right-0 bg-white shadow-lg border-t border-gray-200 
+            z-40 max-h-[80vh] overflow-y-auto animate-fade-in"
         >
           <ul className="flex flex-col gap-4 p-4">
-            {links.map((link) => {
-              const linkHref = link.href("");
-              const isActive = checkIsActive(linkHref);
+            <li>
+              <Link
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-3 text-base font-medium ${
+                  checkIsActive("/")
+                    ? "text-blue-600"
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
+              >
+                <Store size={20} />
+                Negocios
+              </Link>
+            </li>
 
-              return (
-                <li key={linkHref}>
-                  <Link
-                    href={linkHref}
-                    className={`flex items-center gap-3 text-base font-medium
-                      ${
-                        isActive
-                          ? "text-blue-600"
-                          : "text-gray-600 hover:text-gray-800"
-                      }`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <link.icon size={20} />
-                    {link.label}
-                  </Link>
-                </li>
-              );
-            })}
+            {user && (
+              <li>
+                <Link
+                  href="/orders"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 text-base font-medium ${
+                    checkIsActive("/orders")
+                      ? "text-blue-600"
+                      : "text-gray-600 hover:text-gray-800"
+                  }`}
+                >
+                  <ShoppingBag size={20} />
+                  Órdenes
+                </Link>
+              </li>
+            )}
+
+            {/* 🔔 Notificaciones dentro del menú móvil */}
+            {user && (
+              <li>
+                <div 
+                  className="flex items-center gap-3"
+                  // Nota: Aquí envolvemos NotificationsBell y el texto en un div
+                  // ya que NotificationsBell es un componente de botón con su propia lógica.
+                  // Su click ahora navegará (gracias a isMobileView={true}).
+                >
+                  <NotificationsBell
+                    userId={user.id || "default"}
+                    isMobileView={true} // <-- Marcamos como vista móvil para desactivar el dropdown
+                  />
+                  <span className="text-base font-medium text-gray-600">
+                    Notificaciones
+                  </span>
+                </div>
+              </li>
+            )}
+
+            {/* 👤 Perfil/Login */}
+            <li className="pt-2 border-t border-gray-200">
+              {user ? (
+                <Link
+                  href="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 text-base font-medium text-gray-600 hover:text-gray-800"
+                >
+                  <User size={20} />
+                  Perfil
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 text-base font-medium text-gray-600 hover:text-gray-800"
+                >
+                  <User size={20} />
+                  Iniciar sesión
+                </Link>
+              )}
+            </li>
           </ul>
         </div>
       )}

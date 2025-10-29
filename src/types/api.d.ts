@@ -30,8 +30,11 @@ export interface ApiError {
   path: string;
 }
 
+export type ApiResult<T> = T | null;
+
+
 export interface ApiResponse<T = unknown> {
-  data: T | null;
+  data: ApiResult<T>;
   error: ApiError| null;
   success: boolean;
   timestamp: string;

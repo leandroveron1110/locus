@@ -1,27 +1,59 @@
 import { Order, PaymentMethodType, PaymentStatus } from "../types/order";
 import { BusinessPaymentMethod } from "../types/business-payment-methods";
 import { handleApiError } from "@/features/common/utils/handleApiError";
-import { apiGet, apiPatch, apiPost, ApiResult } from "@/lib/apiFetch";
+import { apiGet, apiPatch, apiPost } from "@/lib/apiFetch";
+import { ApiResult } from "@/types/api";
 
-// ===========================
-// 🟩 Obtener órdenes de un usuario
-// ===========================
-export async function getUserOrders(userId: string): Promise<ApiResult<Order[]>> {
+
+export async function getUserOrders(
+  userId: string
+): Promise<ApiResult<Order[]>> {
   try {
     const res = await apiGet<Order[]>(`/orders/user/${userId}`);
-    return res;
+    return res.data;
   } catch (error: unknown) {
     throw handleApiError(error, "Error al buscar las órdenes del usuario");
   }
 }
 
-// ===========================
-// 🟩 Crear una orden
-// ===========================
-export async function createOrder(payload: Partial<Order>): Promise<ApiResult<Order>> {
+export interface SyncResponse {
+  newOrUpdatedOrders: Order[];
+  latestTimestamp: string;
+}
+export const syncOrdersByUserId = async (
+  userId: string,
+  lastSyncTime?: string
+) => {
+  try {
+    const res = await apiPost<SyncResponse>(`/orders/sync/user`, {
+      id: userId,
+      lastSyncTime,
+    });
+
+    if (!res.success || !res.data) {
+      throw handleApiError(
+        res.error,
+        "Error al obtener las  sync ordenes."
+      );
+    }
+    return {
+      newOrUpdatedOrders: res.data.newOrUpdatedOrders,
+      latestTimestamp: res.timestamp,
+    };
+  } catch (error: unknown) {
+    throw handleApiError(
+      error,
+      "Error al obtener las  sync ordenes del negocio."
+    );
+  }
+};
+
+export async function createOrder(
+  payload: Partial<Order>
+): Promise<ApiResult<Order>> {
   try {
     const res = await apiPost<Order>(`/orders`, payload);
-    return res;
+    return res.data;
   } catch (error: unknown) {
     throw handleApiError(error, "Error al crear la orden");
   }
@@ -42,17 +74,14 @@ export async function fetchUpdatePayment(
   try {
     const res = await apiPatch<Order>(
       `/orders/order/payment/status/${orderId}`,
-      {status: payload}
+      { status: payload }
     );
-    return res;
+    return res.data;
   } catch (error: unknown) {
     throw handleApiError(error, "Error al actualizar el pago de la orden");
   }
 }
 
-// ===========================
-// 🟩 Obtener métodos de pago de un negocio
-// ===========================
 export async function fetchBusinessPaymentMethodByBusinessID(
   businessId: string
 ): Promise<ApiResult<BusinessPaymentMethod[]>> {
@@ -60,8 +89,11 @@ export async function fetchBusinessPaymentMethodByBusinessID(
     const res = await apiGet<BusinessPaymentMethod[]>(
       `/business-payment-methods/business/${businessId}`
     );
-    return res;
+    return res.data;
   } catch (error: unknown) {
-    throw handleApiError(error, "Error al obtener los métodos de pago del negocio");
+    throw handleApiError(
+      error,
+      "Error al obtener los métodos de pago del negocio"
+    );
   }
 }

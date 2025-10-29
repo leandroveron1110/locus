@@ -12,6 +12,7 @@ import SearchBusinessMapSkeleton from "./skeleton/SearchBusinessMapSkeleton";
 import { useAlert } from "@/features/common/ui/Alert/Alert";
 import { getDisplayErrorMessage } from "@/lib/uiErrors";
 
+// 💡 Imports dinámicos se mantienen igual
 const DynamicSearchBar = withSkeleton(
   () => import("@/features/search/components/SearchBar"),
   SearchBarSkeleton
@@ -48,6 +49,7 @@ export default function SearchPage() {
     setParams({ query: values.q });
   };
 
+  // 💡 Usamos el optional chaining para mayor seguridad, aunque el hook de React Query puede tiparlo
   const hasResults = data ? data?.data?.length > 0 : false;
 
   const renderContent = () => {
@@ -60,6 +62,7 @@ export default function SearchPage() {
     }
 
     if (hasResults) {
+      // 💡 Se mantiene la aserción '!' ya que `hasResults` garantiza la existencia de `data.data`
       return viewMode === "list" ? (
         <DynamicSearchBusinessList businesses={data!.data} />
       ) : (
@@ -76,44 +79,52 @@ export default function SearchPage() {
 
   return (
     <div className="mx-auto max-w-7xl">
-      <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6">
-        Encontrá lo que buscás
-      </h1>
+      {/* 1. Encabezado compacto: título más pequeño y con margen reducido.
+        2. El `px-2 sm:px-4` ahora envuelve solo el contenido que lo necesita.
+      */}
+      <div className="pt-2 pb-4 px-2 sm:px-4"> 
+        <h1 className="text-xl sm:text-2xl font-bold mb-4">
+          📍 Explorá los negocios de tu ciudad
+        </h1>
 
-      <div className="flex flex-row items-center gap-3 mb-4 w-full px-2 sm:px-4">
-        {/* Buscador: ocupa todo el espacio disponible */}
-        <div className="flex-grow">
-          <DynamicSearchBar onSearch={handleSearch} />
-        </div>
-
-        {/* Botones de vista */}
-        {(hasResults || isLoading) && (
-          <div className="flex gap-2 p-1 rounded-full bg-gray-100 flex-shrink-0">
-            <button
-              onClick={() => setViewMode("map")}
-              className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-colors ${
-                viewMode === "map"
-                  ? "bg-white text-gray-900 shadow"
-                  : "text-gray-500 hover:bg-gray-200"
-              }`}
-            >
-              <MapPin size={20} />
-            </button>
-            <button
-              onClick={() => setViewMode("list")}
-              className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-colors ${
-                viewMode === "list"
-                  ? "bg-white text-gray-900 shadow"
-                  : "text-gray-500 hover:bg-gray-200"
-              }`}
-            >
-              <List size={20} />
-            </button>
+        <div className="flex flex-row items-center gap-2 w-full"> 
+          {/* Buscador: ocupa todo el espacio disponible */}
+          <div className="flex-grow">
+            <DynamicSearchBar onSearch={handleSearch} />
           </div>
-        )}
-      </div>
 
-      <div className="mt-1">{renderContent()}</div>
+          {/* Botones de vista: se ajusta el tamaño (w-9 h-9) y el espaciado (gap-1) para ser más compacto */}
+          {(hasResults || isLoading) && (
+            <div className="flex gap-1 p-1 rounded-full bg-gray-100 flex-shrink-0">
+              {/* Botón Mapa */}
+              <button
+                onClick={() => setViewMode("map")}
+                className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors ${
+                  viewMode === "map"
+                    ? "bg-white text-gray-900 shadow"
+                    : "text-gray-500 hover:bg-gray-200"
+                }`}
+              >
+                <MapPin size={18} /> {/* Ícono más pequeño */}
+              </button>
+              {/* Botón Lista */}
+              <button
+                onClick={() => setViewMode("list")}
+                className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors ${
+                  viewMode === "list"
+                    ? "bg-white text-gray-900 shadow"
+                    : "text-gray-500 hover:bg-gray-200"
+                }`}
+              >
+                <List size={18} /> {/* Ícono más pequeño */}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* 💡 Contenido principal */}
+      <div className="mt-1 px-2 sm:px-4">{renderContent()}</div>
     </div>
   );
 }

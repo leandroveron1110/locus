@@ -3,7 +3,8 @@ import { CreateOrderFull } from "../types/order";
 import { Address, AddressCreateDto } from "../types/address";
 import { CompanyDelivery, PriceZone } from "../types/zone";
 import { handleApiError } from "@/features/common/utils/handleApiError";
-import { apiGet, apiPost, ApiResult } from "@/lib/apiFetch";
+import { apiGet, apiPost } from "@/lib/apiFetch";
+import { ApiResult } from "@/types/api";
 
 // 🟢 Menús y Productos
 export const fetchCatalogByBusinessID = async (
@@ -11,7 +12,7 @@ export const fetchCatalogByBusinessID = async (
 ): Promise<ApiResult<Menu[]>> => {
   try {
     const data = await apiGet<Menu[]>(`/menus/business/${businessId}`);
-    return data;
+    return data.data;
   } catch (error: unknown) {
     throw handleApiError(
       error,
@@ -25,7 +26,7 @@ export const fetchMenuProductDetailByProductId = async (
 ): Promise<ApiResult<Product>> => {
   try {
     const data = await apiGet<Product>(`/menu-products/product/${productId}`);
-    return data;
+    return data.data;;
   } catch (error: unknown) {
     throw handleApiError(
       error,
@@ -52,7 +53,7 @@ export const fetchCreateAddress = async (
 ): Promise<ApiResult<AddressCreateDto>> => {
   try {
     const data = await apiPost<AddressCreateDto>("/address", payload);
-    return data;
+    return data.data;;
   } catch (error: unknown) {
     throw handleApiError(
       error,
@@ -66,7 +67,7 @@ export const fetchUserAddresses = async (
 ): Promise<ApiResult<AddressCreateDto[]>> => {
   try {
     const data = await apiGet<AddressCreateDto[]>(`/address/user/${userId}`);
-    return data;
+    return data.data;;
   } catch (error: unknown) {
     throw handleApiError(
       error,
@@ -86,7 +87,7 @@ export const fetchCalculatePriceZone = async (body: {
       `/delivery-zones/calculate-price`,
       body
     );
-    return data;
+    return data.data;;
   } catch (error: unknown) {
     throw handleApiError(
       error,
@@ -100,7 +101,7 @@ export const fetchCompanyDelivery = async (): Promise<
 > => {
   try {
     const data = await apiGet<CompanyDelivery[]>(`/delivery/companies`);
-    return data;
+    return data.data;;
   } catch (error: unknown) {
     throw handleApiError(
       error,
