@@ -1,8 +1,6 @@
 // src/components/CatalogMenu.tsx
 import React from "react";
 import { Menu } from "../types/catlog";
-import Title from "@/features/common/ui/Title";
-// Importar el nuevo componente envoltorio
 import CatalogSectionWrapper from "./CatalogSectionWrapper"; 
 
 interface Props {

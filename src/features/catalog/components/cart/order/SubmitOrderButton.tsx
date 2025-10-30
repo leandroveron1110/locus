@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { useCartStore } from "@/features/catalog/stores/useCartStore";
 import { useCreateOrder } from "@/features/catalog/hooks/useCreateOrder";
@@ -18,14 +17,13 @@ interface Props {
   orderPayload: CreateOrderFull;
 }
 
-// 🔹 Usamos el mismo tipo que CreateOrderOptionGroup para evitar duplicación
 type MappedOptionGroup = CreateOrderOptionGroup;
 
 export default function SubmitOrderButton({ orderPayload }: Props) {
   const [error, setError] = useState("");
   const { items, getTotal, clearCart } = useCartStore();
   const createOrderMutation = useCreateOrder();
-  const router = useRouter();
+  // const router = useRouter();
   const user = useAuthStore((state) => state.user);
 
   const { addAlert } = useAlert();

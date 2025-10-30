@@ -56,7 +56,6 @@ export default function SearchPage() {
   const { syncSearch } = useFetchSearch(currentSearchParams);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
 
   // 🔄 Actualiza los parámetros en la URL
   const updateUrlParams = useCallback(
@@ -88,10 +87,8 @@ export default function SearchPage() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        setError(null);
         await syncSearch();
       } catch (err) {
-        setError(err);
         addAlert({
           message: getDisplayErrorMessage(err),
           type: "error",
@@ -125,14 +122,6 @@ export default function SearchPage() {
       );
     }
 
-    if (error) {
-      return (
-        <p className="mt-6 text-center text-red-500 text-lg">
-          Ocurrió un error al buscar: {getDisplayErrorMessage(error)}
-        </p>
-      );
-    }
-
     if (hasResults) {
       return viewMode === "list" ? (
         <DynamicSearchBusinessList businesses={businesses} />
@@ -143,7 +132,6 @@ export default function SearchPage() {
 
     if (
       !isLoading &&
-      !error &&
       cachedParams &&
       (cachedParams.query || cachedParams.city)
     ) {
