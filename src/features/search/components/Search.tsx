@@ -43,13 +43,10 @@ export default function SearchPage() {
   const [currentSearchParams, setCurrentSearchParams] =
     useState<ISearchBusinessParams>(() => {
       return {
-        query: cachedParams?.query || searchParams.get("query") || "",
-        city:
-          cachedParams?.city ||
-          searchParams.get("city") ||
-          "Concepcion del Uruguay",
-        limit: cachedParams?.limit || Number(searchParams.get("limit")) || 20,
-        page: cachedParams?.page || Number(searchParams.get("page")) || 1,
+        query: cachedParams?.query || "", // Solo toma de la caché
+        city: cachedParams?.city || "Concepcion del Uruguay", // Solo toma de la caché o default
+        limit: cachedParams?.limit || 20,
+        page: cachedParams?.page || 1,
       };
     });
 
