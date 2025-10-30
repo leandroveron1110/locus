@@ -21,9 +21,8 @@ interface Props {
 
 export default function SearchBar({ onSearch }: Props) {
   const { getParams } = useSearchCacheStore();
-  const searchParams = useSearchParams();
 
-  const defaultQuery = searchParams.get("query") || getParams()?.query || "";
+  const defaultQuery =  getParams()?.query || "";
 
   const {
     register,
@@ -37,11 +36,11 @@ export default function SearchBar({ onSearch }: Props) {
 
   // 🔄 Si cambia el parámetro en la URL (por back/forward), actualizamos el input
   useEffect(() => {
-    const queryFromUrl = searchParams.get("query");
+    const queryFromUrl = getParams()?.query
     if (queryFromUrl) {
       setValue("q", queryFromUrl);
     }
-  }, [searchParams, setValue]);
+  }, [getParams, setValue]);
 
   return (
     <form onSubmit={handleSubmit(onSearch)} className="relative w-full">

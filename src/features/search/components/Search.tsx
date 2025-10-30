@@ -30,10 +30,11 @@ const DynamicSearchBusinessMap = withSkeleton(
   () => import("./components/SearchBusinessMap"),
   SearchBusinessMapSkeleton
 );
-
-export default function SearchPage() {
+interface SearchPageProps {
+  initialParams: Partial<ISearchBusinessParams>;
+}
+export default function SearchPage({ initialParams }: SearchPageProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { addAlert } = useAlert();
 
   const { getParams, getData } = useSearchCacheStore();
@@ -43,10 +44,10 @@ export default function SearchPage() {
   const [currentSearchParams, setCurrentSearchParams] =
     useState<ISearchBusinessParams>(() => {
       return {
-        query: cachedParams?.query || "", // Solo toma de la caché
-        city: cachedParams?.city || "Concepcion del Uruguay", // Solo toma de la caché o default
-        limit: cachedParams?.limit || 20,
-        page: cachedParams?.page || 1,
+        query: cachedParams?.query || initialParams.query || "",
+        city: cachedParams?.city || initialParams.city || "Concepcion del Uruguay",
+        limit: cachedParams?.limit || initialParams.limit || 20,
+        page: cachedParams?.page || initialParams.page || 1,
       };
     });
 
@@ -99,14 +100,6 @@ export default function SearchPage() {
     fetchData();
   }, [currentSearchParams, syncSearch, addAlert]);
 
-  useEffect(() => {
-    const query = searchParams.get("query") || "";
-    const city = searchParams.get("city") || "Concepcion del Uruguay";
-    const limit = Number(searchParams.get("limit")) || 20;
-    const page = Number(searchParams.get("page")) || 1;
-
-    setCurrentSearchParams({ query, city, limit, page });
-  }, [searchParams]);
 
   const businesses = cachedResult?.data || [];
   const hasResults = businesses.length > 0;
