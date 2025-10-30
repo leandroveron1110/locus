@@ -1,5 +1,5 @@
-// src/components/PriceSummary.tsx
 import { formatPrice } from "@/features/common/utils/formatPrice";
+import { ShoppingCart } from "lucide-react";
 import React from "react";
 
 interface Props {
@@ -7,29 +7,34 @@ interface Props {
   handleAddToCart: () => void;
 }
 
-export default function PriceSummary({
-  total,
-  handleAddToCart,
-}: Props) {
-
+export default function PriceSummary({ total, handleAddToCart }: Props) {
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-4 shadow-sm">
-      {/* Total */}
-      <div className="flex justify-between items-center text-base md:text-lg font-semibold text-gray-900">
-        <span>Total</span>
-        <span>
-          {formatPrice(total)}
-        </span>
-      </div>
+    <div className="w-full to-gray- overflow-hidden transition-all duration-300 hover:shadow-lg">
 
-      {/* Botón mejorado */}
-      <button
-        onClick={handleAddToCart}
-        aria-label="Agregar producto al carrito"
-        className="w-full py-3 rounded-xl bg-blue-600 text-white font-semibold text-sm md:text-base hover:bg-blue-700 active:bg-blue-800 transition-all duration-200 ease-in-out transform hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-      >
-        Agregar al carrito
-      </button>
+      {/* Contenido */}
+      <div className="flex flex-col gap-4">
+        {/* Total */}
+        <div className="flex items-center justify-between">
+          <span className="text-gray-600 text-base md:text-lg font-medium">
+            Total
+          </span>
+          <span className="font-semibold tracking-tight">
+            {formatPrice(total)}
+          </span>
+        </div>
+
+        {/* Botón */}
+        <button
+          onClick={handleAddToCart}
+          aria-label="Agregar producto al carrito"
+          className="group w-full mt-2 flex items-center justify-center gap-2 py-3 rounded-xl 
+          bg-blue-600 text-white font-semibold text-base transition-all duration-200 
+          hover:bg-blue-700 active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-blue-300"
+        >
+          <ShoppingCart size={20} className="transition-transform group-hover:scale-110" />
+          <span>Agregar al carrito</span>
+        </button>
+      </div>
     </div>
   );
 }

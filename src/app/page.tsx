@@ -7,8 +7,7 @@ export default function Home() {
     <>
       <AppHeader />
       <div className="bg-white min-h-screen bg-gray-100">
-            <SearchPage />
-
+        <SearchPage />
       </div>
     </>
   );

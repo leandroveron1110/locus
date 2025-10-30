@@ -1,9 +1,7 @@
-// src/features/search/components/SearchPage.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { SearchFormValues } from "@/features/search/components/SearchBar";
-import { useSearchBusinesses } from "@/features/search/hooks/useSearchBusinesses";
 import { List, MapPin } from "lucide-react";
 import { withSkeleton } from "@/features/common/utils/withSkeleton";
 import SearchBarSkeleton from "./skeleton/SearchBarSkeleton";
@@ -11,8 +9,12 @@ import SearchBusinessListSkeleton from "./skeleton/SearchBusinessListSkeleton";
 import SearchBusinessMapSkeleton from "./skeleton/SearchBusinessMapSkeleton";
 import { useAlert } from "@/features/common/ui/Alert/Alert";
 import { getDisplayErrorMessage } from "@/lib/uiErrors";
+import { ISearchBusinessParams } from "@/features/search/types/search";
+import { useFetchSearch } from "@/lib/hooks/useFetchSearch";
+import { useSearchCacheStore } from "@/lib/hooks/useSearchCacheStore";
+import { useRouter, useSearchParams } from "next/navigation";
 
-// 💡 Imports dinámicos se mantienen igual
+// 🧩 Carga dinámica con Skeletons
 const DynamicSearchBar = withSkeleton(
   () => import("@/features/search/components/SearchBar"),
   SearchBarSkeleton
@@ -29,28 +31,90 @@ const DynamicSearchBusinessMap = withSkeleton(
 );
 
 export default function SearchPage() {
-  const [params, setParams] = useState<{ query?: string }>({});
-  const [viewMode, setViewMode] = useState<"list" | "map">("list");
-
-  const { data, isLoading, error, isError } = useSearchBusinesses(params);
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { addAlert } = useAlert();
 
-  // Notificación de error por toast
-  useEffect(() => {
-    if (isError && error) {
-      addAlert({
-        message: getDisplayErrorMessage(error),
-        type: "error",
-      });
-    }
-  }, [isError, error, addAlert]);
+  const { getParams, getData } = useSearchCacheStore();
+  const cachedParams = getParams();
+  const cachedResult = getData();
 
+  const [currentSearchParams, setCurrentSearchParams] =
+    useState<ISearchBusinessParams>(() => {
+      return {
+        query: cachedParams?.query || searchParams.get("query") || "",
+        city:
+          cachedParams?.city ||
+          searchParams.get("city") ||
+          "Concepcion del Uruguay",
+        limit: cachedParams?.limit || Number(searchParams.get("limit")) || 20,
+        page: cachedParams?.page || Number(searchParams.get("page")) || 1,
+      };
+    });
+
+  const [viewMode, setViewMode] = useState<"list" | "map">("list");
+  const { syncSearch } = useFetchSearch(currentSearchParams);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<any>(null);
+
+  // 🔄 Actualiza los parámetros en la URL
+  const updateUrlParams = useCallback(
+    (params: ISearchBusinessParams) => {
+      const queryParams = new URLSearchParams();
+
+      if (params.query) queryParams.set("query", params.query);
+      if (params.city) queryParams.set("city", params.city);
+      if (params.page) queryParams.set("page", String(params.page));
+      if (params.limit) queryParams.set("limit", String(params.limit));
+
+      router.replace(`?${queryParams.toString()}`);
+    },
+    [router]
+  );
+
+  // 🔍 Cuando el usuario realiza una búsqueda
   const handleSearch = (values: SearchFormValues) => {
-    setParams({ query: values.q });
+    const newParams = {
+      ...currentSearchParams,
+      query: values.q,
+      page: 1,
+    };
+    setCurrentSearchParams(newParams);
+    updateUrlParams(newParams);
   };
 
-  // 💡 Usamos el optional chaining para mayor seguridad, aunque el hook de React Query puede tiparlo
-  const hasResults = data ? data?.data?.length > 0 : false;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        await syncSearch();
+      } catch (err) {
+        setError(err);
+        addAlert({
+          message: getDisplayErrorMessage(err),
+          type: "error",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [currentSearchParams, syncSearch, addAlert]);
+
+  useEffect(() => {
+    const query = searchParams.get("query") || "";
+    const city = searchParams.get("city") || "Concepcion del Uruguay";
+    const limit = Number(searchParams.get("limit")) || 20;
+    const page = Number(searchParams.get("page")) || 1;
+
+    setCurrentSearchParams({ query, city, limit, page });
+  }, [searchParams]);
+
+  const businesses = cachedResult?.data || [];
+  const hasResults = businesses.length > 0;
 
   const renderContent = () => {
     if (isLoading) {
@@ -61,70 +125,91 @@ export default function SearchPage() {
       );
     }
 
+    if (error) {
+      return (
+        <p className="mt-6 text-center text-red-500 text-lg">
+          Ocurrió un error al buscar: {getDisplayErrorMessage(error)}
+        </p>
+      );
+    }
+
     if (hasResults) {
-      // 💡 Se mantiene la aserción '!' ya que `hasResults` garantiza la existencia de `data.data`
       return viewMode === "list" ? (
-        <DynamicSearchBusinessList businesses={data!.data} />
+        <DynamicSearchBusinessList businesses={businesses} />
       ) : (
-        <DynamicSearchBusinessMap businesses={data!.data} />
+        <DynamicSearchBusinessMap businesses={businesses} />
+      );
+    }
+
+    if (
+      !isLoading &&
+      !error &&
+      cachedParams &&
+      (cachedParams.query || cachedParams.city)
+    ) {
+      return (
+        <p className="mt-6 text-center text-gray-500 text-lg">
+          No se encontraron resultados para los filtros aplicados.
+        </p>
       );
     }
 
     return (
       <p className="mt-6 text-center text-gray-500 text-lg">
-        No se encontraron resultados
+        ¡Comienza tu búsqueda!
       </p>
     );
   };
 
   return (
     <div className="mx-auto max-w-7xl">
-      {/* 1. Encabezado compacto: título más pequeño y con margen reducido.
-        2. El `px-2 sm:px-4` ahora envuelve solo el contenido que lo necesita.
-      */}
-      <div className="pt-2 pb-4 px-2 sm:px-4"> 
-        <h1 className="text-xl sm:text-2xl font-bold mb-4">
-          📍 Explorá los negocios de tu ciudad
-        </h1>
-
-        <div className="flex flex-row items-center gap-2 w-full"> 
-          {/* Buscador: ocupa todo el espacio disponible */}
-          <div className="flex-grow">
-            <DynamicSearchBar onSearch={handleSearch} />
-          </div>
-
-          {/* Botones de vista: se ajusta el tamaño (w-9 h-9) y el espaciado (gap-1) para ser más compacto */}
-          {(hasResults || isLoading) && (
-            <div className="flex gap-1 p-1 rounded-full bg-gray-100 flex-shrink-0">
-              {/* Botón Mapa */}
-              <button
-                onClick={() => setViewMode("map")}
-                className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors ${
-                  viewMode === "map"
-                    ? "bg-white text-gray-900 shadow"
-                    : "text-gray-500 hover:bg-gray-200"
-                }`}
-              >
-                <MapPin size={18} /> {/* Ícono más pequeño */}
-              </button>
-              {/* Botón Lista */}
-              <button
-                onClick={() => setViewMode("list")}
-                className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors ${
-                  viewMode === "list"
-                    ? "bg-white text-gray-900 shadow"
-                    : "text-gray-500 hover:bg-gray-200"
-                }`}
-              >
-                <List size={18} /> {/* Ícono más pequeño */}
-              </button>
-            </div>
-          )}
+      <div className="pt-6 pb-4 px-2 sm:px-4 text-center">
+        <div className="pt-4 pb-4">
+          <h1 className="text-xl sm:text-2xl font-bold mb-2 uppercase">
+            ¿Qué te tienta hoy?
+          </h1>
+          <p className="text-gray-600 mb-4 text-sm sm:text-base max-w-2xl mx-auto">
+            Encontrá todos los negocios y emprendimientos de tu ciudad en un
+            solo lugar
+          </p>
         </div>
       </div>
-      
-      {/* 💡 Contenido principal */}
-      <div className="mt-1 px-2 sm:px-4">{renderContent()}</div>
+
+      {/* 🔍 Buscador + modos de vista */}
+      <div className="flex flex-row items-center gap-2 px-2 sm:px-4">
+        <div className="flex-grow">
+          <DynamicSearchBar onSearch={handleSearch} />
+        </div>
+
+        {(hasResults || isLoading) && (
+          <div className="flex gap-1 p-1 rounded-full bg-gray-100 flex-shrink-0">
+            <button
+              onClick={() => setViewMode("map")}
+              className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors ${
+                viewMode === "map"
+                  ? "bg-white text-gray-900 shadow"
+                  : "text-gray-500 hover:bg-gray-200"
+              }`}
+            >
+              <MapPin size={18} />
+            </button>
+
+            <button
+              onClick={() => setViewMode("list")}
+              className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors ${
+                viewMode === "list"
+                  ? "bg-white text-gray-900 shadow"
+                  : "text-gray-500 hover:bg-gray-200"
+              }`}
+            >
+              <List size={18} />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 📍 Contenido principal */}
+      <div className="mt-3 px-2 sm:px-4">{renderContent()}</div>
     </div>
   );
 }

@@ -1,9 +1,8 @@
 // src/features/business/hooks/useBusinessProfile.ts
 import { useQuery } from "@tanstack/react-query";
 import { fetchBusinessID } from "../api/business-catalog-api";
-import { ApiResult } from "@/lib/apiFetch";
 import { Business } from "../types/business";
-import { ApiError } from "@/types/api";
+import { ApiError, ApiResult } from "@/types/api";
 
 export const useBusinessProfile = (businessId: string) => {
 

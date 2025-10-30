@@ -21,7 +21,6 @@ export default function CatalogSectionWrapper({ section, pageSize }: Props) {
       <CatalogSection
         section={section}
         pageSize={pageSize}
-        // Pasamos isIntersecting como prop para indicar que debe cargarse
         autoLoad={isIntersecting} 
       />
     </div>

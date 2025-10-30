@@ -1,4 +1,3 @@
-// src/features/catalog/components/Catalog.tsx
 "use client";
 
 import React, { useMemo, useEffect, useState } from "react";
@@ -31,10 +30,20 @@ export default function Catalog({ businessId, business }: Props) {
 
   const user = useAuthStore((state) => state.user);
   const cartItems = useCartStore((state) => state.items);
+  const clearCartItems = useCartStore((state) => state.clearCart);
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   const { addAlert } = useAlert();
 
+  // ✅ Limpiar carrito en la primera carga
+  useEffect(() => {
+    clearCartItems();
+    // opcional: notificar al usuario
+    // addAlert({ message: "El carrito se ha vaciado al ingresar al catálogo", type: "info" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [businessId]); // limpiar si cambia de negocio
+
+  // Manejo de errores al cargar catálogo
   useEffect(() => {
     if (isError) {
       addAlert({
@@ -44,6 +53,7 @@ export default function Catalog({ businessId, business }: Props) {
     }
   }, [isError, error, addAlert]);
 
+  // Normalizar datos
   const normalizedData = useMemo(() => {
     if (!data) return [];
     return data.map((menu) => ({
@@ -71,7 +81,6 @@ export default function Catalog({ businessId, business }: Props) {
   return (
     <div className="w-full min-h-screen pb-2 bg-white">
       <div className="max-w-7xl h-full flex flex-col">
-        {/* Contenedor de la lista */}
         {normalizedData.length > 0 ? (
           normalizedData.map((menu, index) => (
             <MemoizedCatalogMenu key={index} menu={menu} />

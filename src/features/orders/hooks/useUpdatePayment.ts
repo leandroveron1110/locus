@@ -2,8 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { PaymentMethodType, PaymentStatus } from "../types/order";
 import { fetchUpdatePayment } from "../api/order-api";
 import { Order } from "../types/order";
-import { ApiResult } from "@/lib/apiFetch";
-import { ApiError } from "@/types/api";
+import { ApiError, ApiResult } from "@/types/api";
 
 interface UpdatePaymentPayload {
   paymentType: PaymentMethodType;

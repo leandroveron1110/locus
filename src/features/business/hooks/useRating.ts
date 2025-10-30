@@ -5,9 +5,8 @@ import {
   fetchSummarySudmi,
 } from "../api/businessApi";
 import { useState } from "react";
-import { ApiResult } from "@/lib/apiFetch";
 import { BusinessRating, Review } from "../types/business";
-import { ApiError } from "@/types/api";
+import { ApiError, ApiResult } from "@/types/api";
 import { useAlert } from "@/features/common/ui/Alert/Alert";
 import { getDisplayErrorMessage } from "@/lib/uiErrors";
 

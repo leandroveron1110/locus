@@ -2,8 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchCatalogByBusinessID } from "../api/catalog-api";
 import { Menu } from "../types/catlog";
-import { ApiResult } from "@/lib/apiFetch";
-import { ApiError } from "@/types/api";
+import { ApiError, ApiResult } from "@/types/api";
 
 export const useCatalg = (businessId: string) => {
   return useQuery<ApiResult<Menu[]>, ApiError>({

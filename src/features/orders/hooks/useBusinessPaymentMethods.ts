@@ -1,9 +1,8 @@
 // src/features/business/hooks/useBusinessProfile.ts
 import { useQuery } from "@tanstack/react-query";
 import { fetchBusinessPaymentMethodByBusinessID } from "../api/order-api";
-import { ApiResult } from "@/lib/apiFetch";
 import { BusinessPaymentMethod } from "../types/business-payment-methods";
-import { ApiError } from "@/types/api";
+import { ApiError, ApiResult } from "@/types/api";
 
 export const useBusinessPaymentMethods = (businessId: string) => {
 

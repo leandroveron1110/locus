@@ -11,8 +11,6 @@ interface Props {
 export default function ProductHeader({ product }: Props) {
   const { imageUrl, name, rating, description } = product;
 
-  const roundedRating = Math.round(rating || 0);
-
   return (
     <div className="space-y-5">
       {imageUrl && (
@@ -33,19 +31,11 @@ export default function ProductHeader({ product }: Props) {
           {name}
         </h2>
 
-        <div className="flex items-center gap-1 mb-3">
-          {[...Array(5)].map((_, i) => (
-            <Star
-              key={i}
-              size={18}
-              className={
-                i < roundedRating
-                  ? "text-yellow-400 fill-yellow-400"
-                  : "text-gray-300"
-              }
-            />
-          ))}
-        </div>
+          <div className="flex items-center text-[11px] text-gray-700 font-medium">
+            {Number(rating || 0)}
+            <Star size={12} className="ml-1 text-yellow-400 fill-yellow-400" />
+          </div>
+
 
         {description && (
           <p className="text-sm md:text-base text-gray-600 leading-relaxed">

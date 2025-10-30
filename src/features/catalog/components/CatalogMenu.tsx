@@ -15,13 +15,12 @@ export default function CatalogMenu({ menu }: Props) {
 
   return (
     <>
-      <header className="mb-8">
-        <Title size="medium">{menu.name.toLocaleUpperCase()}</Title>
-      </header>
+      <div className="mb-8">
+        <p className="text-xl md:text-2xl font-semibold text-gray-900 leading-tight">{menu.name.toLocaleUpperCase()}</p>
+      </div>
 
-      <div className="space-y-12">
+      <div className="space-y-12 p-1">
         {sortedSections.map((section) => (
-          // ✅ Llamamos al componente envoltorio aquí
           <CatalogSectionWrapper
             key={section.id}
             section={section}

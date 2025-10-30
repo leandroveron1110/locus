@@ -2,8 +2,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { fetchSaveAddressUser } from "../api/location.api";
 import { CreateAddress, FullAddress } from "../types/address-data";
-import { ApiResult } from "@/lib/apiFetch";
-import { ApiError } from "@/types/api";
+import { ApiError, ApiResult } from "@/types/api";
 
 export const useSaveAddress = () => {
   return useMutation<ApiResult<FullAddress>, ApiError, CreateAddress>({

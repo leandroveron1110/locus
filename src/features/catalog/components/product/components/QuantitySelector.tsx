@@ -1,4 +1,3 @@
-// src/components/QuantitySelector.tsx
 import React from "react";
 import { Minus, Plus } from "lucide-react";
 
@@ -10,36 +9,39 @@ interface Props {
 
 export default function QuantitySelector({ count, increase, decrease }: Props) {
   return (
-    <div className="flex items-center gap-4 mb-6">
-      {/* ✅ Se ajusta el tamaño del texto "Unidades" */}
-      <span className="font-medium text-sm md:text-base text-gray-700">Unidades</span>
+    <div className="flex items-center justify-between gap-4 w-full bg-white ">
+      {/* Label */}
+      <span className="text-gray-700 font-medium text-sm md:text-base">
+        Unidades
+      </span>
 
-      <div className="flex items-center gap-3">
-        {/* Botón disminuir */}
+      {/* Controles */}
+      <div className="flex items-center gap-3 bg-gray-50 rounded-full border border-gray-200 overflow-hidden">
+        {/* Disminuir */}
         <button
           onClick={decrease}
-          aria-label="Disminuir cantidad"
-          className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:bg-gray-100 active:scale-95 transition"
+          aria-label="Disminuir Unidades"
+          className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 active:scale-95 transition-transform duration-150"
         >
-          <Minus size={16} strokeWidth={2.5} />
+          <Minus size={18} strokeWidth={2.5} />
         </button>
 
-        {/* ✅ Se ajusta el tamaño del valor numérico */}
+        {/* Número */}
         <span
-          className="text-lg md:text-xl font-bold text-gray-900 min-w-[2ch] text-center"
+          className="text-sm font-bold text-gray-900 min-w-[2ch] text-center"
           aria-live="polite"
           aria-atomic="true"
         >
           {count}
         </span>
 
-        {/* Botón aumentar */}
+        {/* Aumentar */}
         <button
           onClick={increase}
-          aria-label="Aumentar cantidad"
-          className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:bg-gray-100 active:scale-95 transition"
+          aria-label="Aumentar Unidades"
+          className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 active:scale-95 transition-transform duration-150"
         >
-          <Plus size={16} strokeWidth={2.5} />
+          <Plus size={18} strokeWidth={2.5} />
         </button>
       </div>
     </div>

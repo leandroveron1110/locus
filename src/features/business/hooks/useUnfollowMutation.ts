@@ -1,9 +1,9 @@
 // src/features/business/hooks/useUnfollowMutation.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BusinessFollow } from "../types/business";
-import { apiDelete, ApiResult } from "@/lib/apiFetch";
+import { apiDelete } from "@/lib/apiFetch";
+import { ApiError, ApiResult } from "@/types/api";
 import { handleApiError } from "@/features/common/utils/handleApiError";
-import { ApiError } from "@/types/api";
 
 interface UnfollowParams {
   userId: string;
@@ -13,7 +13,7 @@ interface UnfollowParams {
 const unfollowBusiness = async ({ userId, businessId }: UnfollowParams): Promise<ApiResult<void>> => {
   try {
     const res = await apiDelete<void>(`/follow/unfollow/${userId}/${businessId}`);
-    return res;
+    return res.data;
     
   } catch (error: unknown) {
     throw handleApiError(error, "Error al desuscribirte")

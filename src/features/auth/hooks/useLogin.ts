@@ -4,14 +4,9 @@ import { useAuthStore } from '../store/authStore'; // Importa tu store de Zustan
 import { login as apiLogin } from '../api/authApi'; // Importa la función de login de la API
 import { LoginPayload, LoginResponse } from '../types/auth';
 import { useRouter } from 'next/navigation'; // Para la redirección después del login
-import { ApiResult } from '@/lib/apiFetch';
 import { ApiError } from 'next/dist/server/api-utils';
+import { ApiResult } from '@/types/api';
 
-/**
- * Hook personalizado para manejar la lógica de inicio de sesión.
- * Utiliza useMutation de React Query para la llamada a la API
- * y actualiza el store de Zustand con el estado de autenticación.
- */
 export const useLogin = () => {
   const authStoreLogin = useAuthStore((state) => state.login); // Obtiene la acción login de Zustand
   const router = useRouter();

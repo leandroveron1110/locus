@@ -2,8 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchCompanyDelivery } from "../api/catalog-api";
 import { CompanyDelivery, } from "../types/zone";
-import { ApiResult } from "@/lib/apiFetch";
-import { ApiError } from "@/types/api";
+import { ApiError, ApiResult } from "@/types/api";
 
 export const useCompanyDelivery = () => {
   return useQuery<ApiResult<CompanyDelivery[]>, ApiError>({

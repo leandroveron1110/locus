@@ -2,8 +2,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BusinessFollow } from "../types/business";
 import { fetchFollowBusinessAddUser } from "../api/businessApi";
-import { ApiResult } from "@/lib/apiFetch";
-import { ApiError } from "@/types/api";
+import { ApiError, ApiResult } from "@/types/api";
 
 export const useFollowMutation = () => {
   const queryClient = useQueryClient();
@@ -29,6 +28,6 @@ export const useFollowMutation = () => {
           };
         }
       );
-    }
+    },
   });
 };

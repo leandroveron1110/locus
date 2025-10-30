@@ -12,19 +12,13 @@ import {
 } from "lucide-react";
 import svg from "../../../../public/locus_isotipo.svg";
 import { useAuthStore } from "@/features/auth/store/authStore";
-import { NotificationsBell } from "./Notification/NotificationsBell"; // Asume que NotificationsBell.tsx está actualizado
-import { useUserNotificationsSocket } from "@/lib/hooks/useUserNotificationsSocket";
-import { useFetchUserNotifications } from "../hooks/useFetchUserNotifications";
+import { NotificationsBell } from "./Notification/NotificationsBell";
+
 
 export default function AppHeader() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
-  // Conexión del socket solo si hay un usuario
-  useUserNotificationsSocket(user?.id);
-  useFetchUserNotifications(user?.id)
-
-  // Asegúrate de que esta ruta sea correcta
   const logo = svg.src;
 
   const checkIsActive = (href: string) =>

@@ -1,7 +1,7 @@
 // src/features/catalog/hooks/useProductsBySection.ts
 import { useQuery } from "@tanstack/react-query";
 import { fetchProductsBySection, ProductPaginationResponse } from "../api/products-api";
-import { ApiResult } from "@/lib/apiFetch";
+import { ApiResult } from "@/types/api";
 
 interface UseProductsBySectionOptions {
   sectionId: string;

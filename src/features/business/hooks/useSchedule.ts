@@ -1,8 +1,7 @@
 // src/features/business/hooks/useBusinessProfile.ts
 import { useQuery } from "@tanstack/react-query";
 import { fetchWeeklySchedule } from "../api/businessApi";
-import { ApiResult } from "@/lib/apiFetch";
-import { ApiError } from "@/types/api";
+import { ApiError, ApiResult } from "@/types/api";
 
 export const useSchedule = (businessId: string) => {
   return useQuery<ApiResult<Record<string, string[]>>, ApiError>({

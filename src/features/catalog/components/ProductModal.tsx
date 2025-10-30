@@ -70,7 +70,7 @@ const ProductModal = ({ product, onClose }: ModalProps) => {
         >
           &times;
         </button>
-        <div className="p-8">
+        <div className="p-6">
           <ProductDetails product={product} onClose={handleCloseTransition} />
         </div>
       </div>

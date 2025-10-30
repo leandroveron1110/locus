@@ -1,9 +1,8 @@
 // src/features/business/hooks/useBusinessProfile.ts
 import { useQuery } from "@tanstack/react-query";
 import { fetchBusinessGaleryBasic } from "../api/businessApi";
-import { ApiResult } from "@/lib/apiFetch";
 import { BusinessGalery } from "../types/business";
-import { ApiError } from "next/dist/server/api-utils";
+import { ApiError, ApiResult } from "@/types/api";
 
 export const useGallery = (businessId: string) => {
   return useQuery<ApiResult<BusinessGalery[]>, ApiError>({

@@ -12,6 +12,8 @@ import {
   CATEGORY_CONFIG,
   PRIORITY_CONFIG,
 } from "../../utils/configNotification";
+import { useUserNotificationsSocket } from "@/lib/hooks/useUserNotificationsSocket";
+import { useFetchUserNotifications } from "../../hooks/useFetchUserNotifications";
 
 interface NotificationsBellProps {
   userId: string;
@@ -22,6 +24,8 @@ export function NotificationsBell({
   userId,
   isMobileView = false,
 }: NotificationsBellProps) {
+  useUserNotificationsSocket(userId);
+  useFetchUserNotifications(userId);
   const [isOpen, setIsOpen] = useState(false); // Para el dropdown de escritorio
   const [isModalOpen, setIsModalOpen] = useState(false); // Para el modal móvil
   const { getNotifications } = useUserNotificationsStore();

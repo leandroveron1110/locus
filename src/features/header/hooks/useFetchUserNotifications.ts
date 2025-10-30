@@ -14,7 +14,11 @@ export function useFetchUserNotifications(userId: string | undefined) {
     },
     fetchUpdatedItems: async (lastSyncTime) => {
       if (!userId) {
-        throw new Error("User ID is required for fetching user orders.");
+        console.warn("Sincronización de Notificaciones omitida: userId no disponible.");
+        return {
+          items: [],
+          latestTimestamp: ""
+        }
       }
       const res = await syncNotificationsUser(userId, lastSyncTime);
       return {

@@ -5,8 +5,7 @@ import {
   fetchUserAddresses,
 } from "../api/catalog-api";
 import { Address, AddressCreateDto } from "../types/address";
-import { ApiResult } from "@/lib/apiFetch";
-import { ApiError } from "@/types/api";
+import { ApiError, ApiResult } from "@/types/api";
 
 export const useAddress = () => {
   return useMutation<ApiResult<AddressCreateDto>, ApiError, Address>({
