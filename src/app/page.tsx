@@ -1,18 +1,23 @@
-// src/app/(main)/search/page.tsx
-import dynamic from "next/dynamic";
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import AppHeader from "@/features/header/components/AppHeader";
 
+// 💀 Skeleton separado y seguro para el build
 function SearchSkeleton() {
   return (
     <div className="min-h-screen bg-gray-100 px-4 py-6 animate-pulse">
       <div className="max-w-3xl mx-auto space-y-6">
+        {/* 🔍 Input de búsqueda */}
         <div className="h-10 bg-gray-300 rounded-lg w-3/4 mx-auto" />
+
+        {/* 🏷️ Filtros */}
         <div className="flex gap-3 justify-center mt-4">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="h-8 w-20 bg-gray-300 rounded-full" />
           ))}
         </div>
+
+        {/* 🏪 Resultados simulados */}
         <div className="space-y-4 mt-8">
           {[...Array(5)].map((_, i) => (
             <div
@@ -32,12 +37,16 @@ function SearchSkeleton() {
   );
 }
 
-const SearchPage = dynamic(() => import("@/features/search/components/Search"), {
-  ssr: false,
-  loading: () => <SearchSkeleton />,
-});
+// 🧩 Import dinámico sin SSR
+const SearchPage = dynamic(
+  () => import("@/features/search/components/SearchClient"),
+  {
+    ssr: false,
+    loading: () => <SearchSkeleton />,
+  }
+);
 
-export default function SearchPageWrapper() {
+export default function HomePage() {
   return (
     <>
       <AppHeader />
