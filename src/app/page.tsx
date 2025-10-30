@@ -1,4 +1,6 @@
 // src\app\page.tsx
+"use client";
+
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import AppHeader from "@/features/header/components/AppHeader";
