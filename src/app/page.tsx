@@ -1,3 +1,4 @@
+// src\app\page.tsx
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import AppHeader from "@/features/header/components/AppHeader";
@@ -38,7 +39,7 @@ function SearchSkeleton() {
 }
 
 // 🧩 Import dinámico sin SSR
-const SearchPage = dynamic(
+const DynamicSearchClient = dynamic(
   () => import("@/features/search/components/SearchClient"),
   {
     ssr: false,
@@ -52,7 +53,7 @@ export default function HomePage() {
       <AppHeader />
       <div className="bg-white min-h-screen bg-gray-100">
         <Suspense fallback={<SearchSkeleton />}>
-          <SearchPage />
+          <DynamicSearchClient />
         </Suspense>
       </div>
     </>

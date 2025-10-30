@@ -1,3 +1,4 @@
+// src/features/search/components/SearchClient.tsx
 "use client";
 
 import SearchPage from "./Search";
