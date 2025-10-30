@@ -13,7 +13,7 @@ import { getDisplayErrorMessage } from "@/lib/uiErrors";
 import { ISearchBusinessParams } from "@/features/search/types/search";
 import { useFetchSearch } from "@/lib/hooks/useFetchSearch";
 import { useSearchCacheStore } from "@/lib/hooks/useSearchCacheStore";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 // 🧩 Carga dinámica con Skeletons
 const DynamicSearchBar = withSkeleton(

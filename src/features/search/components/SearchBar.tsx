@@ -6,7 +6,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Search } from "lucide-react";
 import { useSearchCacheStore } from "@/lib/hooks/useSearchCacheStore";
-import { useSearchParams } from "next/navigation";
 
 const schema = z.object({
   q: z.string(),
