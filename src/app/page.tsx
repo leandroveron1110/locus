@@ -73,7 +73,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   return (
     <>
       <AppHeader />
-      <div className="bg-white min-h-screen pt-12">
+      <div className="bg-white min-h-screen">
         <Suspense fallback={<SearchSkeleton />}>
           <SearchClient initialParams={initialParams} />
         </Suspense>
