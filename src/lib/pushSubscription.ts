@@ -75,7 +75,7 @@ export async function subscribeUserToPush(userId: string | undefined) {
                     console.log("✅ Suscripción Push ya registrada en LocalStorage para este usuario. Omitiendo llamadas a la API.");
                     return;
                 }
-            } catch (e) {
+            } catch {
                 console.error("Error al parsear el estado de suscripción de localStorage. Limpiando...");
                 localStorage.removeItem(SUB_STATUS_STORAGE);
             }

@@ -12,7 +12,6 @@ import {
   CATEGORY_CONFIG,
   PRIORITY_CONFIG,
 } from "../../utils/configNotification";
-import { useUserNotificationsSocket } from "@/lib/hooks/useUserNotificationsSocket";
 import { useFetchUserNotifications } from "../../hooks/useFetchUserNotifications";
 
 interface NotificationsBellProps {

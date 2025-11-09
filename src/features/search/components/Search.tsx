@@ -14,8 +14,6 @@ import { ISearchBusinessParams } from "@/features/search/types/search";
 import { useFetchSearch } from "@/lib/hooks/useFetchSearch";
 import { useSearchCacheStore } from "@/lib/hooks/useSearchCacheStore";
 import { useRouter } from "next/navigation";
-import { subscribeUserToPush } from "@/lib/pushSubscription";
-import { useAuthStore } from "@/features/auth/store/authStore";
 
 // 🧩 Carga dinámica con Skeletons
 const DynamicSearchBar = withSkeleton(
