@@ -1,11 +1,7 @@
 import { handleApiError } from "@/features/common/utils/handleApiError";
-import { apiPost } from "@/lib/apiFetch";
+import { apiGet } from "@/lib/apiFetch";
 import { INotification } from "@/types/notification";
 
-// 💡 Define la estructura de la respuesta del backend
-interface SyncNotificationUserResponse {
-  notification: INotification[];
-}
 
 export const syncNotificationsUser = async (
   userId: string,
@@ -13,12 +9,8 @@ export const syncNotificationsUser = async (
 ) => {
   try {
     // 💡 El endpoint es '/notifications/user/sync'
-    const res = await apiPost<SyncNotificationUserResponse>(
-      `orders/notifications/user/sync`,
-      {
-        userId,
-        lastSyncTime,
-      }
+    const res = await apiGet<INotification[]>(
+      `notifications/sync/unread?id=${userId}&entityType=USER${lastSyncTime ? `&syncTime=${lastSyncTime}` : ''}`
     );
 
     if (!res.success || !res.data) {
@@ -30,7 +22,7 @@ export const syncNotificationsUser = async (
 
     // 💡 Devolvemos el array de notificaciones y el último timestamp
     return {
-      notification: res.data.notification,
+      notification: res.data,
       latestTimestamp: res.timestamp, // Usando `res.timestamp` como en el ejemplo
     };
   } catch (error: unknown) {

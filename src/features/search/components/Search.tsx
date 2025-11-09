@@ -14,6 +14,8 @@ import { ISearchBusinessParams } from "@/features/search/types/search";
 import { useFetchSearch } from "@/lib/hooks/useFetchSearch";
 import { useSearchCacheStore } from "@/lib/hooks/useSearchCacheStore";
 import { useRouter } from "next/navigation";
+import { subscribeUserToPush } from "@/lib/pushSubscription";
+import { useAuthStore } from "@/features/auth/store/authStore";
 
 // 🧩 Carga dinámica con Skeletons
 const DynamicSearchBar = withSkeleton(
@@ -45,7 +47,8 @@ export default function SearchPage({ initialParams }: SearchPageProps) {
     useState<ISearchBusinessParams>(() => {
       return {
         query: cachedParams?.query || initialParams.query || "",
-        city: cachedParams?.city || initialParams.city || "Concepcion del Uruguay",
+        city:
+          cachedParams?.city || initialParams.city || "Concepcion del Uruguay",
         limit: cachedParams?.limit || initialParams.limit || 20,
         page: cachedParams?.page || initialParams.page || 1,
       };
@@ -54,7 +57,7 @@ export default function SearchPage({ initialParams }: SearchPageProps) {
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const { syncSearch } = useFetchSearch(currentSearchParams);
 
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
 
   // 🔄 Actualiza los parámetros en la URL
   const updateUrlParams = useCallback(
@@ -85,7 +88,7 @@ export default function SearchPage({ initialParams }: SearchPageProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(true);
+        // setIsLoading(true);
         await syncSearch();
       } catch (err) {
         addAlert({
@@ -93,50 +96,20 @@ export default function SearchPage({ initialParams }: SearchPageProps) {
           type: "error",
         });
       } finally {
-        setIsLoading(false);
+        // setIsLoading(false);
       }
     };
 
     fetchData();
   }, [currentSearchParams, syncSearch, addAlert]);
 
-
   const businesses = cachedResult?.data || [];
-  const hasResults = businesses.length > 0;
 
   const renderContent = () => {
-    if (isLoading) {
-      return viewMode === "list" ? (
-        <SearchBusinessListSkeleton />
-      ) : (
-        <SearchBusinessMapSkeleton />
-      );
-    }
-
-    if (hasResults) {
-      return viewMode === "list" ? (
-        <DynamicSearchBusinessList businesses={businesses} />
-      ) : (
-        <DynamicSearchBusinessMap businesses={businesses} />
-      );
-    }
-
-    if (
-      !isLoading &&
-      cachedParams &&
-      (cachedParams.query || cachedParams.city)
-    ) {
-      return (
-        <p className="mt-6 text-center text-gray-500 text-lg">
-          No se encontraron resultados para los filtros aplicados.
-        </p>
-      );
-    }
-
-    return (
-      <p className="mt-6 text-center text-gray-500 text-lg">
-        ¡Comienza tu búsqueda!
-      </p>
+    return viewMode === "list" ? (
+      <DynamicSearchBusinessList businesses={businesses} />
+    ) : (
+      <DynamicSearchBusinessMap businesses={businesses} />
     );
   };
 
@@ -160,31 +133,29 @@ export default function SearchPage({ initialParams }: SearchPageProps) {
           <DynamicSearchBar onSearch={handleSearch} />
         </div>
 
-        {(hasResults || isLoading) && (
-          <div className="flex gap-1 p-1 rounded-full bg-gray-100 flex-shrink-0">
-            <button
-              onClick={() => setViewMode("map")}
-              className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors ${
-                viewMode === "map"
-                  ? "bg-white text-gray-900 shadow"
-                  : "text-gray-500 hover:bg-gray-200"
-              }`}
-            >
-              <MapPin size={18} />
-            </button>
+        <div className="flex gap-1 p-1 rounded-full bg-gray-100 flex-shrink-0">
+          <button
+            onClick={() => setViewMode("map")}
+            className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors ${
+              viewMode === "map"
+                ? "bg-white text-gray-900 shadow"
+                : "text-gray-500 hover:bg-gray-200"
+            }`}
+          >
+            <MapPin size={18} />
+          </button>
 
-            <button
-              onClick={() => setViewMode("list")}
-              className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors ${
-                viewMode === "list"
-                  ? "bg-white text-gray-900 shadow"
-                  : "text-gray-500 hover:bg-gray-200"
-              }`}
-            >
-              <List size={18} />
-            </button>
-          </div>
-        )}
+          <button
+            onClick={() => setViewMode("list")}
+            className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors ${
+              viewMode === "list"
+                ? "bg-white text-gray-900 shadow"
+                : "text-gray-500 hover:bg-gray-200"
+            }`}
+          >
+            <List size={18} />
+          </button>
+        </div>
       </div>
 
       {/* 📍 Contenido principal */}

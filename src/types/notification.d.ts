@@ -30,4 +30,7 @@ export interface INotification {
 
   /** Prioridad de la notificación */
   priority?: NotificationPriority;
+
+  isRead: boolean;
+  link: string;
 }

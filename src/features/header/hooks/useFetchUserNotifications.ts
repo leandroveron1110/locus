@@ -21,6 +21,7 @@ export function useFetchUserNotifications(userId: string | undefined) {
         }
       }
       const res = await syncNotificationsUser(userId, lastSyncTime);
+      console.log("rest, noti", res)
       return {
         items: res.notification,
         latestTimestamp: res.latestTimestamp,

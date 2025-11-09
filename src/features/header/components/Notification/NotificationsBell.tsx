@@ -24,7 +24,7 @@ export function NotificationsBell({
   userId,
   isMobileView = false,
 }: NotificationsBellProps) {
-  useUserNotificationsSocket(userId);
+  // useUserNotificationsSocket(userId);
   useFetchUserNotifications(userId);
   const [isOpen, setIsOpen] = useState(false); // Para el dropdown de escritorio
   const [isModalOpen, setIsModalOpen] = useState(false); // Para el modal móvil
