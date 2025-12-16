@@ -3,7 +3,7 @@
 import { useCompanyDelivery } from "@/features/catalog/hooks/useCompanyDelivery";
 import { CompanyDeliveryWithPrice } from "@/features/catalog/types/zone";
 import React from "react";
-import { Truck, Phone, CircleCheck, Tag } from "lucide-react";
+import { Truck, CircleCheck } from "lucide-react";
 import { formatPrice } from "@/features/common/utils/formatPrice";
 
 interface Props {

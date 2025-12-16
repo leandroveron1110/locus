@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Wallet, DollarSign, Truck, Store } from "lucide-react";
+import { Wallet, DollarSign, Truck } from "lucide-react";
 import { PaymentMethodType } from "@/features/orders/types/order";
 
 type CadetPaymentMethod = "cash" | "transfer";

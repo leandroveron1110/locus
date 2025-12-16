@@ -5,10 +5,8 @@ import { CheckCircle2, Lock } from "lucide-react";
 import DeliveryOptionSelector from "../DeliveryOptionSelector";
 import AddressSelector from "../AddressSelector";
 import CompanyDeliverySelector from "../CompanyDeliverySelector";
-import PaymentOptionSelector from "../PaymentOptionSelector";
 import SubmitOrderButton from "../SubmitOrderButton";
 import OrderSummary from "./OrderSummary";
-import CadetPaymentSelector from "../CadetPaymentSelector";
 
 import { PaymentMethodType } from "@/features/orders/types/order";
 import { DeliveryOption } from "@/features/catalog/types/order";

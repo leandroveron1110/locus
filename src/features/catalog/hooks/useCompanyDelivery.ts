@@ -37,7 +37,7 @@ export const fetchCompanyDelivery = async (
     }
 
     return res.data;
-  } catch (error: unknown) {
+  } catch {
     // ... manejo de errores
     throw new Error(
       "Error al obtener la lista de compañías de entrega con precios"

@@ -68,8 +68,8 @@ export default function OrderFormContainer({
   const [selectedPaymentOption, setSelectedPaymentOption] =
     useState<PaymentMethodType>(PaymentMethodType.TRANSFER);
 
-  const [selectedPaymentOptionDelivery, setSelectedPaymentOptionDelivery] =
-    useState<PaymentMethodType>(PaymentMethodType.TRANSFER);
+  // const [selectedPaymentOptionDelivery, setSelectedPaymentOptionDelivery] =
+  //   useState<PaymentMethodType>(PaymentMethodType.TRANSFER);
   const [selectedAddress, setSelectedAddress] = useState<{
     id: string;
     text: string;
