@@ -1,18 +1,18 @@
 "use client";
 import React from "react";
-import { DollarSign, Store, Wallet } from "lucide-react";
-import { PaymentMethodType } from "@/features/orders/types/order";
+import { DollarSign, Wallet, TruckElectric } from "lucide-react";
+
+export type CadetPaymentMethod = "cash" | "transfer";
 
 interface Props {
-  selectedOption: PaymentMethodType;
-  onChange: (option: PaymentMethodType) => void;
-  isDelivery?: boolean;
+  selectedOption: CadetPaymentMethod;
+  onChange: (option: CadetPaymentMethod) => void;
 }
 
 // Componente auxiliar para el círculo de selección (radio)
 const RadioIndicator = ({ isSelected }: { isSelected: boolean }) => (
   <div
-    className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors duration-200 ${
+    className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors duration-200 flex-shrink-0 ${
       isSelected ? "border-blue-600 bg-white" : "border-gray-300 bg-gray-100"
     }`}
   >
@@ -20,70 +20,30 @@ const RadioIndicator = ({ isSelected }: { isSelected: boolean }) => (
   </div>
 );
 
-export default function PaymentOptionSelector({
+export default function CadetPaymentSelector({
   selectedOption,
   onChange,
-  isDelivery,
 }: Props) {
   const options = [
     {
-      value: PaymentMethodType.TRANSFER,
-      label: "Transferencia",
-      description: "Pagá antes de que el local confirme el pedido.",
-      icon: Wallet,
+      value: "cash" as CadetPaymentMethod,
+      label: "Efectivo",
+      description: "Pagás al cadete al recibir el pedido.",
+      icon: DollarSign,
     },
     {
-      value: PaymentMethodType.CASH,
-      label: "Efectivo",
-      description: "Pagás cuando recibas el pedido.",
-      icon: DollarSign,
+      value: "transfer" as CadetPaymentMethod,
+      label: "Transferencia",
+      description: "Hacés una transferencia al cadete en el momento.",
+      icon: Wallet,
     },
   ];
 
-  const renderDeliveryInfo = () => {
-    if (!isDelivery) return null;
-
-    let content;
-    let colorClasses;
-    let emoji;
-
-    if (selectedOption === PaymentMethodType.TRANSFER) {
-      colorClasses = "border-blue-200 bg-blue-50 text-blue-800";
-      content = (
-        <>
-          <strong>Transferencia Bancaria:</strong> el local procesará tu pedido
-          cuando confirmes el pago subiendo el comprobante.
-        </>
-      );
-    } else if (selectedOption === PaymentMethodType.CASH) {
-      colorClasses = "border-green-200 bg-green-50 text-green-800";
-      content = (
-        <>
-          <strong>Efectivo:</strong> pagás al cadete al momento de recibir tu
-          pedido.
-        </>
-      );
-    } else {
-      return null;
-    }
-
-    return (
-      <div
-        className={`mt-4 rounded-xl border p-4 text-sm shadow-inner ${colorClasses}`}
-      >
-        <div className="flex items-start gap-2">
-          <span className="text-xl">{emoji}</span>
-          <p className="flex-1">{content}</p>
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <div className="bg-white mt-5 rounded-xl border border-gray-100 p-4 sm:p-6 shadow-lg">
+    <div className="bg-white p-4 sm:p-6 rounded-xl mt-5 border border-gray-100 shadow-lg">
       <h3 className="font-bold text-gray-900 mb-4 text-lg sm:text-xl flex items-center gap-2">
-        <Store className="w-6 h-6 text-gray-600" />
-        Pago de la Orden
+        <TruckElectric className="w-6 h-6 text-gray-600" />
+        Pago del Envío
       </h3>
 
       <div className="grid grid-cols-1 gap-4">
@@ -101,8 +61,7 @@ export default function PaymentOptionSelector({
                 }
               `}
             >
-              {/* Contenedor principal: Icono, Texto y Descripción */}
-              {/* Cambiamos a flex-col en móvil y sm:flex-row en desktop */}
+              {/* Contenedor principal: Icono, Título y Descripción (Responsive: Columna en móvil, Fila en desktop) */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 flex-1">
                 {/* Contenedor del Icono y Título */}
                 <div className="flex items-center gap-3">
@@ -127,7 +86,7 @@ export default function PaymentOptionSelector({
                   </span>
                 </div>
 
-                {/* Descripción: Añadimos margen y limitamos el ancho en pantallas grandes */}
+                {/* Descripción */}
                 <p
                   className={`text-sm transition-colors mt-1 sm:mt-0 sm:ml-4 flex-shrink min-w-0 ${
                     isSelected ? "text-blue-600" : "text-gray-500"
@@ -146,7 +105,28 @@ export default function PaymentOptionSelector({
         })}
       </div>
 
-      {renderDeliveryInfo()}
+      {/* Información detallada de la selección */}
+      {selectedOption === "cash" && (
+        <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800 shadow-inner">
+          <div className="flex items-start gap-2">
+            <p className="flex-1">
+              <strong>Efectivo:</strong> Recuerda tener el monto exacto. Pagarás
+              el envío al cadete al momento de la entrega.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {selectedOption === "transfer" && (
+        <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800 shadow-inner">
+          <div className="flex items-start gap-2">
+            <p className="flex-1">
+              <strong>Transferencia:</strong> Podrás realizar la transferencia
+              al cadete una vez que te haya entregado el pedido.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

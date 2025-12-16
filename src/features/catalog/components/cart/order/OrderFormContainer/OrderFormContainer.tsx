@@ -8,11 +8,10 @@ import { useRouter } from "next/navigation";
 // 🟢 Stores & Hooks
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { useCartStore } from "@/features/catalog/stores/useCartStore";
-import { usePriceZone } from "@/features/catalog/hooks/usePriceZone";
 
 // 🟢 Tipos
 import { PaymentMethodType } from "@/features/orders/types/order";
-import { CompanyDelivery } from "@/features/catalog/types/zone";
+import { CompanyDeliveryWithPrice } from "@/features/catalog/types/zone";
 import { AddressData } from "@/features/locationSelector/types/address-data";
 import { CreateOrderFull } from "@/features/catalog/types/order";
 import { DeliveryOption } from "@/features/catalog/types/order";
@@ -34,7 +33,8 @@ interface Props {
   businessAddresslongitude: number;
 }
 
-type Step = "delivery" | "address" | "deliveryCompany" | "payment";
+type Step = "deliveryInfo" | "payment";
+type CadetPaymentMethod = "cash" | "transfer";
 
 export default function OrderFormContainer({
   userId,
@@ -47,7 +47,9 @@ export default function OrderFormContainer({
 }: Props) {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
-  const { getTotal } = useCartStore();
+  const { getTotal, getPaymentBreakdown } = useCartStore();
+
+  console.log("getTotal", getTotal());
 
   const createAddress = useAddress();
   const {
@@ -58,10 +60,15 @@ export default function OrderFormContainer({
   } = useAddresses(userId);
 
   // 🟢 Estados principales
-  const [activeStep, setActiveStep] = useState<Step>("delivery");
+  const [activeStep, setActiveStep] = useState<Step>("deliveryInfo");
   const [selectedDeliveryOption, setSelectedDeliveryOption] =
     useState<DeliveryOption>("DELIVERY");
+  const [selectedCadetPayment, setSelectedCadetPayment] =
+    useState<CadetPaymentMethod>("cash");
   const [selectedPaymentOption, setSelectedPaymentOption] =
+    useState<PaymentMethodType>(PaymentMethodType.TRANSFER);
+
+  const [selectedPaymentOptionDelivery, setSelectedPaymentOptionDelivery] =
     useState<PaymentMethodType>(PaymentMethodType.TRANSFER);
   const [selectedAddress, setSelectedAddress] = useState<{
     id: string;
@@ -71,27 +78,27 @@ export default function OrderFormContainer({
     notes: string;
   }>();
   const [selectedCompanyDelivery, setSelectedCompanyDelivery] =
-    useState<CompanyDelivery | null>(null);
+    useState<CompanyDeliveryWithPrice | null>(null);
   const [orderNote, setOrderNote] = useState("");
   const [showAddressModal, setShowAddressModal] = useState(false);
 
   // Hook para precio del envío
-  const priceZoneParams =
-    selectedCompanyDelivery && selectedAddress
-      ? {
-          companyId: selectedCompanyDelivery.id,
-          lat: selectedAddress.lat,
-          lng: selectedAddress.lng,
-        }
-      : undefined;
+  // const priceZoneParams =
+  //   selectedCompanyDelivery && selectedAddress
+  //     ? {
+  //         companyId: selectedCompanyDelivery.id,
+  //         lat: selectedAddress.lat,
+  //         lng: selectedAddress.lng,
+  //       }
+  //     : undefined;
 
-  const {
-    data: priceZone,
-    isLoading: isPriceLoading,
-    refetch,
-    isError: isErrorPriceZone,
-    error: errorPriceZone,
-  } = usePriceZone(priceZoneParams);
+  // const {
+  //   data: priceZone,
+  //   isLoading: isPriceLoading,
+  //   refetch,
+  //   isError: isErrorPriceZone,
+  //   error: errorPriceZone,
+  // } = usePriceZone(priceZoneParams);
 
   const { addAlert } = useAlert();
 
@@ -104,14 +111,14 @@ export default function OrderFormContainer({
     }
   }, [isError, error, addAlert]);
 
-  useEffect(() => {
-    if (isErrorPriceZone) {
-      addAlert({
-        message: getDisplayErrorMessage(errorPriceZone),
-        type: "error",
-      });
-    }
-  }, [isErrorPriceZone, errorPriceZone, addAlert]);
+  // useEffect(() => {
+  //   if (isErrorPriceZone) {
+  //     addAlert({
+  //       message: getDisplayErrorMessage(errorPriceZone),
+  //       type: "error",
+  //     });
+  //   }
+  // }, [isErrorPriceZone, errorPriceZone, addAlert]);
 
   // Lógica para abrir el modal si no hay direcciones
   useEffect(() => {
@@ -121,11 +128,11 @@ export default function OrderFormContainer({
   }, [addresses, selectedDeliveryOption]);
 
   // Refetch del precio de envío
-  useEffect(() => {
-    if (selectedCompanyDelivery && selectedAddress) {
-      refetch();
-    }
-  }, [selectedCompanyDelivery, selectedAddress, refetch]);
+  // useEffect(() => {
+  //   if (selectedCompanyDelivery && selectedAddress) {
+  //     refetch();
+  //   }
+  // }, [selectedCompanyDelivery, selectedAddress, refetch]);
 
   const handleSaveAddress = async (address: AddressData) => {
     if (!userId) {
@@ -159,7 +166,7 @@ export default function OrderFormContainer({
         notes: result.notes || "",
       });
       setShowAddressModal(false);
-      setActiveStep("deliveryCompany");
+      setActiveStep("payment");
     }
   };
 
@@ -175,8 +182,8 @@ export default function OrderFormContainer({
       setSelectedAddress(undefined);
     } else {
       setSelectedAddress(selection);
-      setActiveStep("deliveryCompany");
     }
+    setSelectedCompanyDelivery(null);
   };
 
   const orderPayload: CreateOrderFull | null = useMemo(() => {
@@ -185,7 +192,9 @@ export default function OrderFormContainer({
       selectedDeliveryOption === "DELIVERY";
     const subtotal = getTotal();
     const deliveryPrice =
-      isSelectedDeliveryOption() && priceZone?.price ? priceZone.price : 0;
+      isSelectedDeliveryOption() && selectedCompanyDelivery?.price
+        ? selectedCompanyDelivery.price
+        : 0;
     const total = subtotal + deliveryPrice;
 
     return {
@@ -196,9 +205,9 @@ export default function OrderFormContainer({
         ? selectedAddress?.id
         : undefined,
       deliveryCompanyId: isSelectedDeliveryOption()
-        ? selectedCompanyDelivery?.id
+        ? selectedCompanyDelivery?.idCompany
         : undefined,
-        
+
       customerName: `${user.firstName} ${user.lastName}`,
       customerPhone: user.email,
       customerAddress: isSelectedDeliveryOption()
@@ -245,21 +254,18 @@ export default function OrderFormContainer({
     selectedPaymentOption,
     selectedCompanyDelivery,
     getTotal,
-    priceZone,
+    selectedCompanyDelivery,
   ]);
 
   const canCreateOrder = useMemo(() => {
     if (!user) return false;
     if (selectedDeliveryOption === "PICKUP") return true;
-    return (
-      !!selectedCompanyDelivery && priceZone?.price != null && !isPriceLoading
-    );
+    return !!selectedCompanyDelivery && selectedCompanyDelivery?.price != null;
   }, [
     user,
     selectedDeliveryOption,
     selectedCompanyDelivery,
-    priceZone,
-    isPriceLoading,
+    selectedCompanyDelivery,
   ]);
 
   return (
@@ -271,6 +277,8 @@ export default function OrderFormContainer({
         setSelectedDeliveryOption={setSelectedDeliveryOption}
         selectedAddress={selectedAddress}
         setSelectedAddress={setSelectedAddress}
+        selectedCadetPayment={selectedCadetPayment}
+        setSelectedCadetPayment={setSelectedCadetPayment}
         handleAddressChange={handleAddressChange}
         addresses={addresses || []}
         selectedCompanyDelivery={selectedCompanyDelivery}
@@ -279,10 +287,25 @@ export default function OrderFormContainer({
         setSelectedPaymentOption={setSelectedPaymentOption}
         orderPayload={orderPayload}
         canCreateOrder={canCreateOrder}
-        isPriceLoading={isPriceLoading}
-        priceZone={priceZone ? priceZone : undefined}
+        priceZone={
+          selectedCompanyDelivery
+            ? {
+                message: selectedCompanyDelivery.priceMessage || "",
+                price: selectedCompanyDelivery.price,
+              }
+            : undefined
+        }
         orderNote={orderNote}
         setOrderNote={setOrderNote}
+        lat={selectedAddress?.lat}
+        lng={selectedAddress?.lng}
+        paymentBreakdown={{
+          cash: getPaymentBreakdown(selectedPaymentOption).cash,
+          transfer: getPaymentBreakdown(selectedPaymentOption).transfer,
+          qr: getPaymentBreakdown(selectedPaymentOption).qr,
+          total: getPaymentBreakdown(selectedPaymentOption).total,
+          delivery: selectedCompanyDelivery?.price
+        }}
       />
 
       <AddressModal

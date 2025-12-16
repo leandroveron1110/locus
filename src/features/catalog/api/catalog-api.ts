@@ -87,7 +87,7 @@ export const fetchCalculatePriceZone = async (body: {
       `/delivery-zones/calculate-price`,
       body
     );
-    return data.data;;
+    return data.data;
   } catch (error: unknown) {
     throw handleApiError(
       error,

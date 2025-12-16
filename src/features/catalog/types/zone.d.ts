@@ -12,3 +12,11 @@ export interface CompanyDelivery {
   ownerId: string;
   phone: string;
 }
+
+export interface CompanyDeliveryWithPrice {
+  idCompany: string;
+  name: string;
+  phone: string;
+  price: number | null;
+  priceMessage: string | undefined;
+}

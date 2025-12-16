@@ -59,15 +59,15 @@ export default function AddressSelector({
         {/* Botón para crear nueva dirección */}
         <button
           onClick={() => onChange({ id: "new", text: "", lat: 0, lng: 0 , notes: ""})}
-          className={`flex items-center justify-between w-full p-4 rounded-xl border transition
+          className={`flex items-center text-center justify-center w-full p-4 pt-2 pb-2 rounded-full border transition
             ${selectedId === "new"
               ? "border-blue-600 bg-blue-50 shadow-sm"
               : "border-gray-300 hover:border-blue-400 active:bg-gray-100"
             }
           `}
         >
-          <span className="text-gray-800 text-sm sm:text-base">
-            ➕ Agregar nueva dirección
+          <span className="text-gray-800 text-center text-sm sm:text-base">
+            Agregar nueva dirección
           </span>
         </button>
       </div>

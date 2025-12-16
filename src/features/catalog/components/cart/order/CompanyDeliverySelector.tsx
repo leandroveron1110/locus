@@ -1,26 +1,44 @@
 "use client";
 
 import { useCompanyDelivery } from "@/features/catalog/hooks/useCompanyDelivery";
-import { CompanyDelivery } from "@/features/catalog/types/zone";
+import { CompanyDeliveryWithPrice } from "@/features/catalog/types/zone";
 import React from "react";
-import { Truck, Phone, CircleCheck } from "lucide-react";
+import { Truck, Phone, CircleCheck, Tag } from "lucide-react";
+import { formatPrice } from "@/features/common/utils/formatPrice";
 
 interface Props {
   selectedCompanyId?: string;
-  onChange: (company: CompanyDelivery) => void;
+  lat: number | undefined;
+  lng: number | undefined;
+  onChange: (company: CompanyDeliveryWithPrice) => void;
 }
 
 export default function CompanyDeliverySelector({
   selectedCompanyId,
+  lat,
+  lng,
   onChange,
 }: Props) {
-  const { data, isLoading, isError } = useCompanyDelivery();
+  const shouldFetch = !!lat && !!lng;
+  const { data, isLoading, isError } = useCompanyDelivery(lat, lng);
+
+  if (!shouldFetch) {
+    return (
+      <div className="p-4 sm:p-6 bg-blue-50 border border-blue-300 rounded-2xl flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-3">
+        <Truck className="w-6 h-6 text-blue-600" />
+        <p className="text-blue-700 font-medium text-sm sm:text-base">
+          Selecciona una dirección para ver las opciones de envío.
+        </p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
-      <div className="p-4 sm:p-6 bg-gray-100 rounded-lg text-center" role="status">
-        <p className="text-gray-500 font-medium animate-pulse text-sm sm:text-base">
-          Cargando opciones de envío...
+      <div className="p-4 sm:p-6 bg-gray-100 rounded-2xl flex items-center justify-center gap-2 animate-pulse">
+        <Truck className="w-5 h-5 text-gray-400" />
+        <p className="text-gray-500 font-medium text-sm sm:text-base">
+          Calculando tarifas de envío para tu dirección...
         </p>
       </div>
     );
@@ -28,10 +46,10 @@ export default function CompanyDeliverySelector({
 
   if (isError || !data) {
     return (
-      <div className="p-4 sm:p-6 bg-red-50 border border-red-200 rounded-lg text-center" role="alert">
-        <p className="text-red-600 font-semibold text-sm sm:text-base">
-          Hubo un problema al cargar las compañías de delivery. Por favor,
-          intenta de nuevo más tarde.
+      <div className="p-4 sm:p-6 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-3">
+        <Truck className="w-6 h-6 text-red-600" />
+        <p className="text-red-600 font-medium text-sm sm:text-base">
+          Hubo un problema al cargar las opciones de envío. Intenta nuevamente más tarde.
         </p>
       </div>
     );
@@ -39,25 +57,24 @@ export default function CompanyDeliverySelector({
 
   if (data.length === 0) {
     return (
-      <div className="p-4 sm:p-6 bg-yellow-50 border border-yellow-200 rounded-lg text-center" role="alert">
-        <p className="text-yellow-700 font-semibold text-sm sm:text-base">
-          No hay compañías de delivery disponibles en este momento.
+      <div className="p-4 sm:p-6 bg-yellow-50 border border-yellow-300 rounded-2xl flex items-center gap-3">
+        <Truck className="w-6 h-6 text-yellow-600" />
+        <p className="text-yellow-700 font-medium text-sm sm:text-base">
+          No hay compañías de delivery disponibles para esta dirección.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <h3 className="font-semibold text-gray-700 text-base sm:text-lg mb-2">
-        Selecciona la compañía de delivery
-      </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4" role="radiogroup" aria-label="Compañías de delivery disponibles">
+    <div className="bg-white ">
+
+      <div className="grid grid-cols-1 gap-4">
         {data.map((company) => (
           <CompanyOption
-            key={company.id}
+            key={company.idCompany}
             company={company}
-            isSelected={selectedCompanyId === company.id}
+            isSelected={selectedCompanyId === company.idCompany}
             onChange={onChange}
           />
         ))}
@@ -67,41 +84,68 @@ export default function CompanyDeliverySelector({
 }
 
 interface CompanyOptionProps {
-  company: CompanyDelivery;
+  company: CompanyDeliveryWithPrice;
   isSelected: boolean;
-  onChange: (company: CompanyDelivery) => void;
+  onChange: (company: CompanyDeliveryWithPrice) => void;
 }
 
 const CompanyOption = ({ company, isSelected, onChange }: CompanyOptionProps) => {
   return (
     <button
+      onClick={() => onChange(company)}
       role="radio"
       aria-checked={isSelected}
-      onClick={() => onChange(company)}
       className={`
-        p-4 sm:p-5 rounded-xl border-2 transition-all duration-200 ease-in-out
-        text-left relative flex flex-col gap-1 sm:gap-2
+        w-full text-left flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl border transition-all duration-200
         ${
           isSelected
-            ? "border-blue-500 bg-blue-50 shadow-lg transform scale-105"
-            : "border-gray-200 bg-white hover:border-blue-300"
+            ? "border-indigo-500 bg-indigo-50 shadow-md"
+            : "border-gray-200 bg-white hover:border-indigo-400 hover:bg-gray-50"
         }
       `}
     >
-      {isSelected && (
-        <div className="absolute top-2 right-2 text-blue-500">
-          <CircleCheck className="w-5 h-5 sm:w-6 sm:h-6" />
+      {/* Lado izquierdo: Nombre + Descripción */}
+      <div className="flex flex-col flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <Truck
+            className={`w-5 h-5 flex-shrink-0 ${
+              isSelected ? "text-indigo-600" : "text-gray-500"
+            }`}
+          />
+          <h4 className="font-semibold text-gray-800 truncate text-sm sm:text-base">
+            {company.name}
+          </h4>
         </div>
-      )}
-      <div className="flex items-center space-x-2 sm:space-x-3 mb-1 sm:mb-2">
-        <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500" />
-        <span className="font-bold text-base sm:text-lg text-gray-800">
-          {company.name}
-        </span>
+
+        <div className="flex items-center gap-1 mt-1 text-xs sm:text-sm text-gray-500">
+          <span className="truncate">
+            {company.price !== null
+              ? company.priceMessage
+              : "Zona no cubierta o fuera de horario"}
+          </span>
+        </div>
       </div>
-      <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-500">
-        <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-        <span>{company.phone || "No especificado"}</span>
+
+      {/* Lado derecho: Precio o Estado */}
+      <div className="flex items-center gap-2 sm:ml-3 flex-shrink-0">
+        {company.price !== null ? (
+          <span
+            className={`font-semibold text-sm sm:text-base ${
+              isSelected ? "text-indigo-700" : "text-green-600"
+            }`}
+          >
+            {formatPrice(company.price)}
+          </span>
+        ) : (
+          <span className="text-red-600 text-xs sm:text-sm font-medium">
+            {company.priceMessage?.includes("Horario")
+              ? "Fuera de horario"
+              : "No disponible"}
+          </span>
+        )}
+        {isSelected && (
+          <CircleCheck className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+        )}
       </div>
     </button>
   );

@@ -44,6 +44,9 @@ interface Product {
   imageUrl: string | null;
   seccionId: string;
   optionGroups: OptionGroup[];
+  acceptsCash: boolean;
+  acceptsTransfer: boolean;
+  acceptsQr: boolean;
 }
 
 interface Section {

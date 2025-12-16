@@ -2,10 +2,17 @@
 import React from "react";
 import { formatPrice } from "@/features/common/utils/formatPrice";
 
+interface PaymentBreakdown {
+  cash: number;
+  transfer: number;
+  qr: number;
+  delivery: number | null | undefined;
+  total: number;
+}
+
 interface Props {
-  subtotal: number;
-  deliveryPrice: number | undefined;
-  isPriceLoading: boolean;
+  paymentBreakdown: PaymentBreakdown;
+
   isDelivery: boolean;
   priceZoneMessage?: string;
   orderNote: string;
@@ -13,70 +20,88 @@ interface Props {
 }
 
 export default function OrderSummary({
-  subtotal,
-  deliveryPrice,
-  isPriceLoading,
+  paymentBreakdown,
   isDelivery,
   priceZoneMessage,
   orderNote,
   setOrderNote,
 }: Props) {
 
+  const { cash, transfer, qr, delivery, total } = paymentBreakdown;
+
   return (
     <>
-      <div className="mt-6 p-4 rounded-xl border border-gray-200 bg-white shadow-sm">
-        <h3 className="text-base sm:text-lg font-semibold mb-3 text-gray-800">
-          Resumen de la Orden
+      {/* 🧾 Resumen de la orden */}
+      <div className="mt-6 p-4 sm:p-6 rounded-xl border border-gray-200 bg-white shadow-sm">
+        <h3 className="text-base sm:text-lg font-semibold mb-4 text-gray-800">
+          Resumen del Pago
         </h3>
 
         <div className="space-y-2 text-sm sm:text-base">
-          <div className="flex justify-between text-gray-700">
-            <span>Subtotal</span>
-            <span className="font-medium">{formatPrice(subtotal -(deliveryPrice ?? 0))}</span>
-          </div>
 
-          {isDelivery && (
-            <>
-              <div className="flex justify-between text-gray-700">
-                <span>Costo de envío</span>
-                <span className="font-medium">
-                  {isPriceLoading
-                    ? "Calculando..."
-                    : deliveryPrice !== undefined
-                    ? formatPrice(deliveryPrice)
-                    : "N/A"}
-                </span>
-              </div>
-
-              {deliveryPrice === undefined && !isPriceLoading && priceZoneMessage && (
-                <p className="mt-1 text-xs sm:text-sm text-red-600 font-semibold">
-                  {priceZoneMessage}
-                </p>
-              )}
-
-              <p className="mt-2 text-xs sm:text-sm text-gray-500 italic">
-                El costo de envío es un <strong>precio base</strong> y puede variar si el pedido excede las condiciones estándar (peso, tamaño, etc.).
-              </p>
-            </>
+          {/* 💵 Pago en efectivo */}
+          {cash > 0 && (
+            <div className="flex justify-between text-gray-700">
+              <span>Pagás en efectivo</span>
+              <span className="font-medium">{formatPrice(cash)}</span>
+            </div>
           )}
 
-          <div className="flex justify-between font-bold text-lg sm:text-xl mt-3 pt-3 border-t border-gray-200">
+          {/* 🏦 Transferencia */}
+          {transfer > 0 && (
+            <div className="flex justify-between text-gray-700">
+              <span>Pagás por transferencia</span>
+              <span className="font-medium">{formatPrice(transfer)}</span>
+            </div>
+          )}
+
+          {/* 📱 QR */}
+          {qr > 0 && (
+            <div className="flex justify-between text-gray-700">
+              <span>Pagás por QR</span>
+              <span className="font-medium">{formatPrice(qr)}</span>
+            </div>
+          )}
+        
+          {/* 🛵 Delivery */}
+          {isDelivery && delivery && (
+            <div className="flex justify-between text-gray-700">
+              <span>Pagás al cadete</span>
+              <span className="font-medium">
+                {delivery ? formatPrice(delivery) : "A confirmar"}
+              </span>
+            </div>
+          )}
+
+          {isDelivery && delivery === 0 && priceZoneMessage && (
+            <p className="mt-1 text-xs sm:text-sm text-red-600 font-semibold">
+              {priceZoneMessage}
+            </p>
+          )}
+
+          {/* TOTAL */}
+          <div className="flex justify-between font-bold text-lg sm:text-xl mt-4 pt-3 border-t border-gray-200">
             <span>Total</span>
-            <span>{formatPrice(subtotal)}</span>
+            <span>{formatPrice(total)}</span>
           </div>
         </div>
       </div>
 
+      {/* 📝 Notas del pedido */}
       <div className="mt-6">
-        <label htmlFor="notes" className="block font-medium mb-2 text-gray-700 text-sm sm:text-base">
+        <label
+          htmlFor="notes"
+          className="block font-medium mb-2 text-gray-700 text-sm sm:text-base"
+        >
           Notas adicionales para tu pedido
         </label>
         <textarea
           id="notes"
+          aria-label="Notas adicionales para el pedido"
           value={orderNote}
           onChange={(e) => setOrderNote(e.target.value)}
           rows={3}
-          className="w-full border rounded-xl p-3 text-sm sm:text-base focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50"
+          className="w-full border rounded-xl p-3 text-sm sm:text-base focus:ring-blue-500 focus:border-blue-500 bg-gray-50 resize-none transition-colors"
           placeholder="Ej: Sin cebolla, con extra de salsa..."
         />
       </div>

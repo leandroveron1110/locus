@@ -1,15 +1,46 @@
-// src/features/orders/hooks/useCreateOrder.ts
-import { useQuery } from "@tanstack/react-query";
-import { fetchCompanyDelivery } from "../api/catalog-api";
-import { CompanyDelivery, } from "../types/zone";
-import { ApiError, ApiResult } from "@/types/api";
+// src/features/orders/hooks/useCompanyDelivery.ts
 
-export const useCompanyDelivery = () => {
-  return useQuery<ApiResult<CompanyDelivery[]>, ApiError>({
-    queryKey: ["campany-delivery"],
-    queryFn: () => fetchCompanyDelivery(),
-    refetchOnWindowFocus: false, // ❌ no refetch al cambiar de pestaña
-    refetchOnReconnect: false, // ❌ no refetch al reconectarse
-    staleTime: 1000 * 60 * 60, // ✅ los datos se consideran "frescos" por 1 hora
+import { useQuery } from "@tanstack/react-query";
+// Importar la nueva interfaz
+import { CompanyDeliveryWithPrice } from "../types/zone";
+import { apiPost } from "@/lib/apiFetch";
+import { handleApiError } from "@/features/common/utils/handleApiError";
+
+export const useCompanyDelivery = (lat: number | undefined, lng: number | undefined) => {
+  return useQuery<CompanyDeliveryWithPrice[], unknown>({
+    queryKey: ["company-delivery", lat, lng],
+    queryFn: () => fetchCompanyDelivery(lat, lng),
+    staleTime: 1000 * 60 * 60,
   });
+};
+
+export const fetchCompanyDelivery = async (
+  lat: number | undefined,
+  lng: number | undefined
+): Promise<CompanyDeliveryWithPrice[]> => {
+  try {
+    if(!lat || !lng) {
+      throw new Error(
+      "Error al obtener la lista de compañías de entrega con precios"
+    );
+    }
+    // Usamos apiPost y enviamos lat/lng en el body
+    const res = await apiPost<CompanyDeliveryWithPrice[]>(`/delivery-zones/options`, {
+      lat,
+      lng,
+    });
+    if (!res.success || !res.data) {
+      throw handleApiError(
+        res.error,
+        "Error al sincronizar las notificaciones del usuario."
+      );
+    }
+
+    return res.data;
+  } catch (error: unknown) {
+    // ... manejo de errores
+    throw new Error(
+      "Error al obtener la lista de compañías de entrega con precios"
+    );
+  }
 };
